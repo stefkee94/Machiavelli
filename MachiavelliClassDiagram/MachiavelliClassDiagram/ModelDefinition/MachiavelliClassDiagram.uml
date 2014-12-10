@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<modelStoreModel xmlns:dm0="http://schemas.microsoft.com/VisualStudio/2008/DslTools/Core" xmlns:dm1="http://schemas.microsoft.com/dsltools/Kernel" xmlns:dm2="http://schemas.microsoft.com/dsltools/Component" xmlns:dm3="http://schemas.microsoft.com/dsltools/Activity" xmlns:dm4="http://schemas.microsoft.com/dsltools/Interaction" xmlns:dm5="http://schemas.microsoft.com/dsltools/UseCase" xmlns:dm6="http://schemas.microsoft.com/dsltools/UmlModelLibrary" xmlns:dm7="http://schemas.microsoft.com/dsltools/UmlDiagrams" xmlns:dm8="http://schemas.microsoft.com/dsltools/LogicalClassDesigner"
+<modelStoreModel xmlns:dm0="http://schemas.microsoft.com/VisualStudio/2008/DslTools/Core" xmlns:dm1="http://schemas.microsoft.com/dsltools/Kernel" xmlns:dm2="http://schemas.microsoft.com/dsltools/Component" xmlns:dm3="http://schemas.microsoft.com/dsltools/UseCase" xmlns:dm4="http://schemas.microsoft.com/dsltools/Activity" xmlns:dm5="http://schemas.microsoft.com/dsltools/Interaction" xmlns:dm6="http://schemas.microsoft.com/dsltools/UmlModelLibrary" xmlns:dm7="http://schemas.microsoft.com/dsltools/UmlDiagrams" xmlns:dm8="http://schemas.microsoft.com/dsltools/LogicalClassDesigner"
   dslVersion="1.0.0.0"
   Id="09574d51-e4ca-4fac-be14-58391a225ed7"
   name="MachiavelliClassDiagram" xmlns="http://schemas.microsoft.com/dsltools/ModelStore">
@@ -28,24 +28,8 @@
     </packageHasNamedElement>
     <packageHasNamedElement>
       <class
-        Id="8f8419a5-5f69-4d58-9b36-a35beff76d98"
-        name="CharacterCard"
-        isAbstract="false"
-        isLeaf="false"
-        isActiveClass="false" />
-    </packageHasNamedElement>
-    <packageHasNamedElement>
-      <class
         Id="409159db-2fa1-4be3-b7fc-5053777126d9"
         name="BuildingCard"
-        isAbstract="false"
-        isLeaf="false"
-        isActiveClass="false" />
-    </packageHasNamedElement>
-    <packageHasNamedElement>
-      <class
-        Id="6281d815-f47b-4275-b0d3-b898c7e655d2"
-        name="Player"
         isAbstract="false"
         isLeaf="false"
         isActiveClass="false" />
@@ -57,6 +41,18 @@
         isAbstract="false"
         isLeaf="false"
         isActiveClass="false" />
+    </packageHasNamedElement>
+    <packageHasNamedElement>
+      <packageMoniker
+        Id="11d9aadf-04ce-43ef-b1da-1863dac658a6"
+        LastKnownName="Server"
+        LastKnownLocation="Package_0937.uml" />
+    </packageHasNamedElement>
+    <packageHasNamedElement>
+      <packageMoniker
+        Id="a5abec81-f170-4a97-9f5d-1ad21c24b0a3"
+        LastKnownName="Client"
+        LastKnownLocation="Package1_0937.uml" />
     </packageHasNamedElement>
   </packagedElements>
   <primitiveType

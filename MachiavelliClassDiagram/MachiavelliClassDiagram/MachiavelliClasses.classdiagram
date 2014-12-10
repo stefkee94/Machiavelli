@@ -1,28 +1,9 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<logicalClassDesignerModel xmlns:dm0="http://schemas.microsoft.com/VisualStudio/2008/DslTools/Core" xmlns:dm1="http://schemas.microsoft.com/dsltools/Kernel" xmlns:dm2="http://schemas.microsoft.com/dsltools/Component" xmlns:dm3="http://schemas.microsoft.com/dsltools/Activity" xmlns:dm4="http://schemas.microsoft.com/dsltools/Interaction" xmlns:dm5="http://schemas.microsoft.com/dsltools/UseCase" xmlns:dm6="http://schemas.microsoft.com/dsltools/UmlModelLibrary" xmlns:dm7="http://schemas.microsoft.com/dsltools/UmlDiagrams" xmlns:dm8="http://schemas.microsoft.com/dsltools/ModelStore" dslVersion="1.0.0.0" Id="a2b96d4a-61da-4ecc-a9f3-50cd139980af" name="MachiavelliClasses" linkedPackageId="2907e042-a281-4206-ae37-c8e670533fbc" xmlns="http://schemas.microsoft.com/dsltools/LogicalClassDesigner">
-  <profileInstances>
-    <packageHasProfileInstances Id="85cc3e84-2d6c-4102-9e99-9b08591386ca">
-      <profileInstance Id="07d9eed3-0f9f-403f-8453-5476b5f18f07" name="StandardProfileL2">
-        <elementDefinition Id="e34d544e-0fea-4ed6-ac5e-1b74119ac791" />
-      </profileInstance>
-      <elementDefinition Id="0caec977-1f8c-4ba3-a7db-8cc9ad9cc73b" />
-    </packageHasProfileInstances>
-    <packageHasProfileInstances Id="f9f3f09c-181c-489f-804c-90056cc35082">
-      <profileInstance Id="7966b21f-2d54-408a-a18e-1ebc02ec67c3" name="StandardProfileL3">
-        <elementDefinition Id="532ea607-fb19-44b8-8502-3351b05452be" />
-      </profileInstance>
-      <elementDefinition Id="29349502-908c-4fda-9054-c48619c59ed0" />
-    </packageHasProfileInstances>
-  </profileInstances>
+<logicalClassDesignerModel xmlns:dm0="http://schemas.microsoft.com/VisualStudio/2008/DslTools/Core" xmlns:dm1="http://schemas.microsoft.com/dsltools/Kernel" xmlns:dm2="http://schemas.microsoft.com/dsltools/Component" xmlns:dm3="http://schemas.microsoft.com/dsltools/UseCase" xmlns:dm4="http://schemas.microsoft.com/dsltools/Activity" xmlns:dm5="http://schemas.microsoft.com/dsltools/Interaction" xmlns:dm6="http://schemas.microsoft.com/dsltools/UmlModelLibrary" xmlns:dm7="http://schemas.microsoft.com/dsltools/UmlDiagrams" xmlns:dm8="http://schemas.microsoft.com/dsltools/ModelStore" dslVersion="1.0.0.0" Id="a2b96d4a-61da-4ecc-a9f3-50cd139980af" name="MachiavelliClasses" linkedPackageId="2907e042-a281-4206-ae37-c8e670533fbc" xmlns="http://schemas.microsoft.com/dsltools/LogicalClassDesigner">
   <packagedElements>
     <logicalClassDesignerModelHasTypes>
       <class Id="db4067b6-53c2-4c34-b1a3-4db35b2996cf" name="CardStack" isAbstract="false" isLeaf="false" isActiveClass="false">
         <elementDefinition Id="7e0ec9c2-426d-4501-97ac-5ea9d8c10353" />
-      </class>
-    </logicalClassDesignerModelHasTypes>
-    <logicalClassDesignerModelHasTypes>
-      <class Id="753a3518-bcbb-4c99-87de-2d95fad86255" name="CharacterCard" isAbstract="false" isLeaf="false" isActiveClass="false">
-        <elementDefinition Id="8f8419a5-5f69-4d58-9b36-a35beff76d98" />
       </class>
     </logicalClassDesignerModelHasTypes>
     <logicalClassDesignerModelHasTypes>
@@ -31,17 +12,81 @@
       </class>
     </logicalClassDesignerModelHasTypes>
     <logicalClassDesignerModelHasTypes>
-      <class Id="8f867a29-d3b7-43fb-a233-078c83edc730" name="Player" isAbstract="false" isLeaf="false" isActiveClass="false">
-        <elementDefinition Id="6281d815-f47b-4275-b0d3-b898c7e655d2" />
-      </class>
-    </logicalClassDesignerModelHasTypes>
-    <logicalClassDesignerModelHasTypes>
       <class Id="5d7b1927-c5d3-4a29-98cc-8b0f6e5dcf06" name="Card" isAbstract="false" isLeaf="false" isActiveClass="false">
         <elementDefinition Id="ba3c65c7-a199-4f46-a7e1-be0cf473b9bc" />
       </class>
     </logicalClassDesignerModelHasTypes>
+    <logicalClassDesignerModelHasPackages>
+      <package Id="400d7280-653d-4ec7-aa32-ee7d5331515e" name="Server">
+        <elementDefinition Id="11d9aadf-04ce-43ef-b1da-1863dac658a6" />
+        <packagedElements>
+          <packageHasNamedElement>
+            <class Id="542e858d-b593-4d5d-9621-39ed2305a71b" name="ServerController" isAbstract="false" isLeaf="false" isActiveClass="false">
+              <elementDefinition Id="194660bf-728f-4ee1-849f-75063ee12d6b" />
+            </class>
+          </packageHasNamedElement>
+          <packageHasNamedElement>
+            <class Id="8f867a29-d3b7-43fb-a233-078c83edc730" name="Player" isAbstract="false" isLeaf="false" isActiveClass="false">
+              <elementDefinition Id="6281d815-f47b-4275-b0d3-b898c7e655d2" />
+              <targetEnds>
+                <association Id="6ac4d3b3-faed-4f2e-8312-e0d3068ff981" isDerived="false" sourceEndRoleName="Player" targetEndRoleName="CharacterCard" isLeaf="false" isAbstract="false">
+                  <classMoniker Id="753a3518-bcbb-4c99-87de-2d95fad86255" LastKnownName="CharacterCard" />
+                  <relationshipOwnedElementsInternal>
+                    <associationHasOwnedEnds>
+                      <memberEnd Id="e1778b8c-f407-4336-8ff9-b431da865fb2" name="Player" isLeaf="false" isStatic="false" isReadOnly="false" isDerived="false" isDerivedUnion="false" aggregation="None" isComposite="false" isNavigableOwned="false">
+                        <elementDefinition Id="788629ec-1fbe-4298-9d7f-09e4ca56b92b" />
+                      </memberEnd>
+                    </associationHasOwnedEnds>
+                    <associationHasOwnedEnds>
+                      <memberEnd Id="5bd89aed-ec47-41ff-b6b1-e2ca3e060477" name="CharacterCard" isLeaf="false" isStatic="false" isReadOnly="false" isDerived="false" isDerivedUnion="false" aggregation="None" isComposite="false">
+                        <lowerValueInternal>
+                          <literalString Id="746355c8-200c-4ed7-ad72-1ed0ca6b5b73" name="Lower" value="1">
+                            <elementDefinition Id="05a65436-ec6d-47ac-9061-b2fa025c1c83" />
+                          </literalString>
+                        </lowerValueInternal>
+                        <upperValueInternal>
+                          <literalString Id="f3d42fa0-2d35-47bc-b233-33360aed7a77" name="Upper" value="*">
+                            <elementDefinition Id="f1910035-4e9f-44fb-b98f-843be80ed083" />
+                          </literalString>
+                        </upperValueInternal>
+                        <elementDefinition Id="166ca0d1-a621-4e7d-ae24-0f3df591e6ed" />
+                      </memberEnd>
+                    </associationHasOwnedEnds>
+                  </relationshipOwnedElementsInternal>
+                  <elementDefinition Id="8598a2fb-5f68-4342-a1e2-1e1394869f16" />
+                </association>
+              </targetEnds>
+            </class>
+          </packageHasNamedElement>
+          <packageHasNamedElement>
+            <class Id="753a3518-bcbb-4c99-87de-2d95fad86255" name="CharacterCard" isAbstract="false" isLeaf="false" isActiveClass="false">
+              <elementDefinition Id="8f8419a5-5f69-4d58-9b36-a35beff76d98" />
+            </class>
+          </packageHasNamedElement>
+        </packagedElements>
+      </package>
+    </logicalClassDesignerModelHasPackages>
+    <logicalClassDesignerModelHasPackages>
+      <package Id="ba52df52-0b2c-4522-bf1a-a1d8ede4a406" name="Client">
+        <elementDefinition Id="a5abec81-f170-4a97-9f5d-1ad21c24b0a3" />
+      </package>
+    </logicalClassDesignerModelHasPackages>
   </packagedElements>
   <package Id="2907e042-a281-4206-ae37-c8e670533fbc" name="MachiavelliClassDiagram">
     <elementDefinition Id="09574d51-e4ca-4fac-be14-58391a225ed7" />
+    <profileInstances>
+      <packageHasProfileInstances Id="85cc3e84-2d6c-4102-9e99-9b08591386ca">
+        <profileInstance Id="07d9eed3-0f9f-403f-8453-5476b5f18f07" name="StandardProfileL2">
+          <elementDefinition Id="e34d544e-0fea-4ed6-ac5e-1b74119ac791" />
+        </profileInstance>
+        <elementDefinition Id="0caec977-1f8c-4ba3-a7db-8cc9ad9cc73b" />
+      </packageHasProfileInstances>
+      <packageHasProfileInstances Id="f9f3f09c-181c-489f-804c-90056cc35082">
+        <profileInstance Id="7966b21f-2d54-408a-a18e-1ebc02ec67c3" name="StandardProfileL3">
+          <elementDefinition Id="532ea607-fb19-44b8-8502-3351b05452be" />
+        </profileInstance>
+        <elementDefinition Id="29349502-908c-4fda-9054-c48619c59ed0" />
+      </packageHasProfileInstances>
+    </profileInstances>
   </package>
 </logicalClassDesignerModel>
