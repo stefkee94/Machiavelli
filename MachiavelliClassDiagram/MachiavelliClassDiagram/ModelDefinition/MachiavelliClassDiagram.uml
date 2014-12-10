@@ -20,22 +20,6 @@
   <packagedElements>
     <packageHasNamedElement>
       <class
-        Id="7e0ec9c2-426d-4501-97ac-5ea9d8c10353"
-        name="CardStack"
-        isAbstract="false"
-        isLeaf="false"
-        isActiveClass="false" />
-    </packageHasNamedElement>
-    <packageHasNamedElement>
-      <class
-        Id="409159db-2fa1-4be3-b7fc-5053777126d9"
-        name="BuildingCard"
-        isAbstract="false"
-        isLeaf="false"
-        isActiveClass="false" />
-    </packageHasNamedElement>
-    <packageHasNamedElement>
-      <class
         Id="ba3c65c7-a199-4f46-a7e1-be0cf473b9bc"
         name="Card"
         isAbstract="false"

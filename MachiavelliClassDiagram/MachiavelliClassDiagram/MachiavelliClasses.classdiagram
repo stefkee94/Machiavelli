@@ -1,44 +1,57 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <logicalClassDesignerModel xmlns:dm0="http://schemas.microsoft.com/VisualStudio/2008/DslTools/Core" xmlns:dm1="http://schemas.microsoft.com/dsltools/Kernel" xmlns:dm2="http://schemas.microsoft.com/dsltools/Component" xmlns:dm3="http://schemas.microsoft.com/dsltools/UseCase" xmlns:dm4="http://schemas.microsoft.com/dsltools/Activity" xmlns:dm5="http://schemas.microsoft.com/dsltools/Interaction" xmlns:dm6="http://schemas.microsoft.com/dsltools/UmlModelLibrary" xmlns:dm7="http://schemas.microsoft.com/dsltools/UmlDiagrams" xmlns:dm8="http://schemas.microsoft.com/dsltools/ModelStore" dslVersion="1.0.0.0" Id="a2b96d4a-61da-4ecc-a9f3-50cd139980af" name="MachiavelliClasses" linkedPackageId="2907e042-a281-4206-ae37-c8e670533fbc" xmlns="http://schemas.microsoft.com/dsltools/LogicalClassDesigner">
   <packagedElements>
-    <logicalClassDesignerModelHasTypes>
-      <class Id="db4067b6-53c2-4c34-b1a3-4db35b2996cf" name="CardStack" isAbstract="false" isLeaf="false" isActiveClass="false">
-        <elementDefinition Id="7e0ec9c2-426d-4501-97ac-5ea9d8c10353" />
-      </class>
-    </logicalClassDesignerModelHasTypes>
-    <logicalClassDesignerModelHasTypes>
-      <class Id="307dc9d2-89cb-4340-b04b-9dacaf4b26f6" name="BuildingCard" isAbstract="false" isLeaf="false" isActiveClass="false">
-        <elementDefinition Id="409159db-2fa1-4be3-b7fc-5053777126d9" />
-      </class>
-    </logicalClassDesignerModelHasTypes>
-    <logicalClassDesignerModelHasTypes>
-      <class Id="5d7b1927-c5d3-4a29-98cc-8b0f6e5dcf06" name="Card" isAbstract="false" isLeaf="false" isActiveClass="false">
-        <elementDefinition Id="ba3c65c7-a199-4f46-a7e1-be0cf473b9bc" />
-      </class>
-    </logicalClassDesignerModelHasTypes>
     <logicalClassDesignerModelHasPackages>
       <package Id="400d7280-653d-4ec7-aa32-ee7d5331515e" name="Server">
         <elementDefinition Id="11d9aadf-04ce-43ef-b1da-1863dac658a6" />
         <packagedElements>
           <packageHasNamedElement>
-            <class Id="542e858d-b593-4d5d-9621-39ed2305a71b" name="ServerController" isAbstract="false" isLeaf="false" isActiveClass="false">
+            <class Id="542e858d-b593-4d5d-9621-39ed2305a71b" name="GameController" isAbstract="false" isLeaf="false" isActiveClass="false">
               <elementDefinition Id="194660bf-728f-4ee1-849f-75063ee12d6b" />
+              <targetEnds>
+                <association Id="440f41b4-6606-4a72-b51c-863ba217933e" isDerived="false" sourceEndRoleName="" targetEndRoleName="" isLeaf="false" isAbstract="false">
+                  <classMoniker Id="db4067b6-53c2-4c34-b1a3-4db35b2996cf" LastKnownName="CardStack" />
+                  <relationshipOwnedElementsInternal>
+                    <associationHasOwnedEnds>
+                      <memberEnd Id="cb55cf91-40a1-4743-bc8e-b644a3abe5d4" isLeaf="false" isStatic="false" isReadOnly="false" isDerived="false" isDerivedUnion="false" aggregation="None" isComposite="false" isNavigableOwned="false">
+                        <elementDefinition Id="a74c6db7-a3d7-434f-90d7-4426811875ea" />
+                      </memberEnd>
+                    </associationHasOwnedEnds>
+                    <associationHasOwnedEnds>
+                      <memberEnd Id="23293246-b68c-4a80-8c63-750410a5f1a8" isLeaf="false" isStatic="false" isReadOnly="false" isDerived="false" isDerivedUnion="false" aggregation="None" isComposite="false">
+                        <lowerValueInternal>
+                          <literalString Id="61db7f03-b021-4a60-9ac2-4637aa3b2551" name="Lower" value="2">
+                            <elementDefinition Id="1dea27af-355d-4446-ada1-3184383ef947" />
+                          </literalString>
+                        </lowerValueInternal>
+                        <upperValueInternal>
+                          <literalString Id="fc7bc19a-3af1-43ee-8cf2-9e19cdbc5357" name="Upper" value="2">
+                            <elementDefinition Id="a13c05ee-5435-4d93-8149-f647451d51fd" />
+                          </literalString>
+                        </upperValueInternal>
+                        <elementDefinition Id="8695a21c-fe8a-4814-b33e-1d0a525c71eb" />
+                      </memberEnd>
+                    </associationHasOwnedEnds>
+                  </relationshipOwnedElementsInternal>
+                  <elementDefinition Id="f64198b3-69f3-46c5-8403-81ed10e51aef" />
+                </association>
+              </targetEnds>
             </class>
           </packageHasNamedElement>
           <packageHasNamedElement>
             <class Id="8f867a29-d3b7-43fb-a233-078c83edc730" name="Player" isAbstract="false" isLeaf="false" isActiveClass="false">
               <elementDefinition Id="6281d815-f47b-4275-b0d3-b898c7e655d2" />
               <targetEnds>
-                <association Id="6ac4d3b3-faed-4f2e-8312-e0d3068ff981" isDerived="false" sourceEndRoleName="Player" targetEndRoleName="CharacterCard" isLeaf="false" isAbstract="false">
+                <association Id="6ac4d3b3-faed-4f2e-8312-e0d3068ff981" isDerived="false" sourceEndRoleName="" targetEndRoleName="" isLeaf="false" isAbstract="false">
                   <classMoniker Id="753a3518-bcbb-4c99-87de-2d95fad86255" LastKnownName="CharacterCard" />
                   <relationshipOwnedElementsInternal>
                     <associationHasOwnedEnds>
-                      <memberEnd Id="e1778b8c-f407-4336-8ff9-b431da865fb2" name="Player" isLeaf="false" isStatic="false" isReadOnly="false" isDerived="false" isDerivedUnion="false" aggregation="None" isComposite="false" isNavigableOwned="false">
+                      <memberEnd Id="e1778b8c-f407-4336-8ff9-b431da865fb2" isLeaf="false" isStatic="false" isReadOnly="false" isDerived="false" isDerivedUnion="false" aggregation="None" isComposite="false" isNavigableOwned="false">
                         <elementDefinition Id="788629ec-1fbe-4298-9d7f-09e4ca56b92b" />
                       </memberEnd>
                     </associationHasOwnedEnds>
                     <associationHasOwnedEnds>
-                      <memberEnd Id="5bd89aed-ec47-41ff-b6b1-e2ca3e060477" name="CharacterCard" isLeaf="false" isStatic="false" isReadOnly="false" isDerived="false" isDerivedUnion="false" aggregation="None" isComposite="false">
+                      <memberEnd Id="5bd89aed-ec47-41ff-b6b1-e2ca3e060477" isLeaf="false" isStatic="false" isReadOnly="false" isDerived="false" isDerivedUnion="false" aggregation="None" isComposite="false">
                         <lowerValueInternal>
                           <literalString Id="746355c8-200c-4ed7-ad72-1ed0ca6b5b73" name="Lower" value="1">
                             <elementDefinition Id="05a65436-ec6d-47ac-9061-b2fa025c1c83" />
@@ -55,13 +68,203 @@
                   </relationshipOwnedElementsInternal>
                   <elementDefinition Id="8598a2fb-5f68-4342-a1e2-1e1394869f16" />
                 </association>
+                <association Id="6a25c7d7-a381-474c-909a-736e20185f91" isDerived="false" sourceEndRoleName="" targetEndRoleName="" isLeaf="false" isAbstract="false">
+                  <classMoniker Id="307dc9d2-89cb-4340-b04b-9dacaf4b26f6" LastKnownName="BuildingCard" />
+                  <relationshipOwnedElementsInternal>
+                    <associationHasOwnedEnds>
+                      <memberEnd Id="55f7c400-3208-4da3-bf45-56043b2831d8" isLeaf="false" isStatic="false" isReadOnly="false" isDerived="false" isDerivedUnion="false" aggregation="None" isComposite="false" isNavigableOwned="false">
+                        <elementDefinition Id="e2591728-a80e-4593-a104-453993ac2865" />
+                      </memberEnd>
+                    </associationHasOwnedEnds>
+                    <associationHasOwnedEnds>
+                      <memberEnd Id="a84c5cf5-391b-4709-aca6-0a666c5dfa1e" isLeaf="false" isStatic="false" isReadOnly="false" isDerived="false" isDerivedUnion="false" aggregation="None" isComposite="false">
+                        <lowerValueInternal>
+                          <literalString Id="e730d6c8-8b21-4044-8397-a59bef805172" name="Lower" value="0">
+                            <elementDefinition Id="b4608140-fb63-417a-8a11-397cd8423502" />
+                          </literalString>
+                        </lowerValueInternal>
+                        <upperValueInternal>
+                          <literalString Id="6c81ef4e-9de3-45aa-8e04-3fa94dd4d1c5" name="Upper" value="*">
+                            <elementDefinition Id="afe3ceb7-4568-4f61-a12b-33173497671f" />
+                          </literalString>
+                        </upperValueInternal>
+                        <elementDefinition Id="7202a189-e26c-45b6-9d35-e2a562407eb5" />
+                      </memberEnd>
+                    </associationHasOwnedEnds>
+                  </relationshipOwnedElementsInternal>
+                  <elementDefinition Id="a0084049-aa38-444c-84c7-d7a69ddf875e" />
+                </association>
+                <association Id="fe5da939-9bd1-4555-adf9-cc35ad02c686" isDerived="false" sourceEndRoleName="" targetEndRoleName="" isLeaf="false" isAbstract="false">
+                  <classMoniker Id="542e858d-b593-4d5d-9621-39ed2305a71b" LastKnownName="GameController" />
+                  <relationshipOwnedElementsInternal>
+                    <associationHasOwnedEnds>
+                      <memberEnd Id="ba4ba428-2240-4a22-be84-d720e68f11e0" isLeaf="false" isStatic="false" isReadOnly="false" isDerived="false" isDerivedUnion="false" aggregation="None" isComposite="false" isNavigableOwned="false">
+                        <elementDefinition Id="f248e2d3-76b4-49a9-947f-c108f9981fe8" />
+                      </memberEnd>
+                    </associationHasOwnedEnds>
+                    <associationHasOwnedEnds>
+                      <memberEnd Id="1c5da44a-a9f8-48cb-ae2c-5b792b7b642a" isLeaf="false" isStatic="false" isReadOnly="false" isDerived="false" isDerivedUnion="false" aggregation="None" isComposite="false">
+                        <elementDefinition Id="931512cf-55e5-4626-a495-f29ae9a46a88" />
+                      </memberEnd>
+                    </associationHasOwnedEnds>
+                  </relationshipOwnedElementsInternal>
+                  <elementDefinition Id="5ae080d3-d2cb-41ac-bb68-eaf78e6420ef" />
+                </association>
               </targetEnds>
             </class>
           </packageHasNamedElement>
           <packageHasNamedElement>
             <class Id="753a3518-bcbb-4c99-87de-2d95fad86255" name="CharacterCard" isAbstract="false" isLeaf="false" isActiveClass="false">
               <elementDefinition Id="8f8419a5-5f69-4d58-9b36-a35beff76d98" />
+              <targetEnds>
+                <association Id="e26151e8-f525-4e00-a992-0d68ce8e31e4" isDerived="false" sourceEndRoleName="" targetEndRoleName="" isLeaf="false" isAbstract="false">
+                  <classMoniker Id="db4067b6-53c2-4c34-b1a3-4db35b2996cf" LastKnownName="CardStack" />
+                  <relationshipOwnedElementsInternal>
+                    <associationHasOwnedEnds>
+                      <memberEnd Id="8c9bc961-7a99-4439-b6fd-1a47cb8fe870" isLeaf="false" isStatic="false" isReadOnly="false" isDerived="false" isDerivedUnion="false" aggregation="None" isComposite="false" isNavigableOwned="false">
+                        <elementDefinition Id="fd3f0dde-1ef1-4337-8f75-3189155e6b01" />
+                      </memberEnd>
+                    </associationHasOwnedEnds>
+                    <associationHasOwnedEnds>
+                      <memberEnd Id="ea1ac140-0182-4173-9d90-7bd2f557ce2a" isLeaf="false" isStatic="false" isReadOnly="false" isDerived="false" isDerivedUnion="false" aggregation="None" isComposite="false">
+                        <elementDefinition Id="9e025ad4-9498-45d8-a305-ac0a6fbe252b" />
+                      </memberEnd>
+                    </associationHasOwnedEnds>
+                  </relationshipOwnedElementsInternal>
+                  <elementDefinition Id="d7d7535f-bd9a-4fed-9fcb-252db4afe265" />
+                </association>
+                <association Id="6c62e058-6627-4e0d-83f8-d5acbf695e00" isDerived="false" sourceEndRoleName="" targetEndRoleName="" isLeaf="false" isAbstract="false">
+                  <enumerationMoniker Id="31e79cf8-4dde-4e7f-88cc-a3ecad641c3f" LastKnownName="CharacterType" />
+                  <relationshipOwnedElementsInternal>
+                    <associationHasOwnedEnds>
+                      <memberEnd Id="7ec7be9a-849a-4a4e-9709-380e65d9e9b5" isLeaf="false" isStatic="false" isReadOnly="false" isDerived="false" isDerivedUnion="false" aggregation="None" isComposite="false" isNavigableOwned="false">
+                        <elementDefinition Id="fb8e41c9-b8b4-4fae-ada9-8a34c061e879" />
+                      </memberEnd>
+                    </associationHasOwnedEnds>
+                    <associationHasOwnedEnds>
+                      <memberEnd Id="2f69155d-bb02-43b7-b230-92ca9ef4f0b8" isLeaf="false" isStatic="false" isReadOnly="false" isDerived="false" isDerivedUnion="false" aggregation="None" isComposite="false">
+                        <elementDefinition Id="92dc90e6-5fc1-4a9f-b60f-88b69b2eaab6" />
+                      </memberEnd>
+                    </associationHasOwnedEnds>
+                  </relationshipOwnedElementsInternal>
+                  <elementDefinition Id="c37ea3a4-7eb1-40a6-af57-db6a974e4e7c" />
+                </association>
+              </targetEnds>
             </class>
+          </packageHasNamedElement>
+          <packageHasNamedElement>
+            <class Id="307dc9d2-89cb-4340-b04b-9dacaf4b26f6" name="BuildingCard" isAbstract="false" isLeaf="false" isActiveClass="false">
+              <elementDefinition Id="409159db-2fa1-4be3-b7fc-5053777126d9" />
+              <targetEnds>
+                <association Id="0e89d448-e456-413b-b661-c9bebdec1fee" isDerived="false" sourceEndRoleName="" targetEndRoleName="" isLeaf="false" isAbstract="false">
+                  <classMoniker Id="db4067b6-53c2-4c34-b1a3-4db35b2996cf" LastKnownName="CardStack" />
+                  <relationshipOwnedElementsInternal>
+                    <associationHasOwnedEnds>
+                      <memberEnd Id="e1b0eb20-d935-4ce0-bab9-cf7b015c625b" isLeaf="false" isStatic="false" isReadOnly="false" isDerived="false" isDerivedUnion="false" aggregation="None" isComposite="false" isNavigableOwned="false">
+                        <elementDefinition Id="6b2ebd32-e97b-4256-a48e-fb346a026446" />
+                      </memberEnd>
+                    </associationHasOwnedEnds>
+                    <associationHasOwnedEnds>
+                      <memberEnd Id="a806fa3f-73ff-4abf-bb61-e2add59b60cd" isLeaf="false" isStatic="false" isReadOnly="false" isDerived="false" isDerivedUnion="false" aggregation="None" isComposite="false">
+                        <elementDefinition Id="2cc61052-b2b9-4a43-bebd-bad7a24e6d4f" />
+                      </memberEnd>
+                    </associationHasOwnedEnds>
+                  </relationshipOwnedElementsInternal>
+                  <elementDefinition Id="5d025a0a-4cd0-4736-8d3a-e0dddf947722" />
+                </association>
+                <association Id="08950902-a2a2-4331-9fe4-c71832a15bd0" isDerived="false" sourceEndRoleName="" targetEndRoleName="" isLeaf="false" isAbstract="false">
+                  <enumerationMoniker Id="a001396b-f275-4f94-98ff-1299b3d33d4d" LastKnownName="CardColor" />
+                  <relationshipOwnedElementsInternal>
+                    <associationHasOwnedEnds>
+                      <memberEnd Id="b7b8b4d8-449a-494b-86d8-b18650e14274" isLeaf="false" isStatic="false" isReadOnly="false" isDerived="false" isDerivedUnion="false" aggregation="None" isComposite="false" isNavigableOwned="false">
+                        <elementDefinition Id="7048896a-7a06-49ce-a3bf-a5990bb68de7" />
+                      </memberEnd>
+                    </associationHasOwnedEnds>
+                    <associationHasOwnedEnds>
+                      <memberEnd Id="340fee57-7cfb-4f3a-9e24-d3f57c306033" isLeaf="false" isStatic="false" isReadOnly="false" isDerived="false" isDerivedUnion="false" aggregation="None" isComposite="false">
+                        <elementDefinition Id="d76a0858-6ebd-47c2-81ed-a6289cd2b6ae" />
+                      </memberEnd>
+                    </associationHasOwnedEnds>
+                  </relationshipOwnedElementsInternal>
+                  <elementDefinition Id="c7481bfb-a5df-43b6-8cd6-dfa41741a7e2" />
+                </association>
+              </targetEnds>
+            </class>
+          </packageHasNamedElement>
+          <packageHasNamedElement>
+            <class Id="a60406c9-92dc-42bd-82e1-41a0b1119a87" name="SpecialCard" isAbstract="false" isLeaf="false" isActiveClass="false">
+              <elementDefinition Id="48e5ee9b-ebee-4546-820d-1d78c5e467a9" />
+              <generalsInternal>
+                <generalization Id="673f01bd-aa32-4c34-ad0e-e823bf8e35f3" isSubstitutable="false">
+                  <classMoniker Id="307dc9d2-89cb-4340-b04b-9dacaf4b26f6" LastKnownName="BuildingCard" />
+                  <elementDefinition Id="e8a5431b-bb31-49c6-8205-49a2a508331e" />
+                </generalization>
+              </generalsInternal>
+            </class>
+          </packageHasNamedElement>
+          <packageHasNamedElement>
+            <class Id="db4067b6-53c2-4c34-b1a3-4db35b2996cf" name="CardStack" isAbstract="false" isLeaf="false" isActiveClass="false">
+              <elementDefinition Id="7e0ec9c2-426d-4501-97ac-5ea9d8c10353" />
+            </class>
+          </packageHasNamedElement>
+          <packageHasNamedElement>
+            <class Id="8ec3c2a9-f212-45f9-90da-83391bc88147" name="ServerController" isAbstract="false" isLeaf="false" isActiveClass="false">
+              <elementDefinition Id="78e6d4b8-522c-4cf5-981f-96d6eb14c5d0" />
+              <targetEnds>
+                <association Id="3aae6ecd-c1e8-4532-841a-e3eabf2b565f" isDerived="false" sourceEndRoleName="" targetEndRoleName="" isLeaf="false" isAbstract="false">
+                  <classMoniker Id="ff60d2ca-30ba-4fde-a309-fb02e96cac30" LastKnownName="ClientController" />
+                  <relationshipOwnedElementsInternal>
+                    <associationHasOwnedEnds>
+                      <memberEnd Id="eb8fe8cc-0081-4722-a4c8-cd48f45bc61d" isLeaf="false" isStatic="false" isReadOnly="false" isDerived="false" isDerivedUnion="false" aggregation="None" isComposite="false" isNavigableOwned="false">
+                        <elementDefinition Id="805da922-5271-4f6e-b9ce-ee983a11f01b" />
+                      </memberEnd>
+                    </associationHasOwnedEnds>
+                    <associationHasOwnedEnds>
+                      <memberEnd Id="df1da661-ae7d-4f44-b5ac-ebe609907b27" isLeaf="false" isStatic="false" isReadOnly="false" isDerived="false" isDerivedUnion="false" aggregation="None" isComposite="false">
+                        <lowerValueInternal>
+                          <literalString Id="adadd08a-de4b-410a-a08f-eff3cc5ed7c1" name="Lower" value="0">
+                            <elementDefinition Id="bdfef2fe-09f7-46b0-9154-22c27065d4a6" />
+                          </literalString>
+                        </lowerValueInternal>
+                        <upperValueInternal>
+                          <literalString Id="253e61f1-eef2-454d-adfa-e90a2a16c281" name="Upper" value="*">
+                            <elementDefinition Id="d82a1f94-7ae6-46ff-9ebb-18e25b5be0da" />
+                          </literalString>
+                        </upperValueInternal>
+                        <elementDefinition Id="9ae83cff-f384-4e60-a6e0-21effc084b9e" />
+                      </memberEnd>
+                    </associationHasOwnedEnds>
+                  </relationshipOwnedElementsInternal>
+                  <elementDefinition Id="27392950-a560-4e89-b8c6-fac93c2079c9" />
+                </association>
+                <association Id="8088e4af-e423-4cc2-b849-1f56ab74e5a5" isDerived="false" sourceEndRoleName="" targetEndRoleName="" isLeaf="false" isAbstract="false">
+                  <classMoniker Id="542e858d-b593-4d5d-9621-39ed2305a71b" LastKnownName="GameController" />
+                  <relationshipOwnedElementsInternal>
+                    <associationHasOwnedEnds>
+                      <memberEnd Id="25e30657-a1c1-4d11-af78-a568945c5450" isLeaf="false" isStatic="false" isReadOnly="false" isDerived="false" isDerivedUnion="false" aggregation="None" isComposite="false" isNavigableOwned="false">
+                        <elementDefinition Id="8a5f1f85-fc8d-4700-8e80-2253ddbf7c60" />
+                      </memberEnd>
+                    </associationHasOwnedEnds>
+                    <associationHasOwnedEnds>
+                      <memberEnd Id="f1a90b67-cdf3-414d-95ce-453c7b62c015" isLeaf="false" isStatic="false" isReadOnly="false" isDerived="false" isDerivedUnion="false" aggregation="None" isComposite="false">
+                        <elementDefinition Id="5b897d19-3b19-4d5a-b6cc-57f842f82599" />
+                      </memberEnd>
+                    </associationHasOwnedEnds>
+                  </relationshipOwnedElementsInternal>
+                  <elementDefinition Id="91d02d91-0bb2-4a41-809c-08511f4bf724" />
+                </association>
+              </targetEnds>
+            </class>
+          </packageHasNamedElement>
+          <packageHasNamedElement>
+            <enumeration Id="31e79cf8-4dde-4e7f-88cc-a3ecad641c3f" name="CharacterType" isAbstract="false" isLeaf="false">
+              <elementDefinition Id="40658e39-5dc3-4961-955c-f9f195ac3412" />
+            </enumeration>
+          </packageHasNamedElement>
+          <packageHasNamedElement>
+            <enumeration Id="a001396b-f275-4f94-98ff-1299b3d33d4d" name="CardColor" isAbstract="false" isLeaf="false">
+              <elementDefinition Id="93ef0dc3-bd8e-4cdb-82e2-b2ceb2300da3" />
+            </enumeration>
           </packageHasNamedElement>
         </packagedElements>
       </package>
@@ -69,6 +272,36 @@
     <logicalClassDesignerModelHasPackages>
       <package Id="ba52df52-0b2c-4522-bf1a-a1d8ede4a406" name="Client">
         <elementDefinition Id="a5abec81-f170-4a97-9f5d-1ad21c24b0a3" />
+        <packagedElements>
+          <packageHasNamedElement>
+            <class Id="ff60d2ca-30ba-4fde-a309-fb02e96cac30" name="ClientController" isAbstract="false" isLeaf="false" isActiveClass="false">
+              <elementDefinition Id="2d85ad31-3bee-4171-96ca-2156ddca732b" />
+              <targetEnds>
+                <association Id="146965f9-7a7e-4842-8b87-85987438c0ad" isDerived="false" sourceEndRoleName="" targetEndRoleName="" isLeaf="false" isAbstract="false">
+                  <classMoniker Id="9f2b9a07-3b0a-4715-8dd0-45d6a662d9e1" LastKnownName="OutputHandler" />
+                  <relationshipOwnedElementsInternal>
+                    <associationHasOwnedEnds>
+                      <memberEnd Id="fbe8d4f0-cc70-44c4-bf7b-01ce13554572" isLeaf="false" isStatic="false" isReadOnly="false" isDerived="false" isDerivedUnion="false" aggregation="None" isComposite="false" isNavigableOwned="false">
+                        <elementDefinition Id="49b34b9a-9e9e-4fbc-8fe5-3833e2da5290" />
+                      </memberEnd>
+                    </associationHasOwnedEnds>
+                    <associationHasOwnedEnds>
+                      <memberEnd Id="79941613-b4ab-4afa-8d31-e495184b3a42" isLeaf="false" isStatic="false" isReadOnly="false" isDerived="false" isDerivedUnion="false" aggregation="None" isComposite="false">
+                        <elementDefinition Id="fb8a3181-1969-4d21-bcfd-690e3726c358" />
+                      </memberEnd>
+                    </associationHasOwnedEnds>
+                  </relationshipOwnedElementsInternal>
+                  <elementDefinition Id="d08f5ea9-9d23-4af4-ab69-87cfca5add7f" />
+                </association>
+              </targetEnds>
+            </class>
+          </packageHasNamedElement>
+          <packageHasNamedElement>
+            <class Id="9f2b9a07-3b0a-4715-8dd0-45d6a662d9e1" name="OutputHandler" isAbstract="false" isLeaf="false" isActiveClass="false">
+              <elementDefinition Id="d088f621-d0bc-48f4-8b8d-2bae9785a82b" />
+            </class>
+          </packageHasNamedElement>
+        </packagedElements>
       </package>
     </logicalClassDesignerModelHasPackages>
   </packagedElements>
