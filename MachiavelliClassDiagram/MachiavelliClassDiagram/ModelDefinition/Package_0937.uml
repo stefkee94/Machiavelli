@@ -620,5 +620,55 @@
         isAbstract="false"
         isLeaf="false" />
     </packageHasNamedElement>
+    <packageHasNamedElement>
+      <class
+        Id="eecee59c-3b83-4d9d-a1ae-886f9bf892be"
+        name="MachiavelliReader"
+        isAbstract="false"
+        isLeaf="false"
+        isActiveClass="false">
+        <targetEnds>
+          <association
+            Id="fb7b48dc-81f9-4e38-8a7a-7adbdad17c74"
+            isDerived="false"
+            sourceEndRoleName="MachiavelliReader"
+            targetEndRoleName="CardStack"
+            isLeaf="false"
+            isAbstract="false">
+            <classMoniker
+              Id="7e0ec9c2-426d-4501-97ac-5ea9d8c10353"
+              LastKnownName="CardStack"
+              LastKnownLocation="Package_0937.uml" />
+            <relationshipOwnedElementsInternal>
+              <associationHasOwnedEnds>
+                <memberEnd
+                  Id="e9b21e49-300d-45cd-ab33-644d2bf68b69"
+                  name="MachiavelliReader"
+                  isLeaf="false"
+                  isStatic="false"
+                  isReadOnly="false"
+                  isDerived="false"
+                  isDerivedUnion="false"
+                  aggregation="None"
+                  isComposite="false"
+                  isNavigableOwned="false" />
+              </associationHasOwnedEnds>
+              <associationHasOwnedEnds>
+                <memberEnd
+                  Id="22fbeb04-5f20-4848-8b46-66a9942fb18c"
+                  name="CardStack"
+                  isLeaf="false"
+                  isStatic="false"
+                  isReadOnly="false"
+                  isDerived="false"
+                  isDerivedUnion="false"
+                  aggregation="None"
+                  isComposite="false" />
+              </associationHasOwnedEnds>
+            </relationshipOwnedElementsInternal>
+          </association>
+        </targetEnds>
+      </class>
+    </packageHasNamedElement>
   </packagedElements>
 </package>

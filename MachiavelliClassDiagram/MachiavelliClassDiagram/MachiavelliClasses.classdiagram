@@ -266,6 +266,29 @@
               <elementDefinition Id="93ef0dc3-bd8e-4cdb-82e2-b2ceb2300da3" />
             </enumeration>
           </packageHasNamedElement>
+          <packageHasNamedElement>
+            <class Id="712d4ecd-d372-4a45-b18f-a4e28a2fa108" name="MachiavelliReader" isAbstract="false" isLeaf="false" isActiveClass="false">
+              <elementDefinition Id="eecee59c-3b83-4d9d-a1ae-886f9bf892be" />
+              <targetEnds>
+                <association Id="7ebf57fc-72ef-46d7-bd61-db7b201c0f2c" isDerived="false" sourceEndRoleName="MachiavelliReader" targetEndRoleName="CardStack" isLeaf="false" isAbstract="false">
+                  <classMoniker Id="db4067b6-53c2-4c34-b1a3-4db35b2996cf" LastKnownName="CardStack" />
+                  <relationshipOwnedElementsInternal>
+                    <associationHasOwnedEnds>
+                      <memberEnd Id="0243583e-6a01-4780-9aed-d5e44f9fb74f" name="MachiavelliReader" isLeaf="false" isStatic="false" isReadOnly="false" isDerived="false" isDerivedUnion="false" aggregation="None" isComposite="false" isNavigableOwned="false">
+                        <elementDefinition Id="e9b21e49-300d-45cd-ab33-644d2bf68b69" />
+                      </memberEnd>
+                    </associationHasOwnedEnds>
+                    <associationHasOwnedEnds>
+                      <memberEnd Id="63b2df08-8f23-40ef-9d07-1a94d2122bac" name="CardStack" isLeaf="false" isStatic="false" isReadOnly="false" isDerived="false" isDerivedUnion="false" aggregation="None" isComposite="false">
+                        <elementDefinition Id="22fbeb04-5f20-4848-8b46-66a9942fb18c" />
+                      </memberEnd>
+                    </associationHasOwnedEnds>
+                  </relationshipOwnedElementsInternal>
+                  <elementDefinition Id="fb7b48dc-81f9-4e38-8a7a-7adbdad17c74" />
+                </association>
+              </targetEnds>
+            </class>
+          </packageHasNamedElement>
         </packagedElements>
       </package>
     </logicalClassDesignerModelHasPackages>

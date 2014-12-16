@@ -59,9 +59,6 @@
     <ClInclude Include="Socket.h">
       <Filter>Header Files\Server</Filter>
     </ClInclude>
-    <ClInclude Include="ThrowMacro.h">
-      <Filter>Header Files\Server</Filter>
-    </ClInclude>
     <ClInclude Include="Sync_Queue.h">
       <Filter>Header Files\Server</Filter>
     </ClInclude>
@@ -75,6 +72,9 @@
       <Filter>Header Files\Server</Filter>
     </ClInclude>
     <ClInclude Include="GameController.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ThrowMacro.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
