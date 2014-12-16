@@ -10,6 +10,6 @@ public:
 	GameController();
 	virtual ~GameController();
 
-	void start_client_game(std::shared_ptr<ServerController> server_controller, std::shared_ptr<Socket> new_client);
+	void handle_client_command(std::string new_command);
 };
 

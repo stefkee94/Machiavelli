@@ -5,7 +5,7 @@ static Sync_Queue<ClientCommand> client_queue;
 
 ServerController::ServerController()
 {
-	game_controller = GameController();
+	game_controller = std::shared_ptr<GameController>();
 }
 
 void ServerController::start_server()
@@ -51,12 +51,42 @@ void ServerController::handle_client(std::shared_ptr<Socket> socket)
 	client->write("Welcome to the Machiavelli Game Server");
 	client->write(prompt);
 	
-	game_controller.start_client_game(std::shared_ptr<ServerController>(this), client);
+	is_handling = true;
+
+	while (is_handling)
+	{
+		try
+		{
+			std::string command = client->read_line();
+			game_controller->handle_client_command(command);
+			std::cerr << "client (" << client->get() << ") said: " << command << "\n";
+
+			if (command == "quit")
+			{
+				client->write("LATER!");
+				break;
+			}
+
+			ClientCommand client_command = ClientCommand(command, client);
+			client_queue.put(client_command);
+		}
+		catch (const std::exception& ex)
+		{
+			std::string exception_string = std::string("ERROR: ") + ex.what() + "\n";
+			client->write(exception_string);
+		}
+		catch (...)
+		{
+			client->write("ERROR: something went wrong");
+		}
+	}
 }
 
 void ServerController::consume_command()
 {
-	while (true)
+	is_consuming = true;
+
+	while (is_consuming)
 	{
 		ClientCommand command;
 		client_queue.get(command);

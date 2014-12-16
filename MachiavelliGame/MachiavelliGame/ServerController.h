@@ -23,7 +23,10 @@ public:
 
 private:
 	bool is_server_running;
-	GameController game_controller;
+	bool is_consuming;
+	bool is_handling;
+
+	std::shared_ptr<GameController> game_controller;
 
 	// Socket info
 	const int port_number = 1080;
