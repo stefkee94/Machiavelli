@@ -25,13 +25,28 @@
     <Filter Include="Source Files\Controller">
       <UniqueIdentifier>{a2c7ddcd-6d25-4865-8548-7c2da2b4130f}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\Controller">
+      <UniqueIdentifier>{85235b15-f358-4c30-83c5-950d841fce8a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Model">
+      <UniqueIdentifier>{3bdadd87-ae98-4bf8-8435-2c6ce81d1aef}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Model">
+      <UniqueIdentifier>{1370c708-7d06-4a55-a11a-0b22666ecd80}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\I/O">
+      <UniqueIdentifier>{f069adcb-25e6-4d7d-b13f-5549b8f4ed24}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\I/O">
+      <UniqueIdentifier>{537b5093-5e73-4e01-a47a-0af16a834442}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Enums">
+      <UniqueIdentifier>{9d4650f1-bd37-458d-8555-fbfca2635908}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
       <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="ServerController.cpp">
-      <Filter>Source Files\Server</Filter>
     </ClCompile>
     <ClCompile Include="Socket.cpp">
       <Filter>Source Files\Server</Filter>
@@ -49,13 +64,28 @@
       <Filter>Source Files\Server</Filter>
     </ClCompile>
     <ClCompile Include="GameController.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>Source Files\Controller</Filter>
+    </ClCompile>
+    <ClCompile Include="ServerController.cpp">
+      <Filter>Source Files\Controller</Filter>
+    </ClCompile>
+    <ClCompile Include="Player.cpp">
+      <Filter>Source Files\Model</Filter>
+    </ClCompile>
+    <ClCompile Include="CardStack.cpp">
+      <Filter>Source Files\Model</Filter>
+    </ClCompile>
+    <ClCompile Include="MachiavelliReader.cpp">
+      <Filter>Source Files\I/O</Filter>
+    </ClCompile>
+    <ClCompile Include="CharacterCard.cpp">
+      <Filter>Source Files\Model</Filter>
+    </ClCompile>
+    <ClCompile Include="BuildingCard.cpp">
+      <Filter>Source Files\Model</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="ServerController.h">
-      <Filter>Header Files\Server</Filter>
-    </ClInclude>
     <ClInclude Include="Socket.h">
       <Filter>Header Files\Server</Filter>
     </ClInclude>
@@ -72,10 +102,34 @@
       <Filter>Header Files\Server</Filter>
     </ClInclude>
     <ClInclude Include="GameController.h">
-      <Filter>Header Files</Filter>
+      <Filter>Header Files\Controller</Filter>
+    </ClInclude>
+    <ClInclude Include="ServerController.h">
+      <Filter>Header Files\Controller</Filter>
     </ClInclude>
     <ClInclude Include="ThrowMacro.h">
-      <Filter>Header Files</Filter>
+      <Filter>Header Files\Server</Filter>
+    </ClInclude>
+    <ClInclude Include="Player.h">
+      <Filter>Header Files\Model</Filter>
+    </ClInclude>
+    <ClInclude Include="CardStack.h">
+      <Filter>Header Files\Model</Filter>
+    </ClInclude>
+    <ClInclude Include="MachiavelliReader.h">
+      <Filter>Header Files\I/O</Filter>
+    </ClInclude>
+    <ClInclude Include="CharacterType.h">
+      <Filter>Header Files\Enums</Filter>
+    </ClInclude>
+    <ClInclude Include="CardColor.h">
+      <Filter>Header Files\Enums</Filter>
+    </ClInclude>
+    <ClInclude Include="CharacterCard.h">
+      <Filter>Header Files\Model</Filter>
+    </ClInclude>
+    <ClInclude Include="BuildingCard.h">
+      <Filter>Header Files\Model</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

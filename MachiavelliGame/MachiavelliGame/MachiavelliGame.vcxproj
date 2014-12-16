@@ -78,19 +78,31 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="BuildingCard.cpp" />
+    <ClCompile Include="CardStack.cpp" />
+    <ClCompile Include="CharacterCard.cpp" />
     <ClCompile Include="ClientCommand.cpp" />
     <ClCompile Include="ClientSocket.cpp" />
     <ClCompile Include="GameController.cpp" />
+    <ClCompile Include="MachiavelliReader.cpp" />
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="Player.cpp" />
     <ClCompile Include="ServerController.cpp" />
     <ClCompile Include="ServerSocket.cpp" />
     <ClCompile Include="Socket.cpp" />
     <ClCompile Include="ThrowMacro.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="BuildingCard.h" />
+    <ClInclude Include="CardStack.h" />
+    <ClInclude Include="CharacterCard.h" />
+    <ClInclude Include="CharacterType.h" />
     <ClInclude Include="ClientCommand.h" />
     <ClInclude Include="ClientSocket.h" />
     <ClInclude Include="GameController.h" />
+    <ClInclude Include="CardColor.h" />
+    <ClInclude Include="MachiavelliReader.h" />
+    <ClInclude Include="Player.h" />
     <ClInclude Include="ServerController.h" />
     <ClInclude Include="ServerSocket.h" />
     <ClInclude Include="Socket.h" />
