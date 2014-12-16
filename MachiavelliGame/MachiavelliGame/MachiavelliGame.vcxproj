@@ -80,6 +80,7 @@
   <ItemGroup>
     <ClCompile Include="ClientCommand.cpp" />
     <ClCompile Include="ClientSocket.cpp" />
+    <ClCompile Include="GameController.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="ServerController.cpp" />
     <ClCompile Include="ServerSocket.cpp" />
@@ -89,6 +90,7 @@
   <ItemGroup>
     <ClInclude Include="ClientCommand.h" />
     <ClInclude Include="ClientSocket.h" />
+    <ClInclude Include="GameController.h" />
     <ClInclude Include="ServerController.h" />
     <ClInclude Include="ServerSocket.h" />
     <ClInclude Include="Socket.h" />
