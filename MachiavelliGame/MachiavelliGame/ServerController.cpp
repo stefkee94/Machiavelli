@@ -5,7 +5,7 @@ static Sync_Queue<ClientCommand> client_queue;
 
 ServerController::ServerController()
 {
-	
+	game_controller = GameController();
 }
 
 void ServerController::start_server()
@@ -28,8 +28,8 @@ void ServerController::start_server()
 
 			while ((socket_client = server_socket.accept()) != nullptr)
 			{
-				//std::thread handler_thread(&handle_client, socket_client);
-				//handler_thread.detach();
+				std::thread handler_thread(&ServerController::handle_client, this, socket_client);
+				handler_thread.detach();
 				std::cerr << "Server listening again" << "\n";
 			}
 		}
@@ -40,39 +40,18 @@ void ServerController::start_server()
 	}
 }
 
+void ServerController::queue_put(ClientCommand new_command)
+{
+	client_queue.put(new_command);
+}
+
 void ServerController::handle_client(std::shared_ptr<Socket> socket)
 {
 	std::shared_ptr<Socket> client = socket;
 	client->write("Welcome to the Machiavelli Game Server");
 	client->write(prompt);
 	
-	// NEXT CODE LATER IN GAMEController class -> GAME LOOP
-	while (true)
-	{
-		try
-		{
-			std::string command = client->read_line();
-			std::cerr << "client (" << client->get() << ") said: " << command << "\n";
-
-			if (command == "quit")
-			{
-				client->write("LATER!");
-				break;
-			}
-
-			ClientCommand client_command = ClientCommand(command, client);
-			client_queue.put(client_command);
-		}
-		catch (const std::exception& ex)
-		{
-			std::string exception_string = std::string("ERROR: ") + ex.what() + "\n";
-			client->write(exception_string);
-		}
-		catch (...)
-		{
-			client->write("ERROR: something went wrong");
-		}
-	}
+	game_controller.start_client_game(std::shared_ptr<ServerController>(this), client);
 }
 
 void ServerController::consume_command()
