@@ -5,7 +5,6 @@
 
 #include "ClientCommand.h"
 #include "Socket.h"
-#include "Sync_Queue.h"
 #include "GameController.h"
 
 class ServerSocket;

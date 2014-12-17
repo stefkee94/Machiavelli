@@ -1,5 +1,6 @@
 #include "ServerController.h"
 #include "ServerSocket.h"
+#include "Sync_Queue.h"
 
 static Sync_Queue<ClientCommand> client_queue;
 

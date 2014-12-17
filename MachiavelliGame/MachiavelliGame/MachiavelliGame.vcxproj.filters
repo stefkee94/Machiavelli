@@ -72,9 +72,6 @@
     <ClCompile Include="Player.cpp">
       <Filter>Source Files\Model</Filter>
     </ClCompile>
-    <ClCompile Include="CardStack.cpp">
-      <Filter>Source Files\Model</Filter>
-    </ClCompile>
     <ClCompile Include="MachiavelliReader.cpp">
       <Filter>Source Files\I/O</Filter>
     </ClCompile>

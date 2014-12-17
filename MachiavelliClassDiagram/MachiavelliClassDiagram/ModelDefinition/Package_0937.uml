@@ -631,8 +631,8 @@
           <association
             Id="fb7b48dc-81f9-4e38-8a7a-7adbdad17c74"
             isDerived="false"
-            sourceEndRoleName="MachiavelliReader"
-            targetEndRoleName="CardStack"
+            sourceEndRoleName=""
+            targetEndRoleName=""
             isLeaf="false"
             isAbstract="false">
             <classMoniker
@@ -643,7 +643,6 @@
               <associationHasOwnedEnds>
                 <memberEnd
                   Id="e9b21e49-300d-45cd-ab33-644d2bf68b69"
-                  name="MachiavelliReader"
                   isLeaf="false"
                   isStatic="false"
                   isReadOnly="false"
@@ -656,7 +655,6 @@
               <associationHasOwnedEnds>
                 <memberEnd
                   Id="22fbeb04-5f20-4848-8b46-66a9942fb18c"
-                  name="CardStack"
                   isLeaf="false"
                   isStatic="false"
                   isReadOnly="false"

@@ -79,7 +79,6 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="BuildingCard.cpp" />
-    <ClCompile Include="CardStack.cpp" />
     <ClCompile Include="CharacterCard.cpp" />
     <ClCompile Include="ClientCommand.cpp" />
     <ClCompile Include="ClientSocket.cpp" />
