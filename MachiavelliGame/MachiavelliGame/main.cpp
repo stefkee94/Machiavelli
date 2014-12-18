@@ -1,5 +1,6 @@
 #include "ServerController.h"
-
+#include "CardStack.h"
+#include "MachiavelliReader.h"
 #include <memory>
 
 int main(int argc, const char* argv[])

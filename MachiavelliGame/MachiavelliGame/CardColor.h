@@ -1,8 +1,9 @@
+#pragma once
 enum class CardColor 
 {
-	YELLOW,
-	GREEN,
-	BLUE,
-	RED,
-	PURPLE
+	Yellow,
+	Green,
+	Blue,
+	Red,
+	Lilac
 };

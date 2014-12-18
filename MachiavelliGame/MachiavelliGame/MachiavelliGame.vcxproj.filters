@@ -40,9 +40,6 @@
     <Filter Include="Source Files\I/O">
       <UniqueIdentifier>{537b5093-5e73-4e01-a47a-0af16a834442}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Header Files\Enums">
-      <UniqueIdentifier>{9d4650f1-bd37-458d-8555-fbfca2635908}</UniqueIdentifier>
-    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
@@ -110,22 +107,22 @@
     <ClInclude Include="Player.h">
       <Filter>Header Files\Model</Filter>
     </ClInclude>
-    <ClInclude Include="CardStack.h">
-      <Filter>Header Files\Model</Filter>
-    </ClInclude>
     <ClInclude Include="MachiavelliReader.h">
       <Filter>Header Files\I/O</Filter>
-    </ClInclude>
-    <ClInclude Include="CharacterType.h">
-      <Filter>Header Files\Enums</Filter>
-    </ClInclude>
-    <ClInclude Include="CardColor.h">
-      <Filter>Header Files\Enums</Filter>
     </ClInclude>
     <ClInclude Include="CharacterCard.h">
       <Filter>Header Files\Model</Filter>
     </ClInclude>
     <ClInclude Include="BuildingCard.h">
+      <Filter>Header Files\Model</Filter>
+    </ClInclude>
+    <ClInclude Include="CardColor.h">
+      <Filter>Header Files\Model</Filter>
+    </ClInclude>
+    <ClInclude Include="CharacterType.h">
+      <Filter>Header Files\Model</Filter>
+    </ClInclude>
+    <ClInclude Include="CardStack.h">
       <Filter>Header Files\Model</Filter>
     </ClInclude>
   </ItemGroup>

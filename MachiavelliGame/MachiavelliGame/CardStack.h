@@ -1,42 +1,26 @@
 #pragma once
-#include <string>
 #include <vector>
-
-#include "MachiavelliReader.h"
-
-template <typename T>
+#include <algorithm>
+template<class T>
 class CardStack
 {
-public:
-	CardStack();
-	virtual ~CardStack();
-
-	void read_character_cards();
-	void read_building_cards();
-
-private:
-	MachiavelliReader reader;
+	public:
+		void addCard(T card){
+			cardVector.push_back(card);
+		}
+		void shuffleCards(){
+			std::random_shuffle(cardVector.begin(), cardVector.end());
+		}
+		T getCardTop(){
+			T card = cardVector.front();
+			cardVector.erase(cardVector.begin());
+			return card;
+		}
+		T getCardAtIndex(int index){
+			T card = cardVector[index];
+			cardVector.erase(cardVector.begin() + index);
+			return card;
+		}
+	private:
+		std::vector<T> cardVector;
 };
-
-template <typename T>
-CardStack<T>::CardStack()
-{
-	reader = MachiavelliReader();
-}
-
-template <typename T>
-void CardStack<T>::read_character_cards()
-{
-	reader.read_building_cards();
-}
-
-template <typename T>
-void CardStack<T>::read_building_cards()
-{
-
-}
-
-template <typename T>
-CardStack<T>::~CardStack()
-{
-}
