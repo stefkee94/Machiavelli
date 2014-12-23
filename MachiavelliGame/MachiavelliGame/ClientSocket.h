@@ -3,14 +3,13 @@
 
 class ClientSocket : public Socket
 {
-public:
-	ClientSocket(const char* host, int port_number);
+	public:
+		ClientSocket(const char* host, int port_number);
 
-	void start();
+		void start();
 
-private:
-	const char* host;
-	int port_number;
-
+	private:
+		const char* host;
+		int port_number;
 };
 

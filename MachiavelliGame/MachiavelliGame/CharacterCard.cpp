@@ -1,11 +1,8 @@
 #include "CharacterCard.h"
 
 
-CharacterCard::CharacterCard(int id, std::string name, CharacterType type)
+CharacterCard::CharacterCard(int id, std::string name, CharacterType type) : id(id), name(name), type(type)
 {
-	this->id = id;
-	this->name = name;
-	this->type = type;
 }
 
 

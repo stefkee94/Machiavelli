@@ -1,10 +1,8 @@
 #include "Player.h"
 
 
-Player::Player(std::string name, int age)
+Player::Player(std::string name, int age) : name(name), age(age)
 {
-	this->name = name;
-	this->age = age;
 }
 
 
@@ -12,17 +10,17 @@ Player::~Player()
 {
 }
 
-void Player::addCardToHand(std::shared_ptr<BuildingCard> handCard)
+void Player::add_card_to_hand(std::shared_ptr<BuildingCard> hand_card)
 {
-	handCards.addCard(handCard);
+	hand_cards.add_card(hand_card);
 }
 
-void Player::putCardOnField(std::shared_ptr<BuildingCard> fieldCard)
+void Player::put_card_on_field(std::shared_ptr<BuildingCard> field_card)
 {
-	fieldCards.addCard(fieldCard);
+	field_cards.add_card(field_card);
 }
 
-void Player::addCharacter(std::shared_ptr<CharacterCard> characterCard)
+void Player::add_character(std::shared_ptr<CharacterCard> character_card)
 {
-	characterCards.addCard(characterCard);
+	character_cards.add_card(character_card);
 }

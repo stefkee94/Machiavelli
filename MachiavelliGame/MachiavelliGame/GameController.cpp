@@ -18,7 +18,7 @@ GameController::~GameController()
 void GameController::init()
 {
 	MachiavelliReader reader;
-	buildingCards = reader.readBuildingCards("Bouwkaarten.csv");
-	characterCards = reader.readCharacterCards("karakters.csv");
+	building_cards = reader.read_building_cards("Bouwkaarten.csv");
+	character_cards = reader.read_character_cards("karakters.csv");
 }
 

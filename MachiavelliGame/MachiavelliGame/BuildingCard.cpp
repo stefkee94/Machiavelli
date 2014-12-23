@@ -1,11 +1,8 @@
 #include "BuildingCard.h"
 
 
-BuildingCard::BuildingCard(std::string name, int points, CardColor color)
+BuildingCard::BuildingCard(std::string name, int points, CardColor color) : name(name), points(points), color(color)
 {
-	this->name = name;
-	this->points = points;
-	this->color = color;
 }
 
 

@@ -9,6 +9,7 @@ ClientSocket::ClientSocket(const char *host, int port)
 	hint.ai_socktype = SOCK_STREAM;
 	struct addrinfo* infolist{ nullptr };
 	int gai_error = ::getaddrinfo(host, std::to_string(port).c_str(), &hint, &infolist);
+
 	if (gai_error) {
 		std::ostringstream oss;
 		oss << "getaddrinfo error " << gai_error << ": " << gai_strerror(gai_error) << " (" << __FILE__ << ":" << __LINE__ << ")";

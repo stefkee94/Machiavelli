@@ -7,20 +7,24 @@
 
 class Player
 {
-public:
-	Player(std::string name, int age);
-	virtual ~Player();
-	void addCardToHand(std::shared_ptr<BuildingCard> handCards);
-	void putCardOnField(std::shared_ptr<BuildingCard> fieldCards);
-	void addCharacter(std::shared_ptr<CharacterCard> characterCards);
-	void useCharacterProperty();
-private:
-	CardStack<std::shared_ptr<BuildingCard>> handCards;
-	CardStack<std::shared_ptr<BuildingCard>> fieldCards;
-	CardStack<std::shared_ptr<CharacterCard>> characterCards;
-	std::string name;
-	int age;
-	int gold;
-	bool isKing;
-	bool charPropertyUsed;
+	public:
+		Player(std::string name, int age);
+		virtual ~Player();
+
+		void add_card_to_hand(std::shared_ptr<BuildingCard> hand_cards);
+		void put_card_on_field(std::shared_ptr<BuildingCard> field_cards);
+		void add_character(std::shared_ptr<CharacterCard> character_cards);
+		void use_character_property();
+
+	private:
+		std::string name;
+		int age;
+		int gold;
+
+		bool is_king;
+		bool char_property_used;
+		
+		CardStack<std::shared_ptr<BuildingCard>> hand_cards;
+		CardStack<std::shared_ptr<BuildingCard>> field_cards;
+		CardStack<std::shared_ptr<CharacterCard>> character_cards;
 };

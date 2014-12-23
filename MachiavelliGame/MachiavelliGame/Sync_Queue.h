@@ -7,16 +7,19 @@
 #include <thread>
 
 template<typename T>
-class Sync_Queue {
-public:
-	void put(const T& val);
-	void get(T& val);
+class Sync_Queue 
+{
+	public:
+		void put(const T& val);
+		void get(T& val);
 
-private:
-	std::mutex mtx;
-	std::condition_variable cond;
-	std::list<T> q;
+	private:
+		std::mutex mtx;
+		std::condition_variable cond;
+		std::list<T> q;
 };
+
+//implementation of template class
 
 template<typename T>
 void Sync_Queue<T>::put(const T& val)
