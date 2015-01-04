@@ -6,7 +6,8 @@ static Sync_Queue<ClientCommand> client_queue;
 
 ServerController::ServerController()
 {
-	game_controller = std::shared_ptr<GameController>();
+	std::shared_ptr<GameController> temp_controller(new GameController());
+	game_controller = temp_controller;
 }
 
 void ServerController::start_server()
@@ -50,6 +51,7 @@ void ServerController::handle_client(std::shared_ptr<Socket> socket)
 {
 	std::shared_ptr<Socket> client = socket;
 	client->write("Welcome to the Machiavelli Game Server");
+	client->write("Please fill in your age to start");
 	client->write(prompt);
 	
 	is_handling = true;
