@@ -16,6 +16,9 @@ class Player
 		void add_character(std::shared_ptr<CharacterCard> character_cards);
 		void use_character_property();
 
+		void add_gold(int amount);
+		void remove_gold(int amount);
+
 	private:
 		std::string name;
 		int age;

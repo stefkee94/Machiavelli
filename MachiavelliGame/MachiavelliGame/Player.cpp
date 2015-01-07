@@ -1,13 +1,27 @@
 #include "Player.h"
 
 
-Player::Player(std::string name, int age) : name(name), age(age)
+Player::Player(std::string name, int age) : name(name), age(age), gold(0)
 {
+
 }
 
 
 Player::~Player()
 {
+}
+
+void Player::add_gold(int amount)
+{
+	gold += amount;
+}
+
+void Player::remove_gold(int amount)
+{
+	if (gold - amount < 0)
+		gold = 0;
+	else
+		gold -= amount;
 }
 
 void Player::add_card_to_hand(std::shared_ptr<BuildingCard> hand_card)

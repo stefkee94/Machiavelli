@@ -51,7 +51,12 @@ void ServerController::handle_client(std::shared_ptr<Socket> socket)
 {
 	std::shared_ptr<Socket> client = socket;
 	client->write("Welcome to the Machiavelli Game Server");
-	client->write("Please fill in your age to start");
+	client->write("Please fill in your name to start");
+	std::string name = client->read_line();
+	client->write("Please fill in your age \n");
+	std::string age = client->read_line();
+
+	game_controller->connect_player(name, age);
 	client->write(prompt);
 	
 	is_handling = true;
