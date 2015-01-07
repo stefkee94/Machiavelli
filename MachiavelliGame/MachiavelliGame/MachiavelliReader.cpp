@@ -17,12 +17,12 @@ CardStack<std::shared_ptr<CharacterCard>> MachiavelliReader::read_character_card
 	std::ifstream file(path);
 	std::string line;
 	char delimiter = ';';
-	if (!line.empty())
+	while (file.good())
 	{
-		while (file.good())
+		std::getline(file, line, '\n');
+		size_t pos = 0;
+		if (!line.empty())
 		{
-			std::getline(file, line, '\n');
-			size_t pos = 0;
 			while ((pos = line.find(delimiter)) != std::string::npos)
 			{
 				std::string value = line.substr(0, pos);
