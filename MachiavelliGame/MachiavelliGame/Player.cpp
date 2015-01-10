@@ -1,7 +1,7 @@
 #include "Player.h"
 
 
-Player::Player(std::string name, int age) : name(name), age(age), gold(0)
+Player::Player(int client_id, std::string name, int age) : client_id(client_id), name(name), age(age), gold(0)
 {
 
 }
@@ -11,6 +11,15 @@ Player::~Player()
 {
 }
 
+int Player::get_client_id()
+{
+	return client_id;
+}
+
+int Player::get_age()
+{
+	return age;
+}
 void Player::add_gold(int amount)
 {
 	gold += amount;

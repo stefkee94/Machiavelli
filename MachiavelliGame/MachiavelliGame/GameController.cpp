@@ -6,15 +6,15 @@ GameController::GameController()
 	init();
 }
 
-void GameController::handle_client_command(std::string new_command)
+void GameController::handle_client_command(std::shared_ptr<Socket> client, std::string new_command)
 {
-	
+	std::cerr << "client (" << client->get() << ") said: " << new_command << "\n";
 }
 
-void GameController::connect_player(std::string name, std::string age)
+void GameController::connect_player(int client_id, std::string name, std::string age)
 {
-	players.push_back(std::make_shared<Player>(name, std::atoi(age.c_str())));
-	//if (players.size() >= 2) -- needed to start the game
+	players.push_back(std::make_shared<Player>(client_id, name, std::atoi(age.c_str())));
+	if (players.size() >= 2) // needed to start the game
 		start_game();
 }
 
@@ -22,12 +22,20 @@ void GameController::start_game()
 {
 	for (std::shared_ptr<Player> player : players)
 	{
+		// Add 4 gold to each player
 		player->add_gold(4);
+
+		// Give each player 4 building cards
 		for (int i = 0; i < 4; i++)
-		{
 			player->add_card_to_hand(building_cards.get_card_at_top());
-		}
 	}
+
+	// geef beurt aan de speler
+	if (players[0]->get_age() >= players[1]->get_age())
+		player_turn = players[0]->get_client_id();
+	else
+		player_turn = players[1]->get_client_id();
+	
 }
 
 GameController::~GameController()

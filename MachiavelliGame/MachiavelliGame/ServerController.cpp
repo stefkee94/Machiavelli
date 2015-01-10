@@ -2,6 +2,9 @@
 #include "ServerSocket.h"
 #include "Sync_Queue.h"
 
+#include <cctype>
+#include <string>
+
 static Sync_Queue<ClientCommand> client_queue;
 
 ServerController::ServerController()
@@ -50,14 +53,7 @@ void ServerController::queue_put(ClientCommand new_command)
 void ServerController::handle_client(std::shared_ptr<Socket> socket)
 {
 	std::shared_ptr<Socket> client = socket;
-	client->write("Welcome to the Machiavelli Game Server");
-	client->write("Please fill in your name to start");
-	std::string name = client->read_line();
-	client->write("Please fill in your age \n");
-	std::string age = client->read_line();
-
-	game_controller->connect_player(name, age);
-	client->write(prompt);
+	startup_player(client);
 	
 	is_handling = true;
 
@@ -66,14 +62,14 @@ void ServerController::handle_client(std::shared_ptr<Socket> socket)
 		try
 		{
 			std::string command = client->read_line();
-			game_controller->handle_client_command(command);
-			std::cerr << "client (" << client->get() << ") said: " << command << "\n";
+			game_controller->handle_client_command(client, command);
+			/*std::cerr << "client (" << client->get() << ") said: " << command << "\n";
 
 			if (command == "quit")
 			{
 				client->write("LATER!");
 				break;
-			}
+			}*/
 
 			ClientCommand client_command = ClientCommand(command, client);
 			client_queue.put(client_command);
@@ -88,6 +84,35 @@ void ServerController::handle_client(std::shared_ptr<Socket> socket)
 			client->write("ERROR: something went wrong");
 		}
 	}
+}
+
+void ServerController::startup_player(std::shared_ptr<Socket> client)
+{
+	// Set info to client
+	client->write("Welcome to the Machiavelli Game Server \r\n");
+	client->write("Please fill in your name to start \r\n");
+	client->write(prompt);
+
+	std::string name = client->read_line();
+	std::string age;
+
+	bool is_age_digit = false;
+		
+	while (!is_age_digit)
+	{
+		client->write("Please fill in your age \r\n");
+		client->write(prompt);
+		age = client->read_line();
+		int charact = atoi(age.c_str());
+		if (charact != 0)
+			is_age_digit = true;
+	}
+	
+	client->write("You are ready to play! \r\n");
+
+	// Get id from the client and save for the player
+	int client_id = client->get();
+	game_controller->connect_player(client_id, name, age);
 }
 
 void ServerController::consume_command()

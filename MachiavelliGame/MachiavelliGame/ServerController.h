@@ -16,6 +16,7 @@ class ServerController
 
 		void consume_command();
 		void start_server();
+		void startup_player(std::shared_ptr<Socket> socket);
 
 		void handle_client(std::shared_ptr<Socket> socket);
 		void queue_put(ClientCommand new_command);

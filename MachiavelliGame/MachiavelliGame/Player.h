@@ -8,7 +8,7 @@
 class Player
 {
 	public:
-		Player(std::string name, int age);
+		Player(int client_id, std::string name, int age);
 		virtual ~Player();
 
 		void add_card_to_hand(std::shared_ptr<BuildingCard> hand_cards);
@@ -19,7 +19,11 @@ class Player
 		void add_gold(int amount);
 		void remove_gold(int amount);
 
+		int get_age();
+		int get_client_id();
+
 	private:
+		int client_id;
 		std::string name;
 		int age;
 		int gold;
