@@ -126,23 +126,7 @@ void ServerController::consume_command()
 		std::shared_ptr<Socket> client = command.get_client();
 		if (client)
 		{
-			try
-			{
-				client->write("Hey you wrote: ");
-				client->write(command.get_command());
-			}
-			catch (const std::exception& ex)
-			{
-				client->write("Sorry, ");
-				client->write(ex.what());
-				client->write("\n");
-			}
-			catch (...)
-			{
-				client->write("Sorry, something went wrong with handling request");
-			}
-
-			client->write(prompt);
+			game_controller->consume_command(command, client);
 		}
 		else
 			std::cerr << "Client has disappeared" << "\n";

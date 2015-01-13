@@ -14,6 +14,8 @@ class GameController
 		virtual ~GameController();
 
 		void handle_client_command(std::shared_ptr<Socket> client, std::string new_command);
+		void consume_command(ClientCommand command, std::shared_ptr<Socket> client);
+
 		void connect_player(int client_id, std::string name, std::string age);
 		void start_game();
 
@@ -24,6 +26,6 @@ class GameController
 
 		void init();
 
-		int player_turn;
+		int player_turn = 0;
 };
 

@@ -8,7 +8,35 @@ GameController::GameController()
 
 void GameController::handle_client_command(std::shared_ptr<Socket> client, std::string new_command)
 {
-	std::cerr << "client (" << client->get() << ") said: " << new_command << "\n";
+	if (player_turn == client->get())
+		std::cerr << "client (" << client->get() << ") said: " << new_command << "\n";
+}
+
+void GameController::consume_command(ClientCommand command, std::shared_ptr<Socket> client)
+{
+	try
+	{
+		if (player_turn != client->get())
+			client->write("It's not your turn \r\n");
+		else
+		{
+			client->write("Hey you wrote: ");
+			client->write(command.get_command());
+			client->write("\r\n");
+		}
+	}
+	catch (const std::exception& ex)
+	{
+		client->write("Sorry, ");
+		client->write(ex.what());
+		client->write("\n");
+	}
+	catch (...)
+	{
+		client->write("Sorry, something went wrong with handling request");
+	}
+
+	client->write(">");
 }
 
 void GameController::connect_player(int client_id, std::string name, std::string age)
@@ -35,7 +63,6 @@ void GameController::start_game()
 		player_turn = players[0]->get_client_id();
 	else
 		player_turn = players[1]->get_client_id();
-	
 }
 
 GameController::~GameController()
