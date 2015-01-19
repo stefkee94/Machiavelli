@@ -29,11 +29,8 @@ void GameController::consume_command(ClientCommand command, std::shared_ptr<Sock
 {
 	try
 	{
-		if (players.size() == 2)
-		{
-			if (player_on_turn->get_client().get() != client.get() && command.get_command().compare("help") != 0)
-				client->write("It's not your turn \r\n");
-		}
+		if (player_on_turn->get_client().get() != client.get())
+			client->write("It's not your turn \r\n");
 		else
 			handle_client_command(client, command.get_command());
 	}
