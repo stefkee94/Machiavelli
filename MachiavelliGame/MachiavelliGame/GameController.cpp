@@ -13,26 +13,32 @@ void GameController::handle_client_command(std::shared_ptr<Socket> client, std::
 		show_help_text(client);
 		return;
 	}
-	if (player_on_turn->get_client().get() == client.get()){
-		if (fase == GameFase::ChooseChar){
+	if (player_on_turn->get_client().get() == client.get())
+	{
+		if (fase == GameFase::ChooseChar)
+		{
 			hanlde_choose_char_command(new_command);
 		}
-		else if (fase == GameFase::DismissChar){
+		else if (fase == GameFase::DismissChar)
+		{
 			handle_dismiss_char_command(new_command);
 		}
 	}
-	else
-		client->write("Please wait for the other player to connect \r\n");
 }
 
 void GameController::consume_command(ClientCommand command, std::shared_ptr<Socket> client)
 {
 	try
 	{
-		if (player_on_turn->get_client().get() != client.get())
-			client->write("It's not your turn \r\n");
+		if (players.size() == 2)
+		{
+			if (player_on_turn->get_client().get() != client.get())
+				client->write("It's not your turn \r\n");
+			else
+				handle_client_command(client, command.get_command());
+		}
 		else
-			handle_client_command(client, command.get_command());
+			client->write("Please wait for the other player to connect \r\n");
 	}
 	catch (const std::exception& ex)
 	{
@@ -50,14 +56,32 @@ void GameController::consume_command(ClientCommand command, std::shared_ptr<Sock
 
 void GameController::hanlde_choose_char_command(std::string new_command)
 {
-	int choice = std::atoi(new_command.c_str());
+	//int choice = std::atoi(new_command.c_str());
+	bool is_command_digit = false;
+	int choice;
+
+	while (!is_command_digit)
+	{
+		choice = atoi(new_command.c_str());
+		if (choice > 0 && (choice < character_cards.size()))
+			is_command_digit = true;
+		else
+		{
+			player_on_turn->get_client()->write("Invalid text, please fill in valid text to choose a character \r\n");
+			return;
+		}
+	}
+
 	player_on_turn->add_character(character_cards.get_card_and_remove_at_index(choice));
-	if (first_pick){
+
+	if (first_pick)
+	{
 		first_pick = false;
 		set_turn_to_next_player();
 		choose_character();
 	}
-	else{
+	else
+	{
 		dismiss_character();
 		fase = GameFase::DismissChar;
 	}
@@ -68,10 +92,13 @@ void GameController::handle_dismiss_char_command(std::string new_command)
 	int choice = std::atoi(new_command.c_str());
 	character_cards.get_card_and_remove_at_index(choice);
 	set_turn_to_next_player();
-	if (character_cards.size() == 0){
+
+	if (character_cards.size() == 0)
+	{
 		fase = GameFase::PlayFase;
 	}
-	else{
+	else
+	{
 		fase = GameFase::ChooseChar;
 		choose_character();
 	}
@@ -79,8 +106,10 @@ void GameController::handle_dismiss_char_command(std::string new_command)
 
 void GameController::set_turn_to_next_player()
 {
-	for (int i = 0; i < players.size(); i++){
-		if (players[i] != player_on_turn){
+	for (int i = 0; i < players.size(); i++)
+	{
+		if (players[i] != player_on_turn)
+		{
 			player_on_turn = players[i];
 			return;
 		}
@@ -129,6 +158,8 @@ void GameController::choose_character()
 	{
 		player_on_turn->get_client()->write("[" + std::to_string(i) + "]: " + character_cards.get_card_at(i)->getName() + "\r\n");
 	}
+
+	player_on_turn->get_client()->write(">");
 }
 
 void GameController::dismiss_character()
@@ -137,7 +168,10 @@ void GameController::dismiss_character()
 
 	for (int i = 0; i < character_cards.size(); i++)
 	{
-		player_on_turn->get_client()->write("[" + std::to_string(i) + "]: " + character_cards.get_card_at(i)->getName() + "\r\n");
+		if (character_cards.size() == 1)
+			player_on_turn->get_client()->write("Dismissed : " + character_cards.get_card_at(i)->getName());
+		else
+			player_on_turn->get_client()->write("[" + std::to_string(i) + "]: " + character_cards.get_card_at(i)->getName() + "\r\n");
 	}
 }
 
