@@ -62,15 +62,6 @@ void ServerController::handle_client(std::shared_ptr<Socket> socket)
 		try
 		{
 			std::string command = client->read_line();
-			game_controller->handle_client_command(client, command);
-			/*std::cerr << "client (" << client->get() << ") said: " << command << "\n";
-
-			if (command == "quit")
-			{
-				client->write("LATER!");
-				break;
-			}*/
-
 			ClientCommand client_command = ClientCommand(command, client);
 			client_queue.put(client_command);
 		}
@@ -92,12 +83,10 @@ void ServerController::startup_player(std::shared_ptr<Socket> client)
 	client->write("Welcome to the Machiavelli Game Server \r\n");
 	client->write("Please fill in your name to start \r\n");
 	client->write(prompt);
-
 	std::string name = client->read_line();
 	std::string age;
+	bool is_age_digit = false;	
 
-	bool is_age_digit = false;
-		
 	while (!is_age_digit)
 	{
 		client->write("Please fill in your age \r\n");
@@ -107,13 +96,12 @@ void ServerController::startup_player(std::shared_ptr<Socket> client)
 		if (charact != 0)
 			is_age_digit = true;
 	}
-	
+
 	client->write("You are ready to play! \r\n");
 	client->write(prompt);
 
 	// Get id from the client and save for the player
-	int client_id = client->get();
-	game_controller->connect_player(client_id, name, age);
+	game_controller->connect_player(client, name, age);
 }
 
 void ServerController::consume_command()

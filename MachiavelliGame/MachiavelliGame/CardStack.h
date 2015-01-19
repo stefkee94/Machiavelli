@@ -9,7 +9,9 @@ class CardStack
 		void add_card(T card);
 		void shuffle_cards();
 		T get_card_at_top();
-		T get_card_at_index(int index);
+		T get_card_and_remove_at_index(int index);
+		int size();
+		T get_card_at(int i);
 
 	private:
 		std::vector<T> card_vector;
@@ -30,19 +32,34 @@ void CardStack<T>::shuffle_cards()
 }
 
 template<typename T>
+int CardStack<T>::size()
+{
+	return card_vector.size();
+}
+
+template<typename T>
+T CardStack<T>::get_card_at(int i)
+{
+	if (i < card_vector.size()){
+		return card_vector[i];
+	}
+}
+
+template<typename T>
 T CardStack<T>::get_card_at_top()
 {
 	T card = card_vector.front();
 	card_vector.erase(card_vector.begin());
-
 	return card;
 }
 
 template<typename T>
-T CardStack<T>::get_card_at_index(int index)
+T CardStack<T>::get_card_and_remove_at_index(int index)
 {
-	T card = card_vector[index];
-	card_vector.erase(card_vector.begin() + index);
-
-	return card;
+	if (index < card_vector.size()){
+		T card = card_vector[index];
+		card_vector.erase(card_vector.begin() + index);
+		return card;
+	}
+	return nullptr;
 }

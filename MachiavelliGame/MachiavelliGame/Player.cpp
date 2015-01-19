@@ -1,9 +1,8 @@
 #include "Player.h"
 
-
-Player::Player(int client_id, std::string name, int age) : client_id(client_id), name(name), age(age), gold(0)
+Player::Player(std::shared_ptr<Socket> client, std::string name, int age) : client(client), name(name), age(age), gold(0)
 {
-
+	this->is_king = false;
 }
 
 
@@ -11,9 +10,9 @@ Player::~Player()
 {
 }
 
-int Player::get_client_id()
+std::shared_ptr<Socket> Player::get_client()
 {
-	return client_id;
+	return client;
 }
 
 int Player::get_age()
@@ -25,6 +24,15 @@ void Player::add_gold(int amount)
 	gold += amount;
 }
 
+bool Player::get_is_king()
+{
+	return is_king;
+}
+
+void Player::set_is_king(bool is_king)
+{
+	this->is_king = is_king;
+}
 void Player::remove_gold(int amount)
 {
 	if (gold - amount < 0)
