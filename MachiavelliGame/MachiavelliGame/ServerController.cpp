@@ -86,6 +86,7 @@ void ServerController::startup_player(std::shared_ptr<Socket> client)
 	std::string name = client->read_line();
 	std::string age;
 	bool is_age_digit = false;	
+
 	while (!is_age_digit)
 	{
 		client->write("Please fill in your age \r\n");
@@ -95,7 +96,10 @@ void ServerController::startup_player(std::shared_ptr<Socket> client)
 		if (charact != 0)
 			is_age_digit = true;
 	}
+
 	client->write("You are ready to play! \r\n");
+	client->write(prompt);
+
 	// Get id from the client and save for the player
 	game_controller->connect_player(client, name, age);
 }

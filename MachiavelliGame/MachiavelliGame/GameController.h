@@ -27,6 +27,8 @@ class GameController
 		GameFase fase;
 		bool first_pick;
 
+		void show_help_text(std::shared_ptr<Socket> client);
+
 	private:
 		CardStack<std::shared_ptr<BuildingCard>> building_cards;
 		CardStack<std::shared_ptr<CharacterCard>> character_cards;
