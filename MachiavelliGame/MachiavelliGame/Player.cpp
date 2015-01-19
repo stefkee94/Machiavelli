@@ -19,9 +19,35 @@ int Player::get_age()
 {
 	return age;
 }
+
+bool Player::has_character(std::string character_name)
+{
+	for (int i = 0; i < character_cards.size(); i++){
+		if (character_cards.get_card_at(i)->getName().compare(character_name)){
+			return true;
+		}
+	}
+	return false;
+}
+
 void Player::add_gold(int amount)
 {
 	gold += amount;
+}
+
+int Player::get_gold()
+{
+	return gold;
+}
+
+CardStack<std::shared_ptr<BuildingCard>> Player::get_field_cards()
+{
+	return field_cards;
+}
+
+CardStack<std::shared_ptr<BuildingCard>> Player::get_hand_cards()
+{
+	return hand_cards;
 }
 
 bool Player::get_is_king()

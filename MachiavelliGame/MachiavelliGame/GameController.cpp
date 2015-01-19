@@ -6,6 +6,10 @@ GameController::GameController()
 	init();
 }
 
+GameController::~GameController()
+{
+}
+
 void GameController::handle_client_command(std::shared_ptr<Socket> client, std::string new_command)
 {
 	if (new_command.compare("help") == 0)
@@ -70,11 +74,43 @@ void GameController::handle_dismiss_char_command(std::string new_command)
 	set_turn_to_next_player();
 	if (character_cards.size() == 0){
 		fase = GameFase::PlayFase;
+		call_next_char();
 	}
 	else{
 		fase = GameFase::ChooseChar;
 		choose_character();
 	}
+}
+
+void GameController::call_next_char()
+{
+	for (int i = 0; i < players.size(); i++){
+		if (players[i]->has_character(char_order[call_count])){
+			player_on_turn = players[i];
+			print_turn_info();
+			call_count++;
+			return;
+		}
+	}
+}
+
+void GameController::print_turn_info()
+{
+	player_on_turn->get_client()->write("As of now you're the " + char_order[call_count] + "\r\n");
+	player_on_turn->get_client()->write("Gold: " + std::to_string(player_on_turn->get_gold()) + "\r\n\r\n");
+	player_on_turn->get_client()->write("Buildings: \r\n");
+	for (int i = 0; i < player_on_turn->get_field_cards().size(); i++){
+		std::shared_ptr<BuildingCard> card = player_on_turn->get_field_cards().get_card_at(i);
+		player_on_turn->get_client()->write(card->get_name() + "(" + card->color_to_name() + ", " + std::to_string(card->get_points()) + ") \r\n");
+	}
+	player_on_turn->get_client()->write("\r\n");
+	player_on_turn->get_client()->write("Hand: \r\n");
+	for (int i = 0; i < player_on_turn->get_hand_cards().size(); i++){
+		std::shared_ptr<BuildingCard> card = player_on_turn->get_hand_cards().get_card_at(i);
+		player_on_turn->get_client()->write(card->get_name() + "(" + card->color_to_name() + ", " + std::to_string(card->get_points()) + ") \r\n");
+	}
+	player_on_turn->get_client()->write("\r\n");
+	player_on_turn->get_client()->write("What to do? \r\n");
 }
 
 void GameController::set_turn_to_next_player()
@@ -123,7 +159,6 @@ void GameController::choose_character()
 	{
 		character_cards.get_card_at_top();
 	}
-
 	player_on_turn->get_client()->write("Choose a character \r\n");
 	for (int i = 0; i < character_cards.size(); i++)
 	{
@@ -157,10 +192,6 @@ void GameController::show_help_text(std::shared_ptr<Socket> client)
 	client->write("8. Condottiere -> Vernietigt een gebouw & ontvangt van alle militaire gebouwen \r\n");
 }
 
-GameController::~GameController()
-{
-}
-
 void GameController::init()
 {
 	MachiavelliReader reader;
@@ -169,5 +200,14 @@ void GameController::init()
 
 	building_cards.shuffle_cards();
 	character_cards.shuffle_cards();
+
+	char_order.push_back("Murderer");
+	char_order.push_back("Thief");
+	char_order.push_back("Magicien");
+	char_order.push_back("King");
+	char_order.push_back("Preacher");
+	char_order.push_back("Merchant");
+	char_order.push_back("Architect");
+	char_order.push_back("Condottiere");
 }
 

@@ -23,6 +23,8 @@ class GameController
 		void dismiss_character();
 		void hanlde_choose_char_command(std::string new_command);
 		void handle_dismiss_char_command(std::string new_command);
+		void call_next_char();
+		void print_turn_info();
 
 		GameFase fase;
 		bool first_pick;
@@ -37,6 +39,9 @@ class GameController
 		void init();
 		void set_turn_to_next_player();
 
+		std::vector<std::string> char_order;
 		std::shared_ptr<Player> player_on_turn;
+
+		int call_count = 0;
 };
 
