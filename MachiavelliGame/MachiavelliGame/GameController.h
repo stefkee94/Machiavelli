@@ -19,6 +19,8 @@ class GameController
 		void connect_player(int client_id, std::string name, std::string age);
 		void start_game();
 
+		void show_help_text(std::shared_ptr<Socket> client);
+
 	private:
 		CardStack<std::shared_ptr<BuildingCard>> building_cards;
 		CardStack<std::shared_ptr<CharacterCard>> character_cards;

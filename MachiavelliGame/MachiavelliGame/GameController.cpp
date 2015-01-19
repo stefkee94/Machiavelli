@@ -8,21 +8,33 @@ GameController::GameController()
 
 void GameController::handle_client_command(std::shared_ptr<Socket> client, std::string new_command)
 {
-	if (player_turn == client->get())
-		std::cerr << "client (" << client->get() << ") said: " << new_command << "\n";
+	if (players.size() == 2)
+	{
+		if (new_command.compare("help") == 0)
+		{
+			show_help_text(client);
+			return;
+		}
+
+		if (player_turn == client->get())
+			std::cerr << "client (" << client->get() << ") said: " << new_command << "\n";
+	}
+	else
+		client->write("Please wait for the other player to connect \r\n");
 }
 
 void GameController::consume_command(ClientCommand command, std::shared_ptr<Socket> client)
 {
 	try
 	{
-		if (player_turn != client->get())
-			client->write("It's not your turn \r\n");
-		else
+		if (players.size() == 2)
 		{
-			client->write("Hey you wrote: ");
-			client->write(command.get_command());
-			client->write("\r\n");
+			if (player_turn != client->get() && command.get_command().compare("help") != 0)
+				client->write("It's not your turn \r\n");
+			else
+			{
+				
+			}
 		}
 	}
 	catch (const std::exception& ex)
@@ -63,6 +75,22 @@ void GameController::start_game()
 		player_turn = players[0]->get_client_id();
 	else
 		player_turn = players[1]->get_client_id();
+}
+
+void GameController::show_help_text(std::shared_ptr<Socket> client)
+{
+	client->write("\r\nVoorkant : \r\n");
+	client->write("Inkomsten -> Neem 2 goudstukken of neem 2 kaarten en leg er 1 af \r\n");
+	client->write("Bouwen -> Leg 1 bouwkaart neer en betaal de waarde");
+	client->write("Karaktereigenschap op elk moment te gebruiken \r\n");
+	client->write("1. Moordernaar -> Vermoord een ander karakter \r\n");
+	client->write("2. Dief -> Steel van een andere speler \r\n");
+	client->write("3. Magier -> Ruilt bouwkaarten om \r\n");
+	client->write("4. Koning -> Begint volgende beurt, ontvangt van monumenten \r\n");
+	client->write("5. Prediker -> Beschermd tegen Condotierre & ontvangt van kerkelijke gebouwen \r\n");
+	client->write("6. Koopman -> Ontvangt een extra goudstuk & ontvangt van commerciele gebouwen \r\n");
+	client->write("7. Bouwmeester -> trekt twee extra kaarten & mag drie gebouwen bouwen \r\n");
+	client->write("8. Condottiere -> Vernietigt een gebouw & ontvangt van alle militaire gebouwen \r\n");
 }
 
 GameController::~GameController()

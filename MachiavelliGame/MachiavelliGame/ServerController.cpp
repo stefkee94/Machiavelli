@@ -109,6 +109,7 @@ void ServerController::startup_player(std::shared_ptr<Socket> client)
 	}
 	
 	client->write("You are ready to play! \r\n");
+	client->write(prompt);
 
 	// Get id from the client and save for the player
 	int client_id = client->get();
