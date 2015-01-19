@@ -9,34 +9,11 @@ GameController::GameController()
 void GameController::handle_client_command(std::shared_ptr<Socket> client, std::string new_command)
 {
 	if (player_on_turn->get_client().get() == client.get()){
-		if (choosing_character){
-			int choice = std::atoi(new_command.c_str());
-			player_on_turn->add_character(character_cards.get_card_and_remove_at_index(choice));
-			if (first_pick){
-				first_pick = false;
-				set_turn_to_next_player();
-				choose_character();
-			}
-			else{
-				dismiss_character();
-				choosing_character = false;
-				dismissing_character = true;
-			}
+		if (fase == GameFase::ChooseChar){
+			hanlde_choose_char_command(new_command);
 		}
-		else if (dismissing_character){
-			int choice = std::atoi(new_command.c_str());
-			character_cards.get_card_and_remove_at_index(choice);
-			set_turn_to_next_player();
-			if (character_cards.size() == 0){
-				choosing_character = false;
-				dismissing_character = false;
-				//start de speelfase
-			}
-			else{
-				choosing_character = true;
-				dismissing_character = false;
-				choose_character();
-			}
+		else if (fase == GameFase::DismissChar){
+			handle_dismiss_char_command(new_command);
 		}
 	}
 }
@@ -64,6 +41,35 @@ void GameController::consume_command(ClientCommand command, std::shared_ptr<Sock
 	}
 
 	client->write(">");
+}
+
+void GameController::hanlde_choose_char_command(std::string new_command)
+{
+	int choice = std::atoi(new_command.c_str());
+	player_on_turn->add_character(character_cards.get_card_and_remove_at_index(choice));
+	if (first_pick){
+		first_pick = false;
+		set_turn_to_next_player();
+		choose_character();
+	}
+	else{
+		dismiss_character();
+		fase = GameFase::DismissChar;
+	}
+}
+
+void GameController::handle_dismiss_char_command(std::string new_command)
+{
+	int choice = std::atoi(new_command.c_str());
+	character_cards.get_card_and_remove_at_index(choice);
+	set_turn_to_next_player();
+	if (character_cards.size() == 0){
+		fase = GameFase::PlayFase;
+	}
+	else{
+		fase = GameFase::ChooseChar;
+		choose_character();
+	}
 }
 
 void GameController::set_turn_to_next_player()
@@ -99,7 +105,7 @@ void GameController::start_game()
 	else
 		player_on_turn = players[1];
 	player_on_turn->set_is_king(true);
-	choosing_character = true;
+	fase = GameFase::ChooseChar;
 	first_pick = true;
 	choose_character();
 }

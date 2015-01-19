@@ -5,6 +5,7 @@
 #include "CardStack.h"
 #include "MachiavelliReader.h"
 #include "Player.h"
+#include "GameFase.h"
 
 class ServerController;
 class GameController
@@ -20,9 +21,10 @@ class GameController
 		void start_game();
 		void choose_character();
 		void dismiss_character();
+		void hanlde_choose_char_command(std::string new_command);
+		void handle_dismiss_char_command(std::string new_command);
 
-		bool choosing_character;
-		bool dismissing_character;
+		GameFase fase;
 		bool first_pick;
 
 	private:
