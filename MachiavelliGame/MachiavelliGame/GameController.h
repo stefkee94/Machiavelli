@@ -16,8 +16,14 @@ class GameController
 		void handle_client_command(std::shared_ptr<Socket> client, std::string new_command);
 		void consume_command(ClientCommand command, std::shared_ptr<Socket> client);
 
-		void connect_player(int client_id, std::string name, std::string age);
+		void connect_player(std::shared_ptr<Socket> client, std::string name, std::string age);
 		void start_game();
+		void choose_character();
+		void dismiss_character();
+
+		bool choosing_character;
+		bool dismissing_character;
+		bool first_pick;
 
 	private:
 		CardStack<std::shared_ptr<BuildingCard>> building_cards;
@@ -25,7 +31,8 @@ class GameController
 		std::vector<std::shared_ptr<Player>> players;
 
 		void init();
+		void set_turn_to_next_player();
 
-		int player_turn = 0;
+		std::shared_ptr<Player> player_on_turn;
 };
 

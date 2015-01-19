@@ -9,3 +9,8 @@ CharacterCard::CharacterCard(int id, std::string name, CharacterType type) : id(
 CharacterCard::~CharacterCard()
 {
 }
+
+std::string CharacterCard::getName()
+{
+	return name;
+}

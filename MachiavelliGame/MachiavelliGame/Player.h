@@ -1,6 +1,7 @@
 #pragma once
 #include <vector>
 #include <memory>
+#include "Socket.h"
 #include "CardStack.h"
 #include "BuildingCard.h"
 #include "CharacterCard.h"
@@ -8,7 +9,7 @@
 class Player
 {
 	public:
-		Player(int client_id, std::string name, int age);
+		Player(std::shared_ptr<Socket> client, std::string name, int age);
 		virtual ~Player();
 
 		void add_card_to_hand(std::shared_ptr<BuildingCard> hand_cards);
@@ -18,12 +19,14 @@ class Player
 
 		void add_gold(int amount);
 		void remove_gold(int amount);
+		void set_is_king(bool is_king);
+		bool get_is_king();
 
 		int get_age();
-		int get_client_id();
+		std::shared_ptr<Socket> get_client();
 
 	private:
-		int client_id;
+		std::shared_ptr<Socket> client;
 		std::string name;
 		int age;
 		int gold;
