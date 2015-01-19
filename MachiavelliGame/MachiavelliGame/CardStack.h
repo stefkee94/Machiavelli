@@ -40,7 +40,8 @@ int CardStack<T>::size()
 template<typename T>
 T CardStack<T>::get_card_at(int i)
 {
-	if (i < card_vector.size()){
+	if (i < card_vector.size())
+	{
 		return card_vector[i];
 	}
 }
@@ -50,15 +51,18 @@ T CardStack<T>::get_card_at_top()
 {
 	T card = card_vector.front();
 	card_vector.erase(card_vector.begin());
+
 	return card;
 }
 
 template<typename T>
 T CardStack<T>::get_card_and_remove_at_index(int index)
 {
-	if (index < card_vector.size()){
+	if (index < card_vector.size())
+	{
 		T card = card_vector[index];
 		card_vector.erase(card_vector.begin() + index);
+
 		return card;
 	}
 	return nullptr;

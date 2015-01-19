@@ -3,6 +3,7 @@
 Player::Player(std::shared_ptr<Socket> client, std::string name, int age) : client(client), name(name), age(age), gold(0)
 {
 	this->is_king = false;
+	set_turn_choices();
 }
 
 
@@ -22,10 +23,10 @@ int Player::get_age()
 
 bool Player::has_character(std::string character_name)
 {
-	for (int i = 0; i < character_cards.size(); i++){
-		if (character_cards.get_card_at(i)->getName().compare(character_name)){
+	for (int i = 0; i < character_cards.size(); i++)
+	{
+		if (character_cards.get_card_at(i)->getName().compare(character_name))			
 			return true;
-		}
 	}
 	return false;
 }
@@ -80,4 +81,24 @@ void Player::put_card_on_field(std::shared_ptr<BuildingCard> field_card)
 void Player::add_character(std::shared_ptr<CharacterCard> character_card)
 {
 	character_cards.add_card(character_card);
+}
+
+std::vector<std::string> Player::get_turn_choices()
+{
+	return turn_choices;
+}
+
+void Player::set_turn_choices()
+{
+	turn_choices.clear();
+
+	turn_choices.push_back("[0] : Neem 2 goudstukken\r\n");
+	turn_choices.push_back("[1] : neem 2 bouwkaarten en leg er 1 af \r\n");
+	turn_choices.push_back("[2] : Leg 1 bouwkaart neer en betaal de waarde \r\n");
+	turn_choices.push_back("[3] : Speel karaktereigenschap \r\n");
+}
+
+void Player::remove_choice(int index)
+{
+	turn_choices.erase(turn_choices.begin() + index);
 }

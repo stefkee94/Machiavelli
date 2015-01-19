@@ -3,5 +3,6 @@ enum class GameFase
 {
 	ChooseChar,
 	DismissChar,
-	PlayFase
+	PlayFase,
+	ChooseBuildingCard
 };

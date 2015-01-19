@@ -30,6 +30,10 @@ class Player
 		int get_age();
 		std::shared_ptr<Socket> get_client();
 
+		std::vector<std::string> get_turn_choices();
+		void set_turn_choices();
+		void remove_choice(int index);
+
 	private:
 		std::shared_ptr<Socket> client;
 		std::string name;
@@ -39,6 +43,8 @@ class Player
 		bool is_king;
 		bool char_property_used;
 		
+		std::vector<std::string> turn_choices;
+
 		CardStack<std::shared_ptr<BuildingCard>> hand_cards;
 		CardStack<std::shared_ptr<BuildingCard>> field_cards;
 		CardStack<std::shared_ptr<CharacterCard>> character_cards;

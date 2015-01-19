@@ -20,13 +20,13 @@ void GameController::handle_client_command(std::shared_ptr<Socket> client, std::
 	if (player_on_turn->get_client().get() == client.get())
 	{
 		if (fase == GameFase::ChooseChar)
-		{
 			hanlde_choose_char_command(new_command);
-		}
 		else if (fase == GameFase::DismissChar)
-		{
 			handle_dismiss_char_command(new_command);
-		}
+		else if (fase == GameFase::PlayFase)
+			handle_play_turn_command(new_command);
+		else if (fase == GameFase::ChooseBuildingCard)
+			handle_choose_building_card(new_command);
 	}
 }
 
@@ -67,7 +67,7 @@ void GameController::hanlde_choose_char_command(std::string new_command)
 	while (!is_command_digit)
 	{
 		choice = atoi(new_command.c_str());
-		if (choice > 0 && (choice < character_cards.size()))
+		if ((choice > 0 || new_command.compare("0") == 0) && (choice < character_cards.size()))
 			is_command_digit = true;
 		else
 		{
@@ -75,6 +75,8 @@ void GameController::hanlde_choose_char_command(std::string new_command)
 			return;
 		}
 	}
+
+	player_on_turn->get_client()->write("You chose the : " + character_cards.get_card_at(choice)->getName() + "\r\n");
 
 	player_on_turn->add_character(character_cards.get_card_and_remove_at_index(choice));
 
@@ -93,9 +95,28 @@ void GameController::hanlde_choose_char_command(std::string new_command)
 
 void GameController::handle_dismiss_char_command(std::string new_command)
 {
-	int choice = std::atoi(new_command.c_str());
-	character_cards.get_card_and_remove_at_index(choice);
-	set_turn_to_next_player();
+	bool is_command_digit = false;
+	int choice;
+
+	if (character_cards.size() > 0)
+	{
+		while (!is_command_digit)
+		{
+			choice = atoi(new_command.c_str());
+			if ((choice > 0 || new_command.compare("0") == 0) && (choice < character_cards.size()))
+				is_command_digit = true;
+			else
+			{
+				player_on_turn->get_client()->write("Invalid text, please fill in valid text to dismiss a character \r\n");
+				return;
+			}
+		}
+
+		player_on_turn->get_client()->write("You dismissed the : " + character_cards.get_card_at(choice)->getName() + "\r\n");
+
+		character_cards.get_card_and_remove_at_index(choice);
+		set_turn_to_next_player();
+	}
 
 	if (character_cards.size() == 0)
 	{
@@ -109,12 +130,67 @@ void GameController::handle_dismiss_char_command(std::string new_command)
 	}
 }
 
+void GameController::handle_play_turn_command(std::string new_command)
+{
+	bool is_command_digit = false;
+	int choice;
+
+	while (!is_command_digit)
+	{
+		choice = atoi(new_command.c_str());
+		if (choice > 0 || new_command.compare("0") == 0)
+			is_command_digit = true;
+		else
+		{
+			player_on_turn->get_client()->write("Invalid text, please fill in valid text to play a turn \r\n");
+			return;
+		}
+	}
+
+	switch (choice)
+	{
+		case 0:
+			take_gold(2);
+		break;
+		case 1:
+			take_building_cards();
+		break;
+
+	}
+}
+
+void GameController::handle_choose_building_card(std::string new_command)
+{
+	bool is_command_digit = false;
+	int choice;
+
+	while (!is_command_digit)
+	{
+		choice = atoi(new_command.c_str());
+		if (choice > 0 || new_command.compare("0") == 0)
+			is_command_digit = true;
+		else
+		{
+			player_on_turn->get_client()->write("Invalid text, please fill in valid text to choose a building card \r\n");
+			return;
+		}
+	}
+
+	player_on_turn->add_card_to_hand(picked_building_cards[choice]);
+	picked_building_cards.clear();
+
+	// Move on to the next fase
+}
+
 void GameController::call_next_char()
 {
-	for (int i = 0; i < players.size(); i++){
-		if (players[i]->has_character(char_order[call_count])){
+	for (int i = 0; i < players.size(); i++)
+	{
+		if (players[i]->has_character(char_order[call_count]))
+		{
 			player_on_turn = players[i];
 			print_turn_info();
+
 			call_count++;
 			return;
 		}
@@ -126,18 +202,28 @@ void GameController::print_turn_info()
 	player_on_turn->get_client()->write("As of now you're the " + char_order[call_count] + "\r\n");
 	player_on_turn->get_client()->write("Gold: " + std::to_string(player_on_turn->get_gold()) + "\r\n\r\n");
 	player_on_turn->get_client()->write("Buildings: \r\n");
-	for (int i = 0; i < player_on_turn->get_field_cards().size(); i++){
+
+	for (int i = 0; i < player_on_turn->get_field_cards().size(); i++)
+	{
 		std::shared_ptr<BuildingCard> card = player_on_turn->get_field_cards().get_card_at(i);
 		player_on_turn->get_client()->write(card->get_name() + "(" + card->color_to_name() + ", " + std::to_string(card->get_points()) + ") \r\n");
 	}
+
 	player_on_turn->get_client()->write("\r\n");
 	player_on_turn->get_client()->write("Hand: \r\n");
-	for (int i = 0; i < player_on_turn->get_hand_cards().size(); i++){
+
+	for (int i = 0; i < player_on_turn->get_hand_cards().size(); i++)
+	{
 		std::shared_ptr<BuildingCard> card = player_on_turn->get_hand_cards().get_card_at(i);
 		player_on_turn->get_client()->write(card->get_name() + "(" + card->color_to_name() + ", " + std::to_string(card->get_points()) + ") \r\n");
 	}
+
 	player_on_turn->get_client()->write("\r\n");
 	player_on_turn->get_client()->write("What to do? \r\n");
+
+	for (int i = 0; i < player_on_turn->get_turn_choices().size(); i++)
+		player_on_turn->get_client()->write(player_on_turn->get_turn_choices()[i]);
+
 }
 
 void GameController::set_turn_to_next_player()
@@ -182,6 +268,34 @@ void GameController::start_game()
 	choose_character();
 }
 
+void GameController::take_gold(int amount)
+{
+	player_on_turn->add_gold(amount);
+
+	for (int i = 0; i < 2; i++)
+		player_on_turn->remove_choice(i);
+
+	player_on_turn->get_client()->write("You picked up " + std::to_string(amount) + " gold \r\n");
+	player_on_turn->get_client()->write(">");
+
+	print_turn_info();
+}
+
+void GameController::take_building_cards()
+{
+	fase = GameFase::ChooseBuildingCard;
+
+	for (int i = 0; i < 2; i++)
+		picked_building_cards.push_back(building_cards.get_card_at_top());
+
+	player_on_turn->get_client()->write("You picked these cards, you have to chose one of these and throw the other away");
+
+	for (int j = 0; j < picked_building_cards.size(); j++)
+		player_on_turn->get_client()->write(picked_building_cards[j]->get_name() + "(" + picked_building_cards[j]->color_to_name() + ", " + std::to_string(picked_building_cards[j]->get_points()) + ") \r\n");
+
+	player_on_turn->get_client()->write(">");
+}
+
 void GameController::choose_character()
 {
 	if (player_on_turn->get_is_king() && first_pick)
@@ -204,7 +318,10 @@ void GameController::dismiss_character()
 	for (int i = 0; i < character_cards.size(); i++)
 	{
 		if (character_cards.size() == 1)
-			player_on_turn->get_client()->write("Dismissed : " + character_cards.get_card_at(i)->getName());
+		{
+			player_on_turn->get_client()->write("Dismissed : " + character_cards.get_card_at(i)->getName() + "\r\n");
+			character_cards.get_card_and_remove_at_index(0);
+		}
 		else
 			player_on_turn->get_client()->write("[" + std::to_string(i) + "]: " + character_cards.get_card_at(i)->getName() + "\r\n");
 	}
@@ -243,5 +360,10 @@ void GameController::init()
 	char_order.push_back("Merchant");
 	char_order.push_back("Architect");
 	char_order.push_back("Condottiere");
+
+	init_choices.push_back("[0] : Neem 2 goudstukken of neem 2 bouwkaarten en leg er 1 af \r\n");
+	init_choices.push_back("[1] : Leg 1 bouwkaart neer en betaal de waarde \r\n");
+	init_choices.push_back("[2] : Speel karaktereigenschap \r\n");
+
 }
 
