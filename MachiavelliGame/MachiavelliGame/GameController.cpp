@@ -155,7 +155,6 @@ void GameController::handle_play_turn_command(std::string new_command)
 		case 1:
 			take_building_cards();
 		break;
-
 	}
 }
 
@@ -221,9 +220,8 @@ void GameController::print_turn_info()
 	player_on_turn->get_client()->write("\r\n");
 	player_on_turn->get_client()->write("What to do? \r\n");
 
-	for (int i = 0; i < player_on_turn->get_turn_choices().size(); i++)
-		player_on_turn->get_client()->write(player_on_turn->get_turn_choices()[i]);
-
+	for (int i = 0; i < turn_choices.size(); i++)
+		player_on_turn->get_client()->write("[" + std::to_string(i) + "] : " + turn_choices[i]);
 }
 
 void GameController::set_turn_to_next_player()
@@ -233,6 +231,7 @@ void GameController::set_turn_to_next_player()
 		if (players[i] != player_on_turn)
 		{
 			player_on_turn = players[i];
+			set_turn_choices();
 			return;
 		}
 	}
@@ -272,8 +271,7 @@ void GameController::take_gold(int amount)
 {
 	player_on_turn->add_gold(amount);
 
-	for (int i = 0; i < 2; i++)
-		player_on_turn->remove_choice(i);
+	remove_choices();
 
 	player_on_turn->get_client()->write("You picked up " + std::to_string(amount) + " gold \r\n");
 	player_on_turn->get_client()->write(">");
@@ -327,6 +325,24 @@ void GameController::dismiss_character()
 	}
 }
 
+std::vector<std::string> GameController::get_turn_choices()
+{
+	return turn_choices;
+}
+
+void GameController::set_turn_choices()
+{
+	turn_choices.clear();
+
+	for (int x = 0; x < init_choices.size(); x++)
+		turn_choices.push_back(init_choices[x]);
+}
+
+void GameController::remove_choices()
+{
+	turn_choices.erase(turn_choices.begin(), turn_choices.begin() + 2);
+}
+
 void GameController::show_help_text(std::shared_ptr<Socket> client)
 {
 	client->write("\r\nVoorkant : \r\n");
@@ -361,9 +377,11 @@ void GameController::init()
 	char_order.push_back("Architect");
 	char_order.push_back("Condottiere");
 
-	init_choices.push_back("[0] : Neem 2 goudstukken of neem 2 bouwkaarten en leg er 1 af \r\n");
-	init_choices.push_back("[1] : Leg 1 bouwkaart neer en betaal de waarde \r\n");
-	init_choices.push_back("[2] : Speel karaktereigenschap \r\n");
+	init_choices.push_back("Neem 2 goudstukken\r\n");
+	init_choices.push_back("Neem 2 bouwkaarten en leg er 1 af \r\n");
+	init_choices.push_back("Leg 1 bouwkaart neer en betaal de waarde \r\n");
+	init_choices.push_back("Speel karaktereigenschap \r\n");
 
+	set_turn_choices();
 }
 

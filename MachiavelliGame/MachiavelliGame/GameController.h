@@ -41,6 +41,12 @@ class GameController
 		void take_gold(int amount);
 		void take_building_cards();
 
+		std::vector<std::string> get_turn_choices();
+		std::vector<std::string> turn_choices;
+
+		void set_turn_choices();
+		void remove_choices();
+
 		std::vector<std::string> char_order;
 		std::vector<std::string> init_choices;
 		std::shared_ptr<Player> player_on_turn;

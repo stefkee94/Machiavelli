@@ -42,8 +42,6 @@ class Player
 
 		bool is_king;
 		bool char_property_used;
-		
-		std::vector<std::string> turn_choices;
 
 		CardStack<std::shared_ptr<BuildingCard>> hand_cards;
 		CardStack<std::shared_ptr<BuildingCard>> field_cards;
