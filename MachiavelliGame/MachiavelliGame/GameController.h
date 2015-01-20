@@ -30,6 +30,7 @@ class GameController
 		void handle_dismiss_char_command(std::string new_command);
 		void handle_play_turn_command(std::string new_command);
 		void handle_choose_building_card(std::string new_command);
+		void handle_build_card(std::string new_command);
 
 	private:
 		CardStack<std::shared_ptr<BuildingCard>> building_cards;
@@ -40,6 +41,8 @@ class GameController
 		void set_turn_to_next_player();
 		void take_gold(int amount);
 		void take_building_cards();
+
+		void build_building_card();
 
 		std::vector<std::string> get_turn_choices();
 		std::vector<std::string> turn_choices;

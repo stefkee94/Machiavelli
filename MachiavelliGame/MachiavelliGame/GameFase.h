@@ -4,5 +4,6 @@ enum class GameFase
 	ChooseChar,
 	DismissChar,
 	PlayFase,
-	ChooseBuildingCard
+	ChooseBuildingCard,
+	BuildCard
 };

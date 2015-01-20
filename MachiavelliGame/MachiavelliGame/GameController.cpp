@@ -27,6 +27,8 @@ void GameController::handle_client_command(std::shared_ptr<Socket> client, std::
 			handle_play_turn_command(new_command);
 		else if (fase == GameFase::ChooseBuildingCard)
 			handle_choose_building_card(new_command);
+		else if (fase == GameFase::BuildCard)
+			handle_build_card(new_command);
 	}
 }
 
@@ -149,6 +151,8 @@ void GameController::handle_play_turn_command(std::string new_command)
 		case 1:
 			take_building_cards();
 		break;
+		case 2:
+			build_building_card();
 	}
 }
 
@@ -172,11 +176,18 @@ void GameController::handle_choose_building_card(std::string new_command)
 	player_on_turn->add_card_to_hand(picked_building_cards[choice]);
 	
 
-	player_on_turn->get_client()->write("You picked up : " + picked_building_cards[choice]->get_name());// card
+	player_on_turn->get_client()->write("You picked up : " + picked_building_cards[choice]->get_name() + "\r\n");// card
 	
 	picked_building_cards.clear();
 
+	remove_choices();
 	// Move on to the next fase
+	print_turn_info();
+}
+
+void GameController::handle_build_card(std::string new_command)
+{
+	// handel het bouwen af naar de veld kaarten
 }
 
 void GameController::call_next_char()
@@ -283,6 +294,17 @@ void GameController::take_building_cards()
 	for (int j = 0; j < picked_building_cards.size(); j++)
 		player_on_turn->get_client()->write("[" + std::to_string(j) + "] : " + picked_building_cards[j]->get_name() + "(" + picked_building_cards[j]->color_to_name() + ", " + std::to_string(picked_building_cards[j]->get_points()) + ") \r\n");
 	player_on_turn->get_client()->write(">");
+}
+
+void GameController::build_building_card()
+{
+	fase = GameFase::BuildCard;
+	player_on_turn->get_client()->write("All the hand cards : \r\n");
+
+	for (int i = 0; i < player_on_turn->get_hand_cards().size(); i++)
+		player_on_turn->get_client()->write("[" + std::to_string(i) + "] : " + player_on_turn->get_hand_cards().get_card_at(i)->get_name() + "(" + player_on_turn->get_hand_cards().get_card_at(i)->color_to_name() + ", " + std::to_string(player_on_turn->get_hand_cards().get_card_at(i)->get_points()) + ") \r\n");
+
+	player_on_turn->get_client()->write("Choose one of these cards to build \r\n");
 }
 
 void GameController::choose_character()
