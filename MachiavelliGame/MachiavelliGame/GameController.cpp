@@ -170,6 +170,10 @@ void GameController::handle_choose_building_card(std::string new_command)
 	}
 
 	player_on_turn->add_card_to_hand(picked_building_cards[choice]);
+	
+
+	player_on_turn->get_client()->write("You picked up : " + picked_building_cards[choice]->get_name());// card
+	
 	picked_building_cards.clear();
 
 	// Move on to the next fase
@@ -183,8 +187,6 @@ void GameController::call_next_char()
 		{
 			player_on_turn = players[i];
 			print_turn_info();
-
-			call_count++;
 			return;
 		}
 	}
@@ -277,9 +279,9 @@ void GameController::take_building_cards()
 	fase = GameFase::ChooseBuildingCard;
 	for (int i = 0; i < 2; i++)
 		picked_building_cards.push_back(building_cards.get_card_at_top());
-	player_on_turn->get_client()->write("You picked these cards, you have to chose one of these and throw the other away");
+	player_on_turn->get_client()->write("You picked these cards, you have to chose one of these and throw the other away \r\n");
 	for (int j = 0; j < picked_building_cards.size(); j++)
-		player_on_turn->get_client()->write(picked_building_cards[j]->get_name() + "(" + picked_building_cards[j]->color_to_name() + ", " + std::to_string(picked_building_cards[j]->get_points()) + ") \r\n");
+		player_on_turn->get_client()->write("[" + std::to_string(j) + "] : " + picked_building_cards[j]->get_name() + "(" + picked_building_cards[j]->color_to_name() + ", " + std::to_string(picked_building_cards[j]->get_points()) + ") \r\n");
 	player_on_turn->get_client()->write(">");
 }
 
