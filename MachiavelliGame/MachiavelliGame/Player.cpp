@@ -91,7 +91,6 @@ std::vector<std::string> Player::get_turn_choices()
 void Player::set_turn_choices()
 {
 	turn_choices.clear();
-
 	turn_choices.push_back("[0] : Neem 2 goudstukken\r\n");
 	turn_choices.push_back("[1] : neem 2 bouwkaarten en leg er 1 af \r\n");
 	turn_choices.push_back("[2] : Leg 1 bouwkaart neer en betaal de waarde \r\n");

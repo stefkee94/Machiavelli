@@ -63,7 +63,6 @@ void GameController::hanlde_choose_char_command(std::string new_command)
 	//int choice = std::atoi(new_command.c_str());
 	bool is_command_digit = false;
 	int choice;
-
 	while (!is_command_digit)
 	{
 		choice = atoi(new_command.c_str());
@@ -75,11 +74,8 @@ void GameController::hanlde_choose_char_command(std::string new_command)
 			return;
 		}
 	}
-
 	player_on_turn->get_client()->write("You chose the : " + character_cards.get_card_at(choice)->getName() + "\r\n");
-
 	player_on_turn->add_character(character_cards.get_card_and_remove_at_index(choice));
-
 	if (first_pick)
 	{
 		first_pick = false;
@@ -134,7 +130,6 @@ void GameController::handle_play_turn_command(std::string new_command)
 {
 	bool is_command_digit = false;
 	int choice;
-
 	while (!is_command_digit)
 	{
 		choice = atoi(new_command.c_str());
@@ -146,7 +141,6 @@ void GameController::handle_play_turn_command(std::string new_command)
 			return;
 		}
 	}
-
 	switch (choice)
 	{
 		case 0:
@@ -271,28 +265,21 @@ void GameController::start_game()
 void GameController::take_gold(int amount)
 {
 	player_on_turn->add_gold(amount);
-
 	for (int i = 0; i < 2; i++)
 		player_on_turn->remove_choice(i);
-
 	player_on_turn->get_client()->write("You picked up " + std::to_string(amount) + " gold \r\n");
 	player_on_turn->get_client()->write(">");
-
 	print_turn_info();
 }
 
 void GameController::take_building_cards()
 {
 	fase = GameFase::ChooseBuildingCard;
-
 	for (int i = 0; i < 2; i++)
 		picked_building_cards.push_back(building_cards.get_card_at_top());
-
 	player_on_turn->get_client()->write("You picked these cards, you have to chose one of these and throw the other away");
-
 	for (int j = 0; j < picked_building_cards.size(); j++)
 		player_on_turn->get_client()->write(picked_building_cards[j]->get_name() + "(" + picked_building_cards[j]->color_to_name() + ", " + std::to_string(picked_building_cards[j]->get_points()) + ") \r\n");
-
 	player_on_turn->get_client()->write(">");
 }
 
@@ -307,7 +294,6 @@ void GameController::choose_character()
 	{
 		player_on_turn->get_client()->write("[" + std::to_string(i) + "]: " + character_cards.get_card_at(i)->getName() + "\r\n");
 	}
-
 	player_on_turn->get_client()->write(">");
 }
 
