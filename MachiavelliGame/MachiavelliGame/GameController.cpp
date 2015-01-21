@@ -252,40 +252,46 @@ void GameController::handle_char_property()
 			do_magicien_property();
 		break;
 		case CharacterType::King:
-			int yellow_cards_on_field = 0;
-			for (int i = 0; player_on_turn->get_field_cards().size(); i++)
-			{
-				if (player_on_turn->get_field_cards().get_card_at(i)->get_card_color() == CardColor::Yellow)
-				{
-					player_on_turn->add_gold(1);
-					yellow_cards_on_field++;
-				}
-			}
-			player_on_turn->get_client()->write("You got " + std::to_string(yellow_cards_on_field) + " from the yellow buildings \r\n");
+		{
+									int yellow_cards_on_field = 0;
+									for (int i = 0; player_on_turn->get_field_cards().size(); i++)
+									{
+										if (player_on_turn->get_field_cards().get_card_at(i)->get_card_color() == CardColor::Yellow)
+										{
+											player_on_turn->add_gold(1);
+											yellow_cards_on_field++;
+										}
+									}
+									player_on_turn->get_client()->write("You got " + std::to_string(yellow_cards_on_field) + "gold from the yellow buildings \r\n");
+		}
 		break;
 		case CharacterType::Preacher:
-			int blue_cards_on_field = 0;
-			for (int i = 0; player_on_turn->get_field_cards().size(); i++)
-			{
-				if (player_on_turn->get_field_cards().get_card_at(i)->get_card_color() == CardColor::Blue)
-				{
-					player_on_turn->add_gold(1);
-					blue_cards_on_field++;
-				}
-			}
-			player_on_turn->get_client()->write("You got " + std::to_string(blue_cards_on_field) + " from the blue buildings \r\n");
+		{
+										int blue_cards_on_field = 0;
+										for (int i = 0; player_on_turn->get_field_cards().size(); i++)
+										{
+											if (player_on_turn->get_field_cards().get_card_at(i)->get_card_color() == CardColor::Blue)
+											{
+												player_on_turn->add_gold(1);
+												blue_cards_on_field++;
+											}
+										}
+										player_on_turn->get_client()->write("You got " + std::to_string(blue_cards_on_field) + "gold from the blue buildings \r\n");
+		}
 		break;
 		case CharacterType::Merchant:
-			int greem_cards_on_field = 0;
-			for (int i = 0; player_on_turn->get_field_cards().size(); i++)
-			{
-				if (player_on_turn->get_field_cards().get_card_at(i)->get_card_color() == CardColor::Green)
-				{
-					player_on_turn->add_gold(1);
-					greem_cards_on_field++;
-				}
-			}
-			player_on_turn->get_client()->write("You got " + std::to_string(greem_cards_on_field) + " from the green buildings \r\n");
+		{
+										int green_cards_on_field = 0;
+										for (int i = 0; player_on_turn->get_field_cards().size(); i++)
+										{
+											if (player_on_turn->get_field_cards().get_card_at(i)->get_card_color() == CardColor::Green)
+											{
+												player_on_turn->add_gold(1);
+												green_cards_on_field++;
+											}
+										}
+										player_on_turn->get_client()->write("You got " + std::to_string(green_cards_on_field) + "gold from the green buildings \r\n");
+		}
 		break;
 		case CharacterType::Architect:
 			count_builded_in_turn_for_architect = 0;
