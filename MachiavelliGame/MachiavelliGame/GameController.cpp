@@ -149,6 +149,9 @@ void GameController::handle_play_turn_command(std::string new_command)
 		case 2:
 			build_building_card();
 		break;
+		case 3:
+			handle_char_property();
+		break;
 	}
 }
 
