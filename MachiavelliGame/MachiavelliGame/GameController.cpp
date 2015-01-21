@@ -529,8 +529,10 @@ void GameController::handle_magicien_property(std::string new_command)
 	{
 		case 0:
 			magicien_trade_cards_with_player();
+		break;
 		case 1:
 			magicien_trade_cards_with_bank();
+		break;
 	}
 }
 
@@ -545,6 +547,7 @@ void GameController::magicien_trade_cards_with_player()
 		if (players[i] != player_on_turn)
 		{
 			other_player_cards = players[i]->get_hand_cards();
+			break;
 		}
 	}
 
@@ -555,7 +558,10 @@ void GameController::magicien_trade_cards_with_player()
 	other_player_cards.clear();
 	other_player_cards = tmp_player_cards;
 
-
+	player_on_turn->get_client()->write("You have swapped your cards with the other player \r\n");
+	
+	fase = GamePhase::PlayFase;
+	print_turn_info();
 }
 
 void GameController::magicien_trade_cards_with_bank()
@@ -604,6 +610,9 @@ void GameController::handle_magicien_trade_bank_prop(std::string new_command)
 		player_on_turn->add_card_to_hand(new_card);
 	}
 
+	fase = GamePhase::PlayFase;
+
+	print_turn_info();
 }
 
 std::vector<std::pair<int, std::string>> GameController::get_turn_choices()
