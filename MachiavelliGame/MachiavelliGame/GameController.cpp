@@ -277,6 +277,10 @@ void GameController::call_next_char()
 			return;
 		}
 	}
+	if (call_count < char_order.size()){
+		call_count++;
+		call_next_char();
+	}
 }
 
 void GameController::print_turn_info()
