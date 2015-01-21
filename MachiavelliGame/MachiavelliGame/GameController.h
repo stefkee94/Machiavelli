@@ -44,8 +44,8 @@ class GameController
 
 		void build_building_card();
 
-		std::vector<std::string> get_turn_choices();
-		std::vector<std::string> turn_choices;
+		std::vector<std::pair<int, std::string>> get_turn_choices();
+		std::vector<std::pair<int, std::string>> turn_choices;
 
 		void set_turn_choices();
 		void remove_choice(int index);

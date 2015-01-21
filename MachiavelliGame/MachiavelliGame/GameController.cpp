@@ -85,8 +85,8 @@ void GameController::hanlde_choose_char_command(std::string new_command)
 	}
 	else
 	{
-		dismiss_character();
 		fase = GamePhase::DismissChar;
+		dismiss_character();
 	}
 }
 
@@ -115,12 +115,7 @@ void GameController::handle_dismiss_char_command(std::string new_command)
 		set_turn_to_next_player();
 	}
 
-	if (character_cards.size() == 0)
-	{
-		fase = GamePhase::PlayFase;
-		call_next_char();
-	}
-	else
+	if (character_cards.size() > 0)
 	{
 		fase = GamePhase::ChooseChar;
 		choose_character();
@@ -142,7 +137,8 @@ void GameController::handle_play_turn_command(std::string new_command)
 			return;
 		}
 	}
-	switch (choice)
+	int turn_number = turn_choices[choice].first;
+	switch (turn_number)
 	{
 		case 0:
 			take_gold(2);
@@ -260,7 +256,9 @@ void GameController::print_turn_info()
 	player_on_turn->get_client()->write("What to do? \r\n");
 
 	for (int i = 0; i < turn_choices.size(); i++)
-		player_on_turn->get_client()->write("[" + std::to_string(i) + "] : " + turn_choices[i]);
+		player_on_turn->get_client()->write("[" + std::to_string(i) + "] : " + turn_choices[i].second);
+
+	player_on_turn->get_client()->write(">");
 }
 
 void GameController::set_turn_to_next_player()
@@ -369,9 +367,15 @@ void GameController::dismiss_character()
 		else
 			player_on_turn->get_client()->write("[" + std::to_string(i) + "]: " + character_cards.get_card_at(i)->getName() + "\r\n");
 	}
+
+	if (character_cards.size() == 0)
+	{
+		fase = GamePhase::PlayFase;
+		call_next_char();
+	}
 }
 
-std::vector<std::string> GameController::get_turn_choices()
+std::vector<std::pair<int, std::string>> GameController::get_turn_choices()
 {
 	return turn_choices;
 }
@@ -381,7 +385,7 @@ void GameController::set_turn_choices()
 	turn_choices.clear();
 
 	for (int x = 0; x < init_choices.size(); x++)
-		turn_choices.push_back(init_choices[x]);
+		turn_choices.push_back(std::pair<int, std::string>(x,init_choices[x]));
 }
 
 void GameController::remove_choice(int index)
