@@ -141,7 +141,7 @@ void GameController::handle_play_turn_command(std::string new_command)
 	while (!is_command_digit)
 	{
 		choice = atoi(new_command.c_str());
-		if ((choice > 0 || new_command.compare("0") == 0) && choice <= turn_choices.size())
+		if ((choice > 0 || new_command.compare("0") == 0) && choice <= turn_choices.size()-1)
 			is_command_digit = true;
 		else
 		{
@@ -242,7 +242,7 @@ void GameController::handle_char_property()
 			fase = GamePhase::MurderPhase;
 		break;
 		case CharacterType::Thief:
-			player_on_turn->get_client()->write("Steal from?");
+			player_on_turn->get_client()->write("Steal from? \r\n");
 			for (auto it : thief_choices){
 				player_on_turn->get_client()->write("[" + std::to_string(it.first) + "]: " + it.second + "\r\n");
 			}
@@ -252,30 +252,49 @@ void GameController::handle_char_property()
 			do_magicien_property();
 		break;
 		case CharacterType::King:
+			int yellow_cards_on_field = 0;
 			for (int i = 0; player_on_turn->get_field_cards().size(); i++)
 			{
 				if (player_on_turn->get_field_cards().get_card_at(i)->get_card_color() == CardColor::Yellow)
+				{
 					player_on_turn->add_gold(1);
+					yellow_cards_on_field++;
+				}
 			}
+			player_on_turn->get_client()->write("You got " + std::to_string(yellow_cards_on_field) + " from the yellow buildings \r\n");
 		break;
 		case CharacterType::Preacher:
+			int blue_cards_on_field = 0;
 			for (int i = 0; player_on_turn->get_field_cards().size(); i++)
 			{
 				if (player_on_turn->get_field_cards().get_card_at(i)->get_card_color() == CardColor::Blue)
+				{
 					player_on_turn->add_gold(1);
+					blue_cards_on_field++;
+				}
 			}
+			player_on_turn->get_client()->write("You got " + std::to_string(blue_cards_on_field) + " from the blue buildings \r\n");
 		break;
 		case CharacterType::Merchant:
+			int greem_cards_on_field = 0;
 			for (int i = 0; player_on_turn->get_field_cards().size(); i++)
 			{
 				if (player_on_turn->get_field_cards().get_card_at(i)->get_card_color() == CardColor::Green)
+				{
 					player_on_turn->add_gold(1);
+					greem_cards_on_field++;
+				}
 			}
+			player_on_turn->get_client()->write("You got " + std::to_string(greem_cards_on_field) + " from the green buildings \r\n");
 		break;
 		case CharacterType::Architect:
 			count_builded_in_turn_for_architect = 0;
-			player_on_turn->add_card_to_hand(building_cards.get_card_at_top());
-			player_on_turn->add_card_to_hand(building_cards.get_card_at_top());
+			for (int i = 0; i < 2; i++)
+			{
+				std::shared_ptr<BuildingCard> new_card = building_cards.get_card_at_top();
+				player_on_turn->get_client()->write("You picked up : " + new_card->get_name() + "(" + new_card->color_to_name() + ", " + std::to_string(new_card->get_points()) + ") \r\n");
+				player_on_turn->add_card_to_hand(new_card);
+			}
 		break;
 		case CharacterType::Condottiere:
 		break;
@@ -334,9 +353,10 @@ void GameController::handle_build_card(std::string new_command)
 
 	std::shared_ptr<BuildingCard> chosen_building_card = player_on_turn->get_hand_cards().get_card_at(choice);
 	if (chosen_building_card->get_points() > player_on_turn->get_gold())
-		player_on_turn->get_client()->write("Can't play this card because you need " + std::to_string(chosen_building_card->get_points()) + " points to play it \r\n Please choose another card");
+		player_on_turn->get_client()->write("Can't play this card because you need " + std::to_string(chosen_building_card->get_points()) + " points to play it \r\nPlease choose another card \r\n");
 	else
 	{
+		player_on_turn->remove_gold(chosen_building_card->get_points());
 		// put card on the field and remove from the hand
 		player_on_turn->put_card_on_field(chosen_building_card);
 		player_on_turn->remove_card_from_hand(choice);
@@ -345,9 +365,9 @@ void GameController::handle_build_card(std::string new_command)
 		
 		if (player_on_turn->get_char_type() == CharacterType::Architect)
 		{
-			bool max_build = 3;
+			int max_build = 3;
 			count_builded_in_turn_for_architect++;
-			if (count_builded_in_turn_for_architect == max_build)
+			if (count_builded_in_turn_for_architect >= max_build)
 				remove_choice(choice);
 		}
 		else
@@ -355,7 +375,6 @@ void GameController::handle_build_card(std::string new_command)
 
 		fase = GamePhase::PlayFase;
 		print_turn_info();
-
 	}
 }
 
