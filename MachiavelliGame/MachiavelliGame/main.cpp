@@ -1,4 +1,5 @@
 #include <memory>
+#include "vld.h"
 #include "ServerController.h"
 #include "CardStack.h"
 #include "MachiavelliReader.h"

@@ -28,7 +28,7 @@ class Player
 		void set_type(CharacterType type);
 		void set_is_king(bool is_king);
 		bool get_is_king();
-
+		void reset_character_cards();
 		bool get_is_robbed();
 		void set_is_robbed(bool b);
 
