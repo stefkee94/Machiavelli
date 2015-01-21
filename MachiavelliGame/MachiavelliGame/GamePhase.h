@@ -5,5 +5,7 @@ enum class GamePhase
 	DismissChar,
 	PlayFase,
 	ChooseBuildingCard,
-	BuildCard
+	BuildCard,
+	MagicienProperty,
+	MagicienTradeBank
 };

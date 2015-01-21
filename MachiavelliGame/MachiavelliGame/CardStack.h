@@ -12,6 +12,7 @@ class CardStack
 		T get_card_and_remove_at_index(int index);
 		int size();
 		T get_card_at(int i);
+		void clear();
 
 	private:
 		std::vector<T> card_vector;
@@ -66,4 +67,10 @@ T CardStack<T>::get_card_and_remove_at_index(int index)
 		return card;
 	}
 	return nullptr;
+}
+
+template<typename T>
+void CardStack<T>::clear()
+{
+	card_vector.clear();
 }
