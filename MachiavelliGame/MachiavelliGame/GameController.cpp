@@ -1,5 +1,9 @@
 #include "GameController.h"
 #include "ServerController.h"
+#include <vector>
+#include <string>
+#include <sstream>
+#include <iostream>
 
 GameController::GameController()
 {
@@ -29,6 +33,10 @@ void GameController::handle_client_command(std::shared_ptr<Socket> client, std::
 			handle_choose_building_card(new_command);
 		else if (fase == GamePhase::BuildCard)
 			handle_build_card(new_command);
+		else if (fase == GamePhase::MagicienProperty)
+			handle_magicien_property(new_command);
+		else if (fase == GamePhase::MagicienTradeBank)
+			handle_magicien_trade_bank_prop(new_command);
 		else if (fase == GamePhase::MurderPhase)
 			handle_murder_character(new_command);
 		else if (fase == GamePhase::ThiefPhase)
@@ -133,7 +141,7 @@ void GameController::handle_play_turn_command(std::string new_command)
 	while (!is_command_digit)
 	{
 		choice = atoi(new_command.c_str());
-		if (choice > 0 || new_command.compare("0") == 0)
+		if ((choice > 0 || new_command.compare("0") == 0) && choice <= turn_choices.size())
 			is_command_digit = true;
 		else
 		{
@@ -158,7 +166,7 @@ void GameController::handle_play_turn_command(std::string new_command)
 			handle_char_property();
 		break;
 		case 4:
-			handle_end_turn();
+			
 		break;
 	}
 }
@@ -173,23 +181,7 @@ void GameController::handle_steal_from_character(std::string new_command)
 		}
 	}
 	fase = GamePhase::PlayFase;
-	init_thief_choices(murderer_choices[choice]);
 	print_turn_info();
-}
-
-void GameController::handle_end_turn()
-{
-	if (player_on_turn->get_char_type() == CharacterType::Thief){
-		for (int i = 0; i < players.size(); i++){
-			if (players[i]->get_is_robbed()){
-				player_on_turn->add_gold(players[i]->get_gold());
-				players[i]->remove_gold(players[i]->get_gold());
-				players[i]->set_is_robbed(false);
-			}
-		}
-	}
-	call_count++;
-	call_next_char();
 }
 
 void GameController::handle_choose_building_card(std::string new_command)
@@ -242,44 +234,57 @@ void GameController::handle_char_property()
 			fase = GamePhase::ThiefPhase;
 		break;
 		case CharacterType::Magicien:
+			do_magicien_property();
 		break;
 		case CharacterType::King:
-		for (int i = 0; player_on_turn->get_field_cards().size(); i++){
-			if (player_on_turn->get_field_cards().get_card_at(i)->get_card_color() == CardColor::Yellow){
-				player_on_turn->add_gold(1);
+			for (int i = 0; player_on_turn->get_field_cards().size(); i++)
+			{
+				if (player_on_turn->get_field_cards().get_card_at(i)->get_card_color() == CardColor::Yellow)
+					player_on_turn->add_gold(1);
 			}
-		}
 		break;
 		case CharacterType::Preacher:
-		for (int i = 0; player_on_turn->get_field_cards().size(); i++){
-			if (player_on_turn->get_field_cards().get_card_at(i)->get_card_color() == CardColor::Blue){
-				player_on_turn->add_gold(1);
+			for (int i = 0; player_on_turn->get_field_cards().size(); i++)
+			{
+				if (player_on_turn->get_field_cards().get_card_at(i)->get_card_color() == CardColor::Blue)
+					player_on_turn->add_gold(1);
 			}
-		}
 		break;
 		case CharacterType::Merchant:
-			for (int i = 0; player_on_turn->get_field_cards().size(); i++){
-				if (player_on_turn->get_field_cards().get_card_at(i)->get_card_color() == CardColor::Green){
+			for (int i = 0; player_on_turn->get_field_cards().size(); i++)
+			{
+				if (player_on_turn->get_field_cards().get_card_at(i)->get_card_color() == CardColor::Green)
 					player_on_turn->add_gold(1);
-				}
 			}
 		break;
 		case CharacterType::Architect:
+			count_builded_in_turn_for_architect = 0;
 			player_on_turn->add_card_to_hand(building_cards.get_card_at_top());
 			player_on_turn->add_card_to_hand(building_cards.get_card_at_top());
 		break;
 		case CharacterType::Condottiere:
-			break;
+		break;
 	}
 }
 
 void GameController::handle_murder_character(std::string new_command)
 {
+	bool is_command_digit = false;
 	int choice;
-	choice = atoi(new_command.c_str());
-	for (int i = 0; i < players.size(); i++){
-		players[i]->remove_character_card(murderer_choices[choice]);
+	while (!is_command_digit)
+	{
+		choice = atoi(new_command.c_str());
+		if ((choice > 0 && choice <= murderer_choices.size()) || new_command.compare("0") == 0)
+			is_command_digit = true;
+		else
+		{
+			player_on_turn->get_client()->write("Invalid text, please fill in valid text to murder a character \r\n");
+			return;
+		}
 	}
+	for (int i = 0; i < players.size(); i++)
+		players[i]->remove_character_card(murderer_choices[choice]);
+	player_on_turn->get_client()->write("The murderer killed the " + murderer_choices[choice] + "\r\n");
 	fase = GamePhase::PlayFase;
 	init_thief_choices(murderer_choices[choice]);
 	print_turn_info();
@@ -323,7 +328,16 @@ void GameController::handle_build_card(std::string new_command)
 
 		player_on_turn->get_client()->write("You have built : " + chosen_building_card->get_name() + "(" + chosen_building_card->color_to_name() + ", " + std::to_string(chosen_building_card->get_points()) + ") \r\n");
 		
-		remove_choice(choice);
+		if (player_on_turn->get_char_type() == CharacterType::Architect)
+		{
+			bool max_build = 3;
+			count_builded_in_turn_for_architect++;
+			if (count_builded_in_turn_for_architect == max_build)
+				remove_choice(choice);
+		}
+		else
+			remove_choice(choice);
+
 		fase = GamePhase::PlayFase;
 		print_turn_info();
 
@@ -346,9 +360,22 @@ void GameController::call_next_char()
 			return;
 		}
 	}
-	if (call_count < char_order.size()){
+
+	if (call_count < char_order.size()-1){
 		call_count++;
 		call_next_char();
+	}
+
+	if (call_count == char_order.size()-1)
+	{
+		player_on_turn->get_client()->write("<----------------------- NEXT ROUND ------------------------>");
+		call_count = 0;
+		fase == GamePhase::ChooseChar;
+
+		if (!player_on_turn->get_is_king())
+			set_turn_to_next_player();
+
+		choose_character();
 	}
 }
 
@@ -496,6 +523,113 @@ void GameController::dismiss_character()
 	}
 }
 
+void GameController::do_magicien_property()
+{
+	player_on_turn->get_client()->write("What do you want to do? \r\n");
+	player_on_turn->get_client()->write("[0] : Trade hand cards with another player \r\n");
+	player_on_turn->get_client()->write("[1] : Chose cards to exchange with the bank \r\n");
+	player_on_turn->get_client()->write(">");
+
+	fase = GamePhase::MagicienProperty;
+}
+
+void GameController::handle_magicien_property(std::string new_command)
+{
+	bool is_command_digit = false;
+	int choice;
+
+	while (!is_command_digit)
+	{
+		choice = atoi(new_command.c_str());
+		if ((choice > 0 && choice < 3) || new_command.compare("0") == 0)
+			is_command_digit = true;
+		else
+		{
+			player_on_turn->get_client()->write("Invalid text, please fill in valid text to play the magicien property \r\n");
+			return;
+		}
+	}
+
+	switch (choice)
+	{
+		case 0:
+			magicien_trade_cards_with_player();
+		case 1:
+			magicien_trade_cards_with_bank();
+	}
+}
+
+void GameController::magicien_trade_cards_with_player()
+{
+	CardStack<std::shared_ptr<BuildingCard>> current_player_cards = player_on_turn->get_hand_cards();
+	CardStack<std::shared_ptr<BuildingCard>> other_player_cards;
+	CardStack<std::shared_ptr<BuildingCard>> tmp_player_cards;
+
+	for (int i = 0; i < players.size(); i++)
+	{
+		if (players[i] != player_on_turn)
+		{
+			other_player_cards = players[i]->get_hand_cards();
+		}
+	}
+	// Change cards to other players
+	tmp_player_cards = current_player_cards;
+	current_player_cards.clear();
+	current_player_cards = other_player_cards;
+	other_player_cards.clear();
+	other_player_cards = tmp_player_cards;
+
+
+}
+
+void GameController::magicien_trade_cards_with_bank()
+{
+	for (int i = 0; i < player_on_turn->get_hand_cards().size(); i++)
+	{
+		std::shared_ptr<BuildingCard> card = player_on_turn->get_hand_cards().get_card_at(i);
+		player_on_turn->get_client()->write(card->get_name() + "(" + card->color_to_name() + ", " + std::to_string(card->get_points()) + ") \r\n");
+	}
+
+	player_on_turn->get_client()->write("which cards do you want to replace? Write the index including a comma \r\n >");
+
+	fase = GamePhase::MagicienTradeBank;
+}
+
+void GameController::handle_magicien_trade_bank_prop(std::string new_command)
+{
+	std::vector<std::string> card_indices;
+	std::stringstream ss(new_command);
+	std::string buffer;
+
+	while (ss >> buffer)
+		card_indices.push_back(buffer);
+
+	for (int x = 0; x < card_indices.size(); x++)
+	{
+		if (atoi(card_indices[x].c_str()) < 0 || atoi(card_indices[x].c_str()) > player_on_turn->get_hand_cards().size())
+		{
+			player_on_turn->get_client()->write("Invalid text, please fill in valid text for the numbers to exchange with the bank \r\n");
+			return;
+		}
+	}
+
+	int count_of_new_cards = card_indices.size();
+	for (int i = 0; i < card_indices.size(); i++)
+	{
+		player_on_turn->get_client()->write("Removed : " + player_on_turn->get_hand_cards().get_card_at(atoi(card_indices.at(i).c_str()))->get_name());
+		player_on_turn->remove_card_from_hand(atoi(card_indices.at(i).c_str()));
+	}
+
+	for (int j = 0; j < count_of_new_cards; j++)
+	{
+		std::shared_ptr<BuildingCard> new_card = building_cards.get_card_at_top();
+		player_on_turn->get_client()->write("You picked up : " + new_card->get_name() + "(" + new_card->color_to_name() + ", " + std::to_string(new_card->get_points()) + ") \r\n");
+
+		player_on_turn->add_card_to_hand(new_card);
+	}
+
+}
+
 std::vector<std::pair<int, std::string>> GameController::get_turn_choices()
 {
 	return turn_choices;
@@ -552,6 +686,7 @@ void GameController::init()
 	init_choices.push_back("Take 2 building cards and choose one \r\n");
 	init_choices.push_back("Build 1 building card and pay the value \r\n");
 	init_choices.push_back("Play character property \r\n");
+	init_choices.push_back("End turn \r\n");
 
 	murderer_choices = std::map<int, std::string>{
 		{ 0, "Thief" },
@@ -562,6 +697,7 @@ void GameController::init()
 		{ 5, "Architect"},
 		{ 6, "Condottiere"}
 	};
+
 	set_turn_choices();
 }
 

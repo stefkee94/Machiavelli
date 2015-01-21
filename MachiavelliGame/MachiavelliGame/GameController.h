@@ -34,8 +34,10 @@ class GameController
 		void handle_murder_character(std::string new_command);
 		void handle_steal_from_character(std::string new_command);
 		void handle_build_card(std::string new_command);
+
 		void handle_char_property();
-		void handle_end_turn();
+		void handle_magicien_property(std::string new_command);
+		void handle_magicien_trade_bank_prop(std::string new_command);
 
 	private:
 		CardStack<std::shared_ptr<BuildingCard>> building_cards;
@@ -65,8 +67,14 @@ class GameController
 
 		std::vector<std::shared_ptr<BuildingCard>> picked_building_cards;
 
+		// magicien
+		void do_magicien_property();
+		void magicien_trade_cards_with_player();
+		void magicien_trade_cards_with_bank();
+
 		GamePhase fase;
 		bool first_pick;
+		bool count_builded_in_turn_for_architect = 0;
 		int call_count = 0;
 };
 
