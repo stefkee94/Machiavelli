@@ -213,9 +213,7 @@ void GameController::handle_choose_building_card(std::string new_command)
 			return;
 		}
 	}
-
 	player_on_turn->add_card_to_hand(picked_building_cards[choice]);
-	
 
 	player_on_turn->get_client()->write("You picked up : " + picked_building_cards[choice]->get_name() + "\r\n");// card
 	
@@ -373,22 +371,40 @@ void GameController::call_next_char()
 			return;
 		}
 	}
-
-	if (call_count < char_order.size()-1){
-		call_count++;
+	call_count++;
+	if (call_count < char_order.size()){
 		call_next_char();
-	}
-
-	if (call_count == char_order.size()-1)
-	{
-		player_on_turn->get_client()->write("<----------------------- NEXT ROUND ------------------------>");
+	}else{
+		set_new_king();
+		reset_characters();
+		for (int i = 0; i < players.size(); i++){
+			players[i]->get_client()->write("<----------------------- NEXT ROUND ------------------------> \r\n");
+		}
+		MachiavelliReader reader;
+		character_cards = reader.read_character_cards("karakters.csv");
 		call_count = 0;
 		fase == GamePhase::ChooseChar;
-
-		if (!player_on_turn->get_is_king())
-			set_turn_to_next_player();
-
 		choose_character();
+	}
+}
+
+void GameController::reset_characters()
+{
+	for (int i = 0; i < players.size(); i++){
+		players[i]->reset_character_cards();
+	}
+}
+
+void GameController::set_new_king()
+{
+	for (int i = 0; i < players.size(); i++){
+		if (players[i]->has_character("King") != nullptr || players[i]->get_is_king()){
+			players[i]->set_is_king(true);
+			player_on_turn = players[i];
+		}
+		else{
+			players[i]->set_is_king(false);
+		}
 	}
 }
 
