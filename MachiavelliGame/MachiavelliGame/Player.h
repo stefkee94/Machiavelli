@@ -29,7 +29,7 @@ class Player
 		void set_is_king(bool is_king);
 		bool get_is_king();
 		std::shared_ptr<CharacterCard> has_character(std::string character_name);
-
+		void remove_character_card(std::string character_name);
 		CharacterType get_char_type();
 		int get_gold();
 		int get_age();
