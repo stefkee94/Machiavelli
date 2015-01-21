@@ -19,15 +19,15 @@ void GameController::handle_client_command(std::shared_ptr<Socket> client, std::
 	}
 	if (player_on_turn->get_client().get() == client.get())
 	{
-		if (fase == GameFase::ChooseChar)
+		if (fase == GamePhase::ChooseChar)
 			hanlde_choose_char_command(new_command);
-		else if (fase == GameFase::DismissChar)
+		else if (fase == GamePhase::DismissChar)
 			handle_dismiss_char_command(new_command);
-		else if (fase == GameFase::PlayFase)
+		else if (fase == GamePhase::PlayFase)
 			handle_play_turn_command(new_command);
-		else if (fase == GameFase::ChooseBuildingCard)
+		else if (fase == GamePhase::ChooseBuildingCard)
 			handle_choose_building_card(new_command);
-		else if (fase == GameFase::BuildCard)
+		else if (fase == GamePhase::BuildCard)
 			handle_build_card(new_command);
 	}
 }
@@ -62,7 +62,6 @@ void GameController::consume_command(ClientCommand command, std::shared_ptr<Sock
 
 void GameController::hanlde_choose_char_command(std::string new_command)
 {
-	//int choice = std::atoi(new_command.c_str());
 	bool is_command_digit = false;
 	int choice;
 	while (!is_command_digit)
@@ -87,7 +86,7 @@ void GameController::hanlde_choose_char_command(std::string new_command)
 	else
 	{
 		dismiss_character();
-		fase = GameFase::DismissChar;
+		fase = GamePhase::DismissChar;
 	}
 }
 
@@ -118,12 +117,12 @@ void GameController::handle_dismiss_char_command(std::string new_command)
 
 	if (character_cards.size() == 0)
 	{
-		fase = GameFase::PlayFase;
+		fase = GamePhase::PlayFase;
 		call_next_char();
 	}
 	else
 	{
-		fase = GameFase::ChooseChar;
+		fase = GamePhase::ChooseChar;
 		choose_character();
 	}
 }
@@ -153,6 +152,7 @@ void GameController::handle_play_turn_command(std::string new_command)
 		break;
 		case 2:
 			build_building_card();
+		break;
 	}
 }
 
@@ -164,7 +164,7 @@ void GameController::handle_choose_building_card(std::string new_command)
 	while (!is_command_digit)
 	{
 		choice = atoi(new_command.c_str());
-		if (choice > 0 || new_command.compare("0") == 0)
+		if (choice == 1 || new_command.compare("0") == 0)
 			is_command_digit = true;
 		else
 		{
@@ -180,14 +180,46 @@ void GameController::handle_choose_building_card(std::string new_command)
 	
 	picked_building_cards.clear();
 
-	remove_choices();
+	remove_choice(0);
+	remove_choice(0);
+
 	// Move on to the next fase
 	print_turn_info();
 }
 
 void GameController::handle_build_card(std::string new_command)
 {
-	// handel het bouwen af naar de veld kaarten
+	bool is_command_digit = false;
+	int choice;
+
+	while (!is_command_digit)
+	{
+		choice = atoi(new_command.c_str());
+		if ((choice > 0 && choice <= player_on_turn->get_hand_cards().size()) || new_command.compare("0") == 0)
+			is_command_digit = true;
+		else
+		{
+			player_on_turn->get_client()->write("Invalid text, please fill in valid text to play a building card \r\n");
+			return;
+		}
+	}
+
+	std::shared_ptr<BuildingCard> chosen_building_card = player_on_turn->get_hand_cards().get_card_at(choice);
+	if (chosen_building_card->get_points() > player_on_turn->get_gold())
+		player_on_turn->get_client()->write("Can't play this card because you need " + std::to_string(chosen_building_card->get_points()) + " points to play it \r\n Please choose another card");
+	else
+	{
+		// put card on the field and remove from the hand
+		player_on_turn->put_card_on_field(chosen_building_card);
+		player_on_turn->remove_card_from_hand(choice);
+
+		player_on_turn->get_client()->write("You have built : " + chosen_building_card->get_name() + "(" + chosen_building_card->color_to_name() + ", " + std::to_string(chosen_building_card->get_points()) + ") \r\n");
+		
+		remove_choice(choice);
+		fase = GamePhase::PlayFase;
+		print_turn_info();
+
+	}
 }
 
 void GameController::call_next_char()
@@ -207,7 +239,7 @@ void GameController::print_turn_info()
 {
 	player_on_turn->get_client()->write("As of now you're the " + char_order[call_count] + "\r\n");
 	player_on_turn->get_client()->write("Gold: " + std::to_string(player_on_turn->get_gold()) + "\r\n\r\n");
-	player_on_turn->get_client()->write("Buildings: \r\n");
+	player_on_turn->get_client()->write("Field: \r\n");
 
 	for (int i = 0; i < player_on_turn->get_field_cards().size(); i++)
 	{
@@ -268,7 +300,7 @@ void GameController::start_game()
 		player_on_turn = players[1];
 
 	player_on_turn->set_is_king(true);
-	fase = GameFase::ChooseChar;
+	fase = GamePhase::ChooseChar;
 	first_pick = true;
 
 	choose_character();
@@ -278,7 +310,9 @@ void GameController::take_gold(int amount)
 {
 	player_on_turn->add_gold(amount);
 
-	remove_choices();
+	remove_choice(0);
+	remove_choice(0);
+
 	player_on_turn->get_client()->write("You picked up " + std::to_string(amount) + " gold \r\n");
 	player_on_turn->get_client()->write(">");
 
@@ -287,7 +321,7 @@ void GameController::take_gold(int amount)
 
 void GameController::take_building_cards()
 {
-	fase = GameFase::ChooseBuildingCard;
+	fase = GamePhase::ChooseBuildingCard;
 	for (int i = 0; i < 2; i++)
 		picked_building_cards.push_back(building_cards.get_card_at_top());
 	player_on_turn->get_client()->write("You picked these cards, you have to chose one of these and throw the other away \r\n");
@@ -298,7 +332,7 @@ void GameController::take_building_cards()
 
 void GameController::build_building_card()
 {
-	fase = GameFase::BuildCard;
+	fase = GamePhase::BuildCard;
 	player_on_turn->get_client()->write("All the hand cards : \r\n");
 
 	for (int i = 0; i < player_on_turn->get_hand_cards().size(); i++)
@@ -350,25 +384,28 @@ void GameController::set_turn_choices()
 		turn_choices.push_back(init_choices[x]);
 }
 
-void GameController::remove_choices()
+void GameController::remove_choice(int index)
 {
-	turn_choices.erase(turn_choices.begin(), turn_choices.begin() + 2);
+	if (index == 0)
+		turn_choices.erase(turn_choices.begin());
+	else
+		turn_choices.erase(turn_choices.begin() + index + 1);
 }
 
 void GameController::show_help_text(std::shared_ptr<Socket> client)
 {
-	client->write("\r\nVoorkant : \r\n");
-	client->write("Inkomsten -> Neem 2 goudstukken of neem 2 kaarten en leg er 1 af \r\n");
-	client->write("Bouwen -> Leg 1 bouwkaart neer en betaal de waarde");
-	client->write("Karaktereigenschap op elk moment te gebruiken \r\n");
-	client->write("1. Moordernaar -> Vermoord een ander karakter \r\n");
-	client->write("2. Dief -> Steel van een andere speler \r\n");
-	client->write("3. Magier -> Ruilt bouwkaarten om \r\n");
-	client->write("4. Koning -> Begint volgende beurt, ontvangt van monumenten \r\n");
-	client->write("5. Prediker -> Beschermd tegen Condotierre & ontvangt van kerkelijke gebouwen \r\n");
-	client->write("6. Koopman -> Ontvangt een extra goudstuk & ontvangt van commerciele gebouwen \r\n");
-	client->write("7. Bouwmeester -> trekt twee extra kaarten & mag drie gebouwen bouwen \r\n");
-	client->write("8. Condottiere -> Vernietigt een gebouw & ontvangt van alle militaire gebouwen \r\n");
+	client->write("\r\nFront : \r\n");
+	client->write("Inkomsten -> Take 2 gold or take 2 building cards and choose one \r\n");
+	client->write("Bouwen -> Build 1 building card and pay the value \r\n");
+	client->write("Character property can be used at every moment when it's your turn \r\n");
+	client->write("1. Murderer -> Kill another character \r\n");
+	client->write("2. Thief -> Steal from another character \r\n");
+	client->write("3. Magicien -> Change building cards \r\n");
+	client->write("4. King -> Begin next turn, get gold from monuments \r\n");
+	client->write("5. Preacher -> Protected against the Condottiere & get gold from church buildings \r\n");
+	client->write("6. Merchant -> Gets 1 extra gold and get gold from commercial buildings \r\n");
+	client->write("7. Architect -> Get two extra cards and is able to build 3 buildings in one turn \r\n");
+	client->write("8. Condottiere -> Destroys a building and get gold from military buildings\r\n");
 }
 
 void GameController::init()
@@ -389,10 +426,10 @@ void GameController::init()
 	char_order.push_back("Architect");
 	char_order.push_back("Condottiere");
 
-	init_choices.push_back("Neem 2 goudstukken\r\n");
-	init_choices.push_back("Neem 2 bouwkaarten en leg er 1 af \r\n");
-	init_choices.push_back("Leg 1 bouwkaart neer en betaal de waarde \r\n");
-	init_choices.push_back("Speel karaktereigenschap \r\n");
+	init_choices.push_back("Take 2 gold\r\n");
+	init_choices.push_back("Take 2 building cards and choose one \r\n");
+	init_choices.push_back("Build 1 building card and pay the value \r\n");
+	init_choices.push_back("Play character property \r\n");
 
 	set_turn_choices();
 }

@@ -81,3 +81,8 @@ void Player::add_character(std::shared_ptr<CharacterCard> character_card)
 {
 	character_cards.add_card(character_card);
 }
+
+void Player::remove_card_from_hand(int index)
+{
+	hand_cards.get_card_and_remove_at_index(index);
+}

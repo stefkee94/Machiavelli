@@ -1,5 +1,5 @@
 #pragma once
-enum class GameFase
+enum class GamePhase
 {
 	ChooseChar,
 	DismissChar,

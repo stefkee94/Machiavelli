@@ -19,9 +19,6 @@
     <Filter Include="Source Files\Server">
       <UniqueIdentifier>{82b31338-7fb1-4965-adda-fea61206d4cb}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Controller">
-      <UniqueIdentifier>{d298157d-b944-4cc2-8a94-7ae885fb4575}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Source Files\Controller">
       <UniqueIdentifier>{a2c7ddcd-6d25-4865-8548-7c2da2b4130f}</UniqueIdentifier>
     </Filter>
@@ -128,7 +125,7 @@
     <ClInclude Include="CharacterType.h">
       <Filter>Header Files\Enums</Filter>
     </ClInclude>
-    <ClInclude Include="GameFase.h">
+    <ClInclude Include="GamePhase.h">
       <Filter>Header Files\Enums</Filter>
     </ClInclude>
   </ItemGroup>

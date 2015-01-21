@@ -13,8 +13,11 @@ class Player
 		virtual ~Player();
 
 		void add_card_to_hand(std::shared_ptr<BuildingCard> hand_cards);
+		void remove_card_from_hand(int index);
+
 		void put_card_on_field(std::shared_ptr<BuildingCard> field_cards);
 		void add_character(std::shared_ptr<CharacterCard> character_cards);
+		
 		CardStack<std::shared_ptr<BuildingCard>> get_field_cards();
 		CardStack<std::shared_ptr<BuildingCard>> get_hand_cards();
 

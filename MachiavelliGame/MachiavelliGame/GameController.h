@@ -5,7 +5,7 @@
 #include "CardStack.h"
 #include "MachiavelliReader.h"
 #include "Player.h"
-#include "GameFase.h"
+#include "GamePhase.h"
 
 class ServerController;
 class GameController
@@ -48,7 +48,7 @@ class GameController
 		std::vector<std::string> turn_choices;
 
 		void set_turn_choices();
-		void remove_choices();
+		void remove_choice(int index);
 
 		std::vector<std::string> char_order;
 		std::vector<std::string> init_choices;
@@ -56,7 +56,7 @@ class GameController
 
 		std::vector<std::shared_ptr<BuildingCard>> picked_building_cards;
 
-		GameFase fase;
+		GamePhase fase;
 		bool first_pick;
 		int call_count = 0;
 };
