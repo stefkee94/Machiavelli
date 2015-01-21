@@ -173,14 +173,18 @@ void GameController::handle_play_turn_command(std::string new_command)
 
 void GameController::handle_end_turn()
 {
-	if (player_on_turn->get_char_type() == CharacterType::Thief){
-		for (int i = 0; i < players.size(); i++){
-			if (players[i]->get_is_robbed()){
+	if (player_on_turn->get_char_type() == CharacterType::Thief)
+	{
+		for (int i = 0; i < players.size(); i++)
+		{
+			if (players[i]->get_is_robbed())
+			{
 				player_on_turn->add_gold(players[i]->get_gold());
 				players[i]->remove_gold(players[i]->get_gold());
 			}
 		}
 	}
+	set_turn_choices();
 	call_count++;
 	call_next_char();
 }
@@ -606,7 +610,7 @@ void GameController::magicien_trade_cards_with_bank()
 	for (int i = 0; i < player_on_turn->get_hand_cards().size(); i++)
 	{
 		std::shared_ptr<BuildingCard> card = player_on_turn->get_hand_cards().get_card_at(i);
-		player_on_turn->get_client()->write(card->get_name() + "(" + card->color_to_name() + ", " + std::to_string(card->get_points()) + ") \r\n");
+		player_on_turn->get_client()->write("[" + std::to_string(i) + "]: " + card->get_name() + "(" + card->color_to_name() + ", " + std::to_string(card->get_points()) + ") \r\n");
 	}
 
 	player_on_turn->get_client()->write("which cards do you want to replace? Write the index including a comma \r\n >");
@@ -614,18 +618,24 @@ void GameController::magicien_trade_cards_with_bank()
 	fase = GamePhase::MagicienTradeBank;
 }
 
+bool greaterThan(std::string i, std::string j) { return i > j; }
+
 void GameController::handle_magicien_trade_bank_prop(std::string new_command)
 {
 	std::vector<std::string> card_indices;
 	std::stringstream ss(new_command);
 	std::string buffer;
 
-	while (ss >> buffer)
+	while (std::getline(ss, buffer, ',')) {
 		card_indices.push_back(buffer);
+	}
+
+	std::sort(card_indices.begin(), card_indices.end(), greaterThan);
 
 	for (int x = 0; x < card_indices.size(); x++)
 	{
-		if (atoi(card_indices[x].c_str()) < 0 || atoi(card_indices[x].c_str()) > player_on_turn->get_hand_cards().size())
+		int choice = atoi(card_indices[x].c_str());
+		if ((choice == 0 && card_indices[x].compare("0") != 0) || choice > player_on_turn->get_hand_cards().size() - 1)
 		{
 			player_on_turn->get_client()->write("Invalid text, please fill in valid text for the numbers to exchange with the bank \r\n");
 			return;
@@ -635,7 +645,7 @@ void GameController::handle_magicien_trade_bank_prop(std::string new_command)
 	int count_of_new_cards = card_indices.size();
 	for (int i = 0; i < card_indices.size(); i++)
 	{
-		player_on_turn->get_client()->write("Removed : " + player_on_turn->get_hand_cards().get_card_at(atoi(card_indices.at(i).c_str()))->get_name());
+		player_on_turn->get_client()->write("Removed : " + player_on_turn->get_hand_cards().get_card_at(atoi(card_indices.at(i).c_str()))->get_name() + "\r\n");
 		player_on_turn->remove_card_from_hand(atoi(card_indices.at(i).c_str()));
 	}
 
