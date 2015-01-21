@@ -81,7 +81,8 @@ std::unique_ptr<BuildingCard> MachiavelliReader::create_building_card(std::vecto
 
 std::unique_ptr<CharacterCard> MachiavelliReader::create_character_card(std::vector<std::string>& character_card_values)
 {
-	if (character_card_values.size() == 2){
+	if (character_card_values.size() == 2)
+	{
 		int id = atoi(character_card_values[0].c_str());
 		std::string name = character_card_values[1];
 		CharacterType type = string_to_character_type(name);
@@ -110,19 +111,19 @@ CardColor MachiavelliReader::string_to_card_olor(std::string card_color)
 
 CharacterType MachiavelliReader::string_to_character_type(std::string character)
 {
-	if (character.compare("Moordenaar") == 0)
+	if (character.compare("Murderer") == 0)
 		return CharacterType::Murderer;
-	else if (character.compare("Dief") == 0)
+	else if (character.compare("Thief") == 0)
 		return CharacterType::Thief;
-	else if (character.compare("Magiër") == 0)
+	else if (character.compare("Magicien") == 0)
 		return CharacterType::Magicien;
-	else if (character.compare("Koning") == 0)
+	else if (character.compare("King") == 0)
 		return CharacterType::King;
-	else if (character.compare("Prediker") == 0)
+	else if (character.compare("Preacher") == 0)
 		return CharacterType::Preacher;
-	else if (character.compare("Koopman") == 0)
+	else if (character.compare("Merchant") == 0)
 		return CharacterType::Merchant;
-	else if (character.compare("Bouwmeester") == 0)
+	else if (character.compare("Architect") == 0)
 		return CharacterType::Architect;
 	else if (character.compare("Condottiere") == 0)
 		return CharacterType::Condottiere;
