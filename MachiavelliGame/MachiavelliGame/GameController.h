@@ -34,7 +34,7 @@ class GameController
 		void handle_murder_character(std::string new_command);
 		void handle_steal_from_character(std::string new_command);
 		void handle_build_card(std::string new_command);
-
+		void handle_end_turn();
 		void handle_char_property();
 		void handle_magicien_property(std::string new_command);
 		void handle_magicien_trade_bank_prop(std::string new_command);

@@ -166,12 +166,24 @@ void GameController::handle_play_turn_command(std::string new_command)
 			handle_char_property();
 		break;
 		case 4:
-			call_count++;
-			call_next_char();
+			handle_end_turn();
 		break;
 	}
 }
 
+void GameController::handle_end_turn()
+{
+	if (player_on_turn->get_char_type() == CharacterType::Thief){
+		for (int i = 0; i < players.size(); i++){
+			if (players[i]->get_is_robbed()){
+				player_on_turn->add_gold(players[i]->get_gold());
+				players[i]->remove_gold(players[i]->get_gold());
+			}
+		}
+	}
+	call_count++;
+	call_next_char();
+}
 void GameController::handle_steal_from_character(std::string new_command)
 {
 	int choice;
