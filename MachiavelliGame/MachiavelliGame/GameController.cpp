@@ -166,7 +166,8 @@ void GameController::handle_play_turn_command(std::string new_command)
 			handle_char_property();
 		break;
 		case 4:
-			
+			call_count++;
+			call_next_char();
 		break;
 	}
 }
