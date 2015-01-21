@@ -31,6 +31,8 @@ void GameController::handle_client_command(std::shared_ptr<Socket> client, std::
 			handle_build_card(new_command);
 		else if (fase == GamePhase::MurderPhase)
 			handle_murder_character(new_command);
+		else if (fase == GamePhase::ThiefPhase)
+			handle_steal_from_character(new_command);
 	}
 }
 
@@ -155,7 +157,39 @@ void GameController::handle_play_turn_command(std::string new_command)
 			remove_choice(choice);
 			handle_char_property();
 		break;
+		case 4:
+			handle_end_turn();
+		break;
 	}
+}
+
+void GameController::handle_steal_from_character(std::string new_command)
+{
+	int choice;
+	choice = atoi(new_command.c_str());
+	for (int i = 0; i < players.size(); i++){
+		if (players[i]->has_character(thief_choices[choice]) != nullptr){
+			players[i]->set_is_robbed(true);
+		}
+	}
+	fase = GamePhase::PlayFase;
+	init_thief_choices(murderer_choices[choice]);
+	print_turn_info();
+}
+
+void GameController::handle_end_turn()
+{
+	if (player_on_turn->get_char_type() == CharacterType::Thief){
+		for (int i = 0; i < players.size(); i++){
+			if (players[i]->get_is_robbed()){
+				player_on_turn->add_gold(players[i]->get_gold());
+				players[i]->remove_gold(players[i]->get_gold());
+				players[i]->set_is_robbed(false);
+			}
+		}
+	}
+	call_count++;
+	call_next_char();
 }
 
 void GameController::handle_choose_building_card(std::string new_command)
@@ -196,11 +230,16 @@ void GameController::handle_char_property()
 		case CharacterType::Murderer:
 			player_on_turn->get_client()->write("Who do you want to murder? \r\n");
 			for (auto it : murderer_choices){
-				player_on_turn->get_client()->write("[" + std::to_string(it.first) + "]: " + it.second);
+				player_on_turn->get_client()->write("[" + std::to_string(it.first) + "]: " + it.second + "\r\n");
 			}
 			fase = GamePhase::MurderPhase;
 		break;
 		case CharacterType::Thief:
+			player_on_turn->get_client()->write("Steal from?");
+			for (auto it : thief_choices){
+				player_on_turn->get_client()->write("[" + std::to_string(it.first) + "]: " + it.second + "\r\n");
+			}
+			fase = GamePhase::ThiefPhase;
 		break;
 		case CharacterType::Magicien:
 		break;
@@ -242,7 +281,18 @@ void GameController::handle_murder_character(std::string new_command)
 		players[i]->remove_character_card(murderer_choices[choice]);
 	}
 	fase = GamePhase::PlayFase;
+	init_thief_choices(murderer_choices[choice]);
 	print_turn_info();
+}
+
+void GameController::init_thief_choices(std::string name_of_murdered)
+{
+	for (int i = 0; i < char_order.size(); i++){
+		if (char_order[i].compare("Murderer") == 0 || char_order[i].compare(name_of_murdered) == 0){
+			continue;
+		}
+		thief_choices.insert(std::make_pair(i, char_order[i]));
+	}
 }
 
 void GameController::handle_build_card(std::string new_command)
