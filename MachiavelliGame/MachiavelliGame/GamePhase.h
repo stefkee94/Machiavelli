@@ -5,8 +5,9 @@ enum class GamePhase
 	DismissChar,
 	PlayFase,
 	ChooseBuildingCard,
+	MurderPhase,
+	ThiefPhase,
 	BuildCard,
 	MagicienProperty,
 	MagicienTradeBank,
-	MurderPhase
 };

@@ -3,6 +3,7 @@
 Player::Player(std::shared_ptr<Socket> client, std::string name, int age) : client(client), name(name), age(age), gold(0)
 {
 	this->is_king = false;
+	this->is_robbed = false;
 }
 
 
@@ -48,6 +49,16 @@ void Player::remove_character_card(std::string character_name)
 			card.reset();
 		}
 	}
+}
+
+bool Player::get_is_robbed()
+{
+	return is_robbed;
+}
+
+void Player::set_is_robbed(bool b)
+{
+	is_robbed = b;
 }
 
 void Player::add_gold(int amount)

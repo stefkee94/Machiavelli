@@ -28,6 +28,10 @@ class Player
 		void set_type(CharacterType type);
 		void set_is_king(bool is_king);
 		bool get_is_king();
+
+		bool get_is_robbed();
+		void set_is_robbed(bool b);
+
 		std::shared_ptr<CharacterCard> has_character(std::string character_name);
 		void remove_character_card(std::string character_name);
 		CharacterType get_char_type();
@@ -47,6 +51,8 @@ class Player
 
 		bool is_king;
 		bool char_property_used;
+		bool is_robbed;
+
 		CharacterType character_type;
 
 		CardStack<std::shared_ptr<BuildingCard>> hand_cards;
