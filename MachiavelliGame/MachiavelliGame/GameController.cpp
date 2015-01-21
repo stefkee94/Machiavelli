@@ -164,7 +164,8 @@ void GameController::handle_play_turn_command(std::string new_command)
 			handle_char_property();
 		break;
 		case 4:
-			call_count++;
+			if (call_count <  char_order.size() - 1)
+				call_count++;
 			call_next_char();
 		break;
 	}
@@ -334,9 +335,22 @@ void GameController::call_next_char()
 			return;
 		}
 	}
-	if (call_count < char_order.size()){
+
+	if (call_count < char_order.size()-1){
 		call_count++;
 		call_next_char();
+	}
+
+	if (call_count == char_order.size()-1)
+	{
+		player_on_turn->get_client()->write("<----------------------- NEXT ROUND ------------------------>");
+		call_count = 0;
+		fase == GamePhase::ChooseChar;
+
+		if (!player_on_turn->get_is_king())
+			set_turn_to_next_player();
+
+		choose_character();
 	}
 }
 
@@ -648,7 +662,7 @@ void GameController::init()
 	init_choices.push_back("Take 2 building cards and choose one \r\n");
 	init_choices.push_back("Build 1 building card and pay the value \r\n");
 	init_choices.push_back("Play character property \r\n");
-	init_choices.push_back("End turn");
+	init_choices.push_back("End turn \r\n");
 
 	murderer_choices = std::map<int, std::string>{
 		{ 0, "Thief" },
