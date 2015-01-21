@@ -29,6 +29,8 @@ void GameController::handle_client_command(std::shared_ptr<Socket> client, std::
 			handle_choose_building_card(new_command);
 		else if (fase == GamePhase::BuildCard)
 			handle_build_card(new_command);
+		else if (fase == GamePhase::MurderPhase)
+			handle_murder_character(new_command);
 	}
 }
 
@@ -150,6 +152,7 @@ void GameController::handle_play_turn_command(std::string new_command)
 			build_building_card();
 		break;
 		case 3:
+			remove_choice(choice);
 			handle_char_property();
 		break;
 	}
@@ -191,6 +194,11 @@ void GameController::handle_char_property()
 	switch (player_on_turn->get_char_type())
 	{
 		case CharacterType::Murderer:
+			player_on_turn->get_client()->write("Who do you want to murder? \r\n");
+			for (auto it : murderer_choices){
+				player_on_turn->get_client()->write("[" + std::to_string(it.first) + "]: " + it.second);
+			}
+			fase = GamePhase::MurderPhase;
 		break;
 		case CharacterType::Thief:
 		break;
@@ -224,6 +232,17 @@ void GameController::handle_char_property()
 		case CharacterType::Condottiere:
 			break;
 	}
+}
+
+void GameController::handle_murder_character(std::string new_command)
+{
+	int choice;
+	choice = atoi(new_command.c_str());
+	for (int i = 0; i < players.size(); i++){
+		players[i]->remove_character_card(murderer_choices[choice]);
+	}
+	fase = GamePhase::PlayFase;
+	print_turn_info();
 }
 
 void GameController::handle_build_card(std::string new_command)
@@ -484,6 +503,15 @@ void GameController::init()
 	init_choices.push_back("Build 1 building card and pay the value \r\n");
 	init_choices.push_back("Play character property \r\n");
 
+	murderer_choices = std::map<int, std::string>{
+		{ 0, "Thief" },
+		{ 1, "Magicien"},
+		{ 2, "King"},
+		{ 3, "Preacher"},
+		{ 4, "Merchant"},
+		{ 5, "Architect"},
+		{ 6, "Condottiere"}
+	};
 	set_turn_choices();
 }
 

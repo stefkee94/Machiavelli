@@ -5,5 +5,6 @@ enum class GamePhase
 	DismissChar,
 	PlayFase,
 	ChooseBuildingCard,
+	MurderPhase,
 	BuildCard
 };

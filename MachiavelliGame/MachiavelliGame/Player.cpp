@@ -40,6 +40,16 @@ CharacterType Player::get_char_type()
 	return character_type;
 }
 
+void Player::remove_character_card(std::string character_name)
+{
+	for (int i = 0; i < character_cards.size(); i++){
+		if (character_cards.get_card_at(i)->get_name().compare(character_name) == 0){
+			std::shared_ptr<CharacterCard> card = character_cards.get_card_and_remove_at_index(i);
+			card.reset();
+		}
+	}
+}
+
 void Player::add_gold(int amount)
 {
 	gold += amount;
