@@ -40,6 +40,7 @@ class GameController
 		void handle_char_property();
 		void handle_magicien_property(std::string new_command);
 		void handle_magicien_trade_bank_prop(std::string new_command);
+		void handle_condottiere_phase(std::string new_command);
 
 	private:
 		CardStack<std::shared_ptr<BuildingCard>> building_cards;

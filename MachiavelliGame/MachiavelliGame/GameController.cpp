@@ -41,6 +41,8 @@ void GameController::handle_client_command(std::shared_ptr<Socket> client, std::
 			handle_murder_character(new_command);
 		else if (fase == GamePhase::ThiefPhase)
 			handle_steal_from_character(new_command);
+		else if (fase == GamePhase::CondottierePhase)
+			handle_condottiere_phase(new_command);
 	}
 }
 
@@ -102,6 +104,24 @@ void GameController::hanlde_choose_char_command(std::string new_command)
 	}
 }
 
+void GameController::handle_condottiere_phase(std::string new_command)
+{
+	bool is_command_digit = false;
+	int choice;
+	choice = atoi(new_command.c_str());
+	std::shared_ptr<BuildingCard> card_to_destor = condottiere_choices[choice];
+	if (card_to_destor->get_points() > 0){
+		player_on_turn->remove_gold(card_to_destor->get_points() - 1);
+	}
+	for (int i = 0; i < players.size(); i++){
+		if (player_on_turn != players[i]){
+			players[i]->remove_field_card(card_to_destor->get_name());
+		}
+	}
+	fase = GamePhase::PlayFase;
+	print_turn_info();
+}
+
 void GameController::handle_dismiss_char_command(std::string new_command)
 {
 	bool is_command_digit = false;
@@ -159,6 +179,15 @@ void GameController::handle_play_turn_command(std::string new_command)
 			take_building_cards();
 		break;
 		case 2:
+			if (player_on_turn->get_char_type() == CharacterType::Architect)
+			{
+				count_builded_in_turn_for_architect++;
+				if (count_builded_in_turn_for_architect >= 3)
+					remove_choice(choice);
+			}
+			else{
+				remove_choice(choice);
+			}
 			build_building_card();
 		break;
 		case 3:
@@ -226,7 +255,7 @@ void GameController::handle_choose_building_card(std::string new_command)
 	remove_choice(0);
 	remove_choice(0);
 
-	// Move on to the next fase
+	fase = GamePhase::PlayFase;
 	print_turn_info();
 }
 
@@ -243,6 +272,9 @@ void GameController::handle_char_property()
 		break;
 		case CharacterType::Thief:
 			player_on_turn->get_client()->write("Steal from? \r\n");
+			if (thief_choices.empty()){
+				init_thief_choices("");
+			}
 			for (auto it : thief_choices){
 				player_on_turn->get_client()->write("[" + std::to_string(it.first) + "]: " + it.second + "\r\n");
 			}
@@ -254,21 +286,23 @@ void GameController::handle_char_property()
 		case CharacterType::King:
 		{
 									int yellow_cards_on_field = 0;
-									for (int i = 0; player_on_turn->get_field_cards().size(); i++)
+									for (int i = 0; i < player_on_turn->get_field_cards().size(); i++)
 									{
-										if (player_on_turn->get_field_cards().get_card_at(i)->get_card_color() == CardColor::Yellow)
+										if (!player_on_turn->get_field_cards().is_empty() && player_on_turn->get_field_cards().get_card_at(i)->get_card_color() == CardColor::Yellow)
 										{
 											player_on_turn->add_gold(1);
 											yellow_cards_on_field++;
 										}
 									}
 									player_on_turn->get_client()->write("You got " + std::to_string(yellow_cards_on_field) + "gold from the yellow buildings \r\n");
+									print_turn_info();
+									fase = GamePhase::PlayFase;
 		}
 		break;
 		case CharacterType::Preacher:
 		{
 										int blue_cards_on_field = 0;
-										for (int i = 0; player_on_turn->get_field_cards().size(); i++)
+										for (int i = 0; i < player_on_turn->get_field_cards().size(); i++)
 										{
 											if (player_on_turn->get_field_cards().get_card_at(i)->get_card_color() == CardColor::Blue)
 											{
@@ -277,12 +311,14 @@ void GameController::handle_char_property()
 											}
 										}
 										player_on_turn->get_client()->write("You got " + std::to_string(blue_cards_on_field) + "gold from the blue buildings \r\n");
+										print_turn_info();
+										fase = GamePhase::PlayFase;
 		}
 		break;
 		case CharacterType::Merchant:
 		{
 										int green_cards_on_field = 0;
-										for (int i = 0; player_on_turn->get_field_cards().size(); i++)
+										for (int i = 0; i < player_on_turn->get_field_cards().size(); i++)
 										{
 											if (player_on_turn->get_field_cards().get_card_at(i)->get_card_color() == CardColor::Green)
 											{
@@ -291,25 +327,30 @@ void GameController::handle_char_property()
 											}
 										}
 										player_on_turn->get_client()->write("You got " + std::to_string(green_cards_on_field) + "gold from the green buildings \r\n");
+										print_turn_info();
+										fase = GamePhase::PlayFase;
 		}
 		break;
 		case CharacterType::Architect:
-			count_builded_in_turn_for_architect = 0;
 			for (int i = 0; i < 2; i++)
 			{
 				std::shared_ptr<BuildingCard> new_card = building_cards.get_card_at_top();
 				player_on_turn->get_client()->write("You picked up : " + new_card->get_name() + "(" + new_card->color_to_name() + ", " + std::to_string(new_card->get_points()) + ") \r\n");
 				player_on_turn->add_card_to_hand(new_card);
 			}
+			fase = GamePhase::PlayFase;
+			print_turn_info();
 		break;
 		case CharacterType::Condottiere:
-			for (int i = 0; players.size(); i++){
-				if (player_on_turn != players[i]){
-					for (int i = 0; i < players[i]->get_field_cards().size(); i++){
-						condottiere_choices.insert(std::make_pair(i, players[i]->get_field_cards().get_card_at(i)));
-					}
+			for (int i = 0; i < players.size(); i++){
+				std::shared_ptr<Player> player = players[i];
+				if (player_on_turn != player){
+						for (int a = 0; a < player->get_field_cards().size(); a++){
+							condottiere_choices.insert(std::make_pair(a, player->get_field_cards().get_card_at(a)));
+						}
 				}
 			}
+			player_on_turn->get_client()->write("Which building would you like to destroy? \r\n");
 			for (auto it : condottiere_choices){
 				player_on_turn->get_client()->write("[" + std::to_string(it.first) + "]: " + it.second->to_string() + "\r\n");
 			}
@@ -344,7 +385,7 @@ void GameController::handle_murder_character(std::string new_command)
 void GameController::init_thief_choices(std::string name_of_murdered)
 {
 	for (int i = 0; i < char_order.size(); i++){
-		if (char_order[i].compare("Murderer") == 0 || char_order[i].compare(name_of_murdered) == 0){
+		if (char_order[i].compare("Murderer") == 0 || char_order[i].compare("Thief") == 0 ||char_order[i].compare(name_of_murdered) == 0){
 			continue;
 		}
 		thief_choices.insert(std::make_pair(i, char_order[i]));
@@ -374,22 +415,9 @@ void GameController::handle_build_card(std::string new_command)
 	else
 	{
 		player_on_turn->remove_gold(chosen_building_card->get_points());
-		// put card on the field and remove from the hand
 		player_on_turn->put_card_on_field(chosen_building_card);
 		player_on_turn->remove_card_from_hand(choice);
-
 		player_on_turn->get_client()->write("You have built : " + chosen_building_card->get_name() + "(" + chosen_building_card->color_to_name() + ", " + std::to_string(chosen_building_card->get_points()) + ") \r\n");
-		
-		if (player_on_turn->get_char_type() == CharacterType::Architect)
-		{
-			int max_build = 3;
-			count_builded_in_turn_for_architect++;
-			if (count_builded_in_turn_for_architect >= max_build)
-				remove_choice(choice);
-		}
-		else
-			remove_choice(choice);
-
 		fase = GamePhase::PlayFase;
 		print_turn_info();
 	}
@@ -397,24 +425,25 @@ void GameController::handle_build_card(std::string new_command)
 
 void GameController::call_next_char()
 {
-	for (int i = 0; i < players.size(); i++)
-	{
-		std::shared_ptr<CharacterCard> card = players[i]->has_character(char_order[call_count]);
-		if (card != nullptr)
-		{
-			player_on_turn = players[i];
-			player_on_turn->set_type(card->get_type());
-			if (player_on_turn->get_char_type() == CharacterType::Merchant){
-				player_on_turn->add_gold(1);
-			}
-			print_turn_info();
-			return;
-		}
-	}
-	call_count++;
 	if (call_count < char_order.size()){
+		for (int i = 0; i < players.size(); i++)
+		{
+			std::shared_ptr<CharacterCard> card = players[i]->has_character(char_order[call_count]);
+			if (card != nullptr)
+			{
+				player_on_turn = players[i];
+				player_on_turn->set_type(card->get_type());
+				if (player_on_turn->get_char_type() == CharacterType::Merchant){
+					player_on_turn->add_gold(1);
+				}
+				print_turn_info();
+				return;
+			}
+		}
+		call_count++;
 		call_next_char();
-	}else{
+	}
+	else{
 		set_new_king();
 		reset_characters();
 		for (int i = 0; i < players.size(); i++){
@@ -423,7 +452,9 @@ void GameController::call_next_char()
 		MachiavelliReader reader;
 		character_cards = reader.read_character_cards("karakters.csv");
 		call_count = 0;
-		fase == GamePhase::ChooseChar;
+		count_builded_in_turn_for_architect = 0;
+		first_pick = true;
+		fase = GamePhase::ChooseChar;
 		choose_character();
 	}
 }
@@ -783,5 +814,7 @@ void GameController::init()
 	};
 
 	set_turn_choices();
+	count_builded_in_turn_for_architect;
+	first_pick = true;
 }
 

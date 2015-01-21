@@ -13,6 +13,7 @@ class CardStack
 		int size();
 		T get_card_at(int i);
 		void clear();
+		bool is_empty();
 
 	private:
 		std::vector<T> card_vector;
@@ -24,6 +25,13 @@ template<typename T>
 void CardStack<T>::add_card(T card)
 {
 	card_vector.push_back(card);
+}
+
+
+template<typename T>
+bool CardStack<T>::is_empty()
+{
+	return card_vector.empty();
 }
 
 template<typename T>
