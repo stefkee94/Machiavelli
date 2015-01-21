@@ -265,7 +265,7 @@ void GameController::call_next_char()
 {
 	for (int i = 0; i < players.size(); i++)
 	{
-		std::shared_ptr<CharacterCard> card = character_cards.get_card_at(i);
+		std::shared_ptr<CharacterCard> card = players[i]->has_character(char_order[call_count]);
 		if (card != nullptr)
 		{
 			player_on_turn = players[i];
