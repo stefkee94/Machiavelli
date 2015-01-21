@@ -66,6 +66,7 @@ class GameController
 
 		std::map<int, std::string> murderer_choices;
 		std::map<int, std::string> thief_choices;
+		std::map<int, std::shared_ptr<BuildingCard>> condottiere_choices;
 
 		std::vector<std::shared_ptr<BuildingCard>> picked_building_cards;
 

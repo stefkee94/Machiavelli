@@ -39,3 +39,8 @@ int BuildingCard::get_points()
 BuildingCard::~BuildingCard()
 {
 }
+
+std::string BuildingCard::to_string()
+{
+	return name + "(" + color_to_name() + ", " + std::to_string(points) + ")";
+}

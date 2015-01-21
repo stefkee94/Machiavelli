@@ -274,6 +274,17 @@ void GameController::handle_char_property()
 			player_on_turn->add_card_to_hand(building_cards.get_card_at_top());
 		break;
 		case CharacterType::Condottiere:
+			for (int i = 0; players.size(); i++){
+				if (player_on_turn != players[i]){
+					for (int i = 0; i < players[i]->get_field_cards().size(); i++){
+						condottiere_choices.insert(std::make_pair(i, players[i]->get_field_cards().get_card_at(i)));
+					}
+				}
+			}
+			for (auto it : condottiere_choices){
+				player_on_turn->get_client()->write("[" + std::to_string(it.first) + "]: " + it.second->to_string() + "\r\n");
+			}
+			fase = GamePhase::CondottierePhase;
 		break;
 	}
 }
@@ -417,7 +428,7 @@ void GameController::print_turn_info()
 	for (int i = 0; i < player_on_turn->get_field_cards().size(); i++)
 	{
 		std::shared_ptr<BuildingCard> card = player_on_turn->get_field_cards().get_card_at(i);
-		player_on_turn->get_client()->write(card->get_name() + "(" + card->color_to_name() + ", " + std::to_string(card->get_points()) + ") \r\n");
+		player_on_turn->get_client()->write(card->to_string() + "\r\n");
 	}
 
 	player_on_turn->get_client()->write("\r\n");
@@ -426,7 +437,7 @@ void GameController::print_turn_info()
 	for (int i = 0; i < player_on_turn->get_hand_cards().size(); i++)
 	{
 		std::shared_ptr<BuildingCard> card = player_on_turn->get_hand_cards().get_card_at(i);
-		player_on_turn->get_client()->write(card->get_name() + "(" + card->color_to_name() + ", " + std::to_string(card->get_points()) + ") \r\n");
+		player_on_turn->get_client()->write(card->to_string() + "\r\n");
 	}
 
 	player_on_turn->get_client()->write("\r\n");
@@ -501,7 +512,7 @@ void GameController::take_building_cards()
 		picked_building_cards.push_back(building_cards.get_card_at_top());
 	player_on_turn->get_client()->write("You picked these cards, you have to chose one of these and throw the other away \r\n");
 	for (int j = 0; j < picked_building_cards.size(); j++)
-		player_on_turn->get_client()->write("[" + std::to_string(j) + "] : " + picked_building_cards[j]->get_name() + "(" + picked_building_cards[j]->color_to_name() + ", " + std::to_string(picked_building_cards[j]->get_points()) + ") \r\n");
+		player_on_turn->get_client()->write("[" + std::to_string(j) + "] : " + picked_building_cards[j]->to_string() + "\r\n");
 	player_on_turn->get_client()->write(">");
 }
 
@@ -511,7 +522,7 @@ void GameController::build_building_card()
 	player_on_turn->get_client()->write("All the hand cards : \r\n");
 
 	for (int i = 0; i < player_on_turn->get_hand_cards().size(); i++)
-		player_on_turn->get_client()->write("[" + std::to_string(i) + "] : " + player_on_turn->get_hand_cards().get_card_at(i)->get_name() + "(" + player_on_turn->get_hand_cards().get_card_at(i)->color_to_name() + ", " + std::to_string(player_on_turn->get_hand_cards().get_card_at(i)->get_points()) + ") \r\n");
+		player_on_turn->get_client()->write("[" + std::to_string(i) + "] : " + player_on_turn->get_hand_cards().get_card_at(i)->to_string() + "\r\n");
 
 	player_on_turn->get_client()->write("Choose one of these cards to build \r\n");
 }
@@ -622,7 +633,7 @@ void GameController::magicien_trade_cards_with_bank()
 	for (int i = 0; i < player_on_turn->get_hand_cards().size(); i++)
 	{
 		std::shared_ptr<BuildingCard> card = player_on_turn->get_hand_cards().get_card_at(i);
-		player_on_turn->get_client()->write(card->get_name() + "(" + card->color_to_name() + ", " + std::to_string(card->get_points()) + ") \r\n");
+		player_on_turn->get_client()->write(card->to_string() + "\r\n");
 	}
 
 	player_on_turn->get_client()->write("which cards do you want to replace? Write the index including a comma \r\n >");
@@ -658,7 +669,7 @@ void GameController::handle_magicien_trade_bank_prop(std::string new_command)
 	for (int j = 0; j < count_of_new_cards; j++)
 	{
 		std::shared_ptr<BuildingCard> new_card = building_cards.get_card_at_top();
-		player_on_turn->get_client()->write("You picked up : " + new_card->get_name() + "(" + new_card->color_to_name() + ", " + std::to_string(new_card->get_points()) + ") \r\n");
+		player_on_turn->get_client()->write("You picked up : " + new_card->to_string() + "\r\n");
 
 		player_on_turn->add_card_to_hand(new_card);
 	}
