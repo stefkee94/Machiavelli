@@ -25,10 +25,12 @@ class Player
 
 		void add_gold(int amount);
 		void remove_gold(int amount);
+		void set_type(CharacterType type);
 		void set_is_king(bool is_king);
 		bool get_is_king();
-		bool has_character(std::string character_name);
+		std::shared_ptr<CharacterCard> has_character(std::string character_name);
 
+		CharacterType get_char_type();
 		int get_gold();
 		int get_age();
 		std::shared_ptr<Socket> get_client();
@@ -45,6 +47,7 @@ class Player
 
 		bool is_king;
 		bool char_property_used;
+		CharacterType character_type;
 
 		CardStack<std::shared_ptr<BuildingCard>> hand_cards;
 		CardStack<std::shared_ptr<BuildingCard>> field_cards;

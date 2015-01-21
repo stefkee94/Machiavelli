@@ -26,6 +26,11 @@ std::string BuildingCard::color_to_name()
 	}
 }
 
+CardColor BuildingCard::get_card_color()
+{
+	return color;
+}
+
 int BuildingCard::get_points()
 {
 	return points;

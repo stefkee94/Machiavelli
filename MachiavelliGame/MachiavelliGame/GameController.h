@@ -31,6 +31,7 @@ class GameController
 		void handle_play_turn_command(std::string new_command);
 		void handle_choose_building_card(std::string new_command);
 		void handle_build_card(std::string new_command);
+		void handle_char_property();
 
 	private:
 		CardStack<std::shared_ptr<BuildingCard>> building_cards;

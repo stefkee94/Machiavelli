@@ -10,6 +10,7 @@ class BuildingCard
 		std::string color_to_name();
 		int get_points();
 		virtual ~BuildingCard();
+		CardColor get_card_color();
 
 	private:
 		std::string name;

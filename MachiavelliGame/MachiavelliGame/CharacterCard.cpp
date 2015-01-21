@@ -10,7 +10,12 @@ CharacterCard::~CharacterCard()
 {
 }
 
-std::string CharacterCard::getName()
+CharacterType CharacterCard::get_type()
+{
+	return type;
+}
+
+std::string CharacterCard::get_name()
 {
 	return name;
 }

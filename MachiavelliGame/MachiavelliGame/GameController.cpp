@@ -75,7 +75,7 @@ void GameController::hanlde_choose_char_command(std::string new_command)
 			return;
 		}
 	}
-	player_on_turn->get_client()->write("You chose the : " + character_cards.get_card_at(choice)->getName() + "\r\n");
+	player_on_turn->get_client()->write("You chose the : " + character_cards.get_card_at(choice)->get_name() + "\r\n");
 	player_on_turn->add_character(character_cards.get_card_and_remove_at_index(choice));
 	if (first_pick)
 	{
@@ -109,7 +109,7 @@ void GameController::handle_dismiss_char_command(std::string new_command)
 			}
 		}
 
-		player_on_turn->get_client()->write("You dismissed the : " + character_cards.get_card_at(choice)->getName() + "\r\n");
+		player_on_turn->get_client()->write("You dismissed the : " + character_cards.get_card_at(choice)->get_name() + "\r\n");
 
 		character_cards.get_card_and_remove_at_index(choice);
 		set_turn_to_next_player();
@@ -183,6 +183,46 @@ void GameController::handle_choose_building_card(std::string new_command)
 	print_turn_info();
 }
 
+void GameController::handle_char_property()
+{
+	switch (player_on_turn->get_char_type())
+	{
+		case CharacterType::Murderer:
+		break;
+		case CharacterType::Thief:
+		break;
+		case CharacterType::Magicien:
+		break;
+		case CharacterType::King:
+		for (int i = 0; player_on_turn->get_field_cards().size(); i++){
+			if (player_on_turn->get_field_cards().get_card_at(i)->get_card_color() == CardColor::Yellow){
+				player_on_turn->add_gold(1);
+			}
+		}
+		break;
+		case CharacterType::Preacher:
+		for (int i = 0; player_on_turn->get_field_cards().size(); i++){
+			if (player_on_turn->get_field_cards().get_card_at(i)->get_card_color() == CardColor::Blue){
+				player_on_turn->add_gold(1);
+			}
+		}
+		break;
+		case CharacterType::Merchant:
+			for (int i = 0; player_on_turn->get_field_cards().size(); i++){
+				if (player_on_turn->get_field_cards().get_card_at(i)->get_card_color() == CardColor::Green){
+					player_on_turn->add_gold(1);
+				}
+			}
+		break;
+		case CharacterType::Architect:
+			player_on_turn->add_card_to_hand(building_cards.get_card_at_top());
+			player_on_turn->add_card_to_hand(building_cards.get_card_at_top());
+		break;
+		case CharacterType::Condottiere:
+			break;
+	}
+}
+
 void GameController::handle_build_card(std::string new_command)
 {
 	bool is_command_digit = false;
@@ -222,9 +262,14 @@ void GameController::call_next_char()
 {
 	for (int i = 0; i < players.size(); i++)
 	{
-		if (players[i]->has_character(char_order[call_count]))
+		std::shared_ptr<CharacterCard> card = character_cards.get_card_at(i);
+		if (card != nullptr)
 		{
 			player_on_turn = players[i];
+			player_on_turn->set_type(card->get_type());
+			if (player_on_turn->get_char_type() == CharacterType::Merchant){
+				player_on_turn->add_gold(1);
+			}
 			print_turn_info();
 			return;
 		}
@@ -348,7 +393,7 @@ void GameController::choose_character()
 	player_on_turn->get_client()->write("Choose a character \r\n");
 	for (int i = 0; i < character_cards.size(); i++)
 	{
-		player_on_turn->get_client()->write("[" + std::to_string(i) + "]: " + character_cards.get_card_at(i)->getName() + "\r\n");
+		player_on_turn->get_client()->write("[" + std::to_string(i) + "]: " + character_cards.get_card_at(i)->get_name() + "\r\n");
 	}
 	player_on_turn->get_client()->write(">");
 }
@@ -361,11 +406,11 @@ void GameController::dismiss_character()
 	{
 		if (character_cards.size() == 1)
 		{
-			player_on_turn->get_client()->write("Dismissed : " + character_cards.get_card_at(i)->getName() + "\r\n");
+			player_on_turn->get_client()->write("Dismissed : " + character_cards.get_card_at(i)->get_name() + "\r\n");
 			character_cards.get_card_and_remove_at_index(0);
 		}
 		else
-			player_on_turn->get_client()->write("[" + std::to_string(i) + "]: " + character_cards.get_card_at(i)->getName() + "\r\n");
+			player_on_turn->get_client()->write("[" + std::to_string(i) + "]: " + character_cards.get_card_at(i)->get_name() + "\r\n");
 	}
 
 	if (character_cards.size() == 0)
@@ -390,10 +435,7 @@ void GameController::set_turn_choices()
 
 void GameController::remove_choice(int index)
 {
-	if (index == 0)
-		turn_choices.erase(turn_choices.begin());
-	else
-		turn_choices.erase(turn_choices.begin() + index + 1);
+	turn_choices.erase(turn_choices.begin() + index );
 }
 
 void GameController::show_help_text(std::shared_ptr<Socket> client)

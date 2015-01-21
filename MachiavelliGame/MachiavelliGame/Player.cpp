@@ -20,14 +20,24 @@ int Player::get_age()
 	return age;
 }
 
-bool Player::has_character(std::string character_name)
+std::shared_ptr<CharacterCard> Player::has_character(std::string character_name)
 {
 	for (int i = 0; i < character_cards.size(); i++)
 	{
-		if (character_cards.get_card_at(i)->getName().compare(character_name))			
-			return true;
+		std::shared_ptr<CharacterCard> card = character_cards.get_card_at(i);
+		if (card->get_name().compare(character_name) == 0)			
+			return card;
 	}
-	return false;
+	return nullptr;
+}
+
+void Player::set_type(CharacterType type){
+	character_type = type;
+}
+
+CharacterType Player::get_char_type()
+{
+	return character_type;
 }
 
 void Player::add_gold(int amount)
