@@ -78,7 +78,7 @@ class GameController
 
 		GamePhase fase;
 		bool first_pick;
-		bool count_builded_in_turn_for_architect = 0;
+		int count_builded_in_turn_for_architect = 0;
 		int call_count = 0;
 };
 

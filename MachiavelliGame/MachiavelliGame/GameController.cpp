@@ -814,7 +814,7 @@ void GameController::init()
 	};
 
 	set_turn_choices();
-	count_builded_in_turn_for_architect;
+	count_builded_in_turn_for_architect = 0;
 	first_pick = true;
 }
 
