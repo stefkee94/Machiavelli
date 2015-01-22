@@ -505,18 +505,19 @@ void GameController::handle_char_property()
 					red_cards_on_field++;
 				}
 			}
-			player_on_turn->get_client()->write("You got " + std::to_string(red_cards_on_field) + "gold from the red buildings \r\n");
+			player_on_turn->get_client()->write("You got " + std::to_string(red_cards_on_field) + " gold from the red buildings \r\n");
 
 			condottiere_choices.clear();
 			for (int i = 0; i < players.size(); i++)
 			{
 				std::shared_ptr<Player> player = players[i];
-				if (player_on_turn != player && player->has_character("Preacher") == nullptr){
-					for (int a = 0; a < player->get_field_cards().size(); a++){
+				if (player_on_turn != player && player->has_character("Preacher") == nullptr)
+				{
+					for (int a = 0; a < player->get_field_cards().size(); a++)
+					{
 						std::shared_ptr<BuildingCard> card = player->get_field_cards().get_card_at(a);
-						if (card->get_name().compare("Kerker") != 0){
+						if (card->get_name().compare("Kerker") != 0)
 							condottiere_choices.insert(std::make_pair(a, player->get_field_cards().get_card_at(a)));
-						}
 					}
 				}
 			}
@@ -530,7 +531,7 @@ void GameController::handle_char_property()
 			}
 			else
 			{
-				player_on_turn->get_client()->write("You can't destroy any buildings because your opponent has got the preacher \r\n");
+				player_on_turn->get_client()->write("You can't destroy any buildings\r\n");
 				fase = GamePhase::PlayFase;
 				print_turn_info();
 			}
