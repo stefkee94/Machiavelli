@@ -52,6 +52,9 @@ class Player
 		void set_turn_choices();
 		void remove_choice(int index);
 
+		void clear_hand();
+		void set_new_hand(CardStack<std::shared_ptr<BuildingCard>> new_cards);
+
 	private:
 		std::shared_ptr<Socket> client;
 		std::string name;

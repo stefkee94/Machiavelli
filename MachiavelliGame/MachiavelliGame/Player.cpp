@@ -179,3 +179,14 @@ void Player::remove_card_from_hand(int index)
 {
 	hand_cards.get_card_and_remove_at_index(index);
 }
+
+void Player::clear_hand()
+{
+	hand_cards.clear();
+}
+
+void Player::set_new_hand(CardStack<std::shared_ptr<BuildingCard>> new_cards)
+{
+	for (int i = 0; i < new_cards.size(); i++)
+		hand_cards.add_card(new_cards.get_card_at(i));
+}
