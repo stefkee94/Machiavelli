@@ -997,11 +997,13 @@ void GameController::magicien_trade_cards_with_player()
 	CardStack<std::shared_ptr<BuildingCard>> other_player_cards;
 	CardStack<std::shared_ptr<BuildingCard>> tmp_player_cards;
 
+	std::shared_ptr<Player> other_player;
 	for (int i = 0; i < players.size(); i++)
 	{
 		if (players[i] != player_on_turn)
 		{
 			other_player_cards = players[i]->get_hand_cards();
+			other_player = players[i];
 			break;
 		}
 	}
@@ -1011,6 +1013,12 @@ void GameController::magicien_trade_cards_with_player()
 	current_player_cards = other_player_cards;
 	other_player_cards.clear();
 	other_player_cards = tmp_player_cards;
+
+	player_on_turn->clear_hand();
+	player_on_turn->set_new_hand(current_player_cards);
+
+	other_player->clear_hand();
+	other_player->set_new_hand(other_player_cards);
 
 	player_on_turn->get_client()->write("You have swapped your cards with the other player \r\n");
 	
