@@ -53,10 +53,6 @@ CharacterType Player::get_char_type()
 void Player::reset_character_cards()
 {
 	character_cards.clear();
-	for (int i = 0; i < character_cards.size(); i++){
-		std::shared_ptr<CharacterCard> card = character_cards.get_card_and_remove_at_index(i);
-		card.reset();
-	}
 }
 void Player::remove_character_card(std::string character_name)
 {
