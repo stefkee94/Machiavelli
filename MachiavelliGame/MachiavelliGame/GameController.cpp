@@ -643,7 +643,7 @@ void GameController::handle_build_card(std::string new_command)
 		player_on_turn->put_card_on_field(chosen_building_card);
 		player_on_turn->remove_card_from_hand(choice);
 		player_on_turn->get_client()->write("You have built : " + chosen_building_card->get_name() + "(" + chosen_building_card->color_to_name() + ", " + std::to_string(chosen_building_card->get_points()) + ") \r\n");
-		if (player_on_turn->get_field_cards().size >= 8){
+		if (player_on_turn->get_field_cards().size() >= 8){
 			for (int i = 0; i < players.size(); i++){
 				players[i]->get_client()->write(player_on_turn->get_name() + " has reached a city of " + std::to_string(player_on_turn->get_field_cards().size()) + " the game has ended! finish you're turns");
 				game_is_finished = true;
