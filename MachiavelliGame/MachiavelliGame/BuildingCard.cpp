@@ -5,9 +5,19 @@ BuildingCard::BuildingCard(std::string name, int points, CardColor color) : name
 {
 }
 
+BuildingCard::BuildingCard(std::string name, int points, CardColor color, std::string effect) : name(name), points(points), color(color), effect(effect)
+{
+
+}
+
 std::string BuildingCard::get_name()
 {
 	return name;
+}
+
+std::string BuildingCard::get_effect()
+{
+	return effect;
 }
 
 std::string BuildingCard::color_to_name()
@@ -46,5 +56,8 @@ BuildingCard::~BuildingCard()
 
 std::string BuildingCard::to_string()
 {
-	return name + "(" + color_to_name() + ", " + std::to_string(points) + ")";
+	if (get_effect().compare("") == 0)
+		return name + "(" + color_to_name() + ", " + std::to_string(points) + ")";
+	else
+		return name + "(" + color_to_name() + ", " + std::to_string(points) + ", " + get_effect() + ")";
 }
