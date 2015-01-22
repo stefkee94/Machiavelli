@@ -73,9 +73,14 @@ std::unique_ptr<BuildingCard> MachiavelliReader::create_building_card(std::vecto
 
 		return std::make_unique<BuildingCard>(name, points, color);
 	}
-	else
+	else if (building_card_values.size() == 4)
 	{
-		//error
+		std::string name = building_card_values[0];
+		int points = atoi(building_card_values[1].c_str());
+		CardColor color = string_to_card_olor(building_card_values[2]);
+		std::string effect = building_card_values[3];
+
+		return std::make_unique<BuildingCard>(name, points, color, effect);
 	}
 }
 

@@ -641,7 +641,7 @@ void GameController::handle_build_card(std::string new_command)
 		player_on_turn->remove_gold(chosen_building_card->get_points());
 		player_on_turn->put_card_on_field(chosen_building_card);
 		player_on_turn->remove_card_from_hand(choice);
-		player_on_turn->get_client()->write("You have built : " + chosen_building_card->get_name() + "(" + chosen_building_card->color_to_name() + ", " + std::to_string(chosen_building_card->get_points()) + ") \r\n");
+		player_on_turn->get_client()->write("You have built : " + chosen_building_card->to_string() + "\r\n");
 		fase = GamePhase::PlayFase;
 		print_turn_info();
 	}
