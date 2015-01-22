@@ -5,6 +5,7 @@ Player::Player(std::shared_ptr<Socket> client, std::string name, int age) : clie
 	this->is_king = false;
 	this->is_robbed = false;
 	this->finished_first = false;
+	this->points = 0;
 }
 
 
@@ -20,6 +21,40 @@ void Player::set_finished_first(bool first)
 bool Player::get_finished_first()
 {
 	return finished_first;
+}
+
+bool Player::has_five_of_same_color()
+{
+	int yellow = 0;
+	int blue = 0;
+	int green = 0;
+	int lilac = 0;
+	int red = 0;
+	for (int i = 0; i < field_cards.size(); i++){
+		switch (field_cards.get_card_at(i)->get_card_color()){
+		case CardColor::Yellow:
+			yellow++;
+			break;
+		case CardColor::Blue:
+			blue++;
+			break;
+		case CardColor::Green:
+			green++;
+			break;
+		case CardColor::Lilac:
+			lilac++;
+			break;
+		case CardColor::Red:
+			red++;
+			break;
+		}
+	}
+	if (yellow > 4 || blue > 4 || green > 4 || lilac > 4 || red > 4){
+		return true;
+	}
+	else{
+		return false;
+	}
 }
 
 std::shared_ptr<Socket> Player::get_client()

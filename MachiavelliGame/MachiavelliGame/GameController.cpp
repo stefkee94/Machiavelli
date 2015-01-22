@@ -5,11 +5,17 @@
 
 GameController::GameController()
 {
+	is_ended = false;
 	init();
 }
 
 GameController::~GameController()
 {
+}
+
+bool GameController::get_is_ended()
+{
+	return is_ended;
 }
 
 void GameController::handle_client_command(std::shared_ptr<Socket> client, std::string new_command)
@@ -21,33 +27,33 @@ void GameController::handle_client_command(std::shared_ptr<Socket> client, std::
 	}
 	if (player_on_turn->get_client().get() == client.get())
 	{
-		if (fase == GamePhase::ChooseChar)
+		if (phase == GamePhase::ChooseChar)
 			hanlde_choose_char_command(new_command);
-		else if (fase == GamePhase::DismissChar)
+		else if (phase == GamePhase::DismissChar)
 			handle_dismiss_char_command(new_command);
-		else if (fase == GamePhase::PlayFase)
+		else if (phase == GamePhase::PlayFase)
 			handle_play_turn_command(new_command);
-		else if (fase == GamePhase::ChooseBuildingCard)
+		else if (phase == GamePhase::ChooseBuildingCard)
 			handle_choose_building_card(new_command);
-		else if (fase == GamePhase::BuildCard)
+		else if (phase == GamePhase::BuildCard)
 			handle_build_card(new_command);
-		else if (fase == GamePhase::MagicienProperty)
+		else if (phase == GamePhase::MagicienProperty)
 			handle_magicien_property(new_command);
-		else if (fase == GamePhase::MagicienTradeBank)
+		else if (phase == GamePhase::MagicienTradeBank)
 			handle_magicien_trade_bank_prop(new_command);
-		else if (fase == GamePhase::MurderPhase)
+		else if (phase == GamePhase::MurderPhase)
 			handle_murder_character(new_command);
-		else if (fase == GamePhase::ThiefPhase)
+		else if (phase == GamePhase::ThiefPhase)
 			handle_steal_from_character(new_command);
-		else if (fase == GamePhase::CondottierePhase)
+		else if (phase == GamePhase::CondottierePhase)
 			handle_condottiere_phase(new_command);
-		else if (fase == GamePhase::BuyDestroyedBuildingPhase)
+		else if (phase == GamePhase::BuyDestroyedBuildingPhase)
 			handle_buy_destroyed_building(new_command);
-		else if (fase == GamePhase::LaboratoryPhase)
+		else if (phase == GamePhase::LaboratoryPhase)
 			handle_labroratory_choice(new_command);
-		else if (fase == GamePhase::SchoolOfMagicPhase)
+		else if (phase == GamePhase::SchoolOfMagicPhase)
 			handle_school_of_magic_choice(new_command);
-		else if (fase == GamePhase::HofOfMiraclesPhase)
+		else if (phase == GamePhase::HofOfMiraclesPhase)
 			handle_hof_of_miracles_choice(new_command);
 	}
 }
@@ -83,7 +89,7 @@ void GameController::hanlde_choose_char_command(std::string new_command)
 {
 	try{
 		int choice = std::stoi(new_command.c_str());
-		if (choice < 0 || choice > character_cards.size()){
+		if (choice < 0 || choice >= character_cards.size()){
 			throw std::exception();
 		}
 		player_on_turn->get_client()->write("You chose the : " + character_cards.get_card_at(choice)->get_name() + "\r\n");
@@ -95,7 +101,7 @@ void GameController::hanlde_choose_char_command(std::string new_command)
 			choose_character();
 		}
 		else{
-			fase = GamePhase::DismissChar;
+			phase = GamePhase::DismissChar;
 			dismiss_character();
 		}
 	}
@@ -109,7 +115,7 @@ void GameController::handle_condottiere_phase(std::string new_command)
 {
 	if (condottiere_choices.size() > 7){
 		player_on_turn->get_client()->write("Opponent has a city of 8 buildings or more \r\n");
-		fase = GamePhase::PlayFase;
+		phase = GamePhase::PlayFase;
 		print_turn_info();
 		return;
 	}
@@ -118,7 +124,7 @@ void GameController::handle_condottiere_phase(std::string new_command)
 		card_to_destroy = condottiere_choices[choice];
 		if (player_on_turn->get_gold() - (card_to_destroy->get_points() - 1) < 0){
 			player_on_turn->get_client()->write("Can't destroy the " + card_to_destroy->get_name() + " with " + std::to_string(card_to_destroy->get_points()) + " gold, because you don't have enough gold \r\n");
-			fase = GamePhase::PlayFase;
+			phase = GamePhase::PlayFase;
 			print_turn_info();
 		}
 		else{
@@ -142,7 +148,7 @@ void GameController::check_for_graveyard(std::string card_name)
 	for (int i = 0; i < players.size(); i++)
 	{
 		if (players[i]->has_field_card("Kerkhof") && players[i]->get_char_type() != CharacterType::Condottiere){
-			fase = GamePhase::BuyDestroyedBuildingPhase;
+			phase = GamePhase::BuyDestroyedBuildingPhase;
 			player_on_turn = players[i];
 			player_on_turn->get_client()->write("You got the graveyard! \r\n");
 			player_on_turn->get_client()->write("Would you like to buy " + card_name + "for 1 gold? \r\n");
@@ -151,7 +157,7 @@ void GameController::check_for_graveyard(std::string card_name)
 			return;
 		}
 	}
-	fase = GamePhase::PlayFase;
+	phase = GamePhase::PlayFase;
 	print_turn_info();
 }
 
@@ -186,7 +192,7 @@ void GameController::handle_school_of_magic_choice(std::string new_command)
 				break;
 			}
 		}
-		fase = GamePhase::PlayFase;
+		phase = GamePhase::PlayFase;
 		print_turn_info();
 	}
 	catch (std::exception& e){
@@ -197,6 +203,10 @@ void GameController::handle_school_of_magic_choice(std::string new_command)
 
 void GameController::handle_workplace()
 {
+	if (player_on_turn->get_gold() < 3){
+		player_on_turn->get_client()->write("You dont have enough moneys \r\n");
+		return;
+	}
 	player_on_turn->remove_gold(3);
 	for (int i = 0; i < 2; i++)
 	{
@@ -228,7 +238,7 @@ void GameController::handle_buy_destroyed_building(std::string new_command)
 			if (players[i]->get_char_type() == CharacterType::Condottiere)
 				player_on_turn = players[i];
 		}
-		fase = GamePhase::PlayFase;
+		phase = GamePhase::PlayFase;
 		print_turn_info();
 	}
 	catch (std::exception& e){
@@ -241,14 +251,14 @@ void GameController::handle_dismiss_char_command(std::string new_command)
 {
 	try{
 		int choice = std::stoi(new_command.c_str());
-		if (choice < 0 || choice > character_cards.size()){
+		if (choice < 0 || choice >= character_cards.size()){
 			throw std::exception();
 		}
 		player_on_turn->get_client()->write("You dismissed the : " + character_cards.get_card_at(choice)->get_name() + "\r\n");
 		character_cards.get_card_and_remove_at_index(choice);
 		set_turn_to_next_player();
 		if (character_cards.size() > 0){
-			fase = GamePhase::ChooseChar;
+			phase = GamePhase::ChooseChar;
 			choose_character();
 		}
 	}
@@ -262,7 +272,7 @@ void GameController::handle_play_turn_command(std::string new_command)
 {
 	try{
 		int choice = std::stoi(new_command.c_str());
-		if (choice < 0 || choice > turn_choices.size()){
+		if (choice < 0 || choice >= turn_choices.size()){
 			throw std::exception();
 		}
 		switch (turn_choices[choice].first)
@@ -318,10 +328,10 @@ void GameController::handle_end_turn()
 			if (players[i]->get_is_robbed()){
 				player_on_turn->add_gold(players[i]->get_gold());
 				players[i]->remove_gold(players[i]->get_gold());
+				players[i]->set_is_robbed(false);
 			}
 		}
 	}
-	set_turn_choices();
 	call_count++;
 	call_next_char();
 }
@@ -331,7 +341,7 @@ void GameController::handle_steal_from_character(std::string new_command)
 	bool is_command_digit = false;
 	try{
 		int choice = std::stoi(new_command.c_str());
-		if (choice < 0 || choice > thief_choices.size()){
+		if (choice < 0 || choice >= thief_choices.size()){
 			throw std::exception();
 		}
 		for (int i = 0; i < players.size(); i++)
@@ -340,7 +350,7 @@ void GameController::handle_steal_from_character(std::string new_command)
 				players[i]->set_is_robbed(true);
 		}
 		player_on_turn->get_client()->write("You robbed all the money of the : " + thief_choices[choice] + "\r\n");
-		fase = GamePhase::PlayFase;
+		phase = GamePhase::PlayFase;
 		print_turn_info();
 	}
 	catch (std::exception& e){
@@ -353,7 +363,7 @@ void GameController::handle_choose_building_card(std::string new_command)
 {
 	try{
 		int choice = std::stoi(new_command.c_str());
-		if (choice < 0 || choice > picked_building_cards.size()){
+		if (choice < 0 || choice >= picked_building_cards.size()){
 			throw std::exception();
 		}
 		player_on_turn->add_card_to_hand(picked_building_cards[choice]);
@@ -361,7 +371,7 @@ void GameController::handle_choose_building_card(std::string new_command)
 		picked_building_cards.clear();
 		remove_choice(0);
 		remove_choice(0);
-		fase = GamePhase::PlayFase;
+		phase = GamePhase::PlayFase;
 		print_turn_info();
 	}
 	catch (std::exception& e){
@@ -379,7 +389,7 @@ void GameController::handle_char_property()
 			for (auto it : murderer_choices){
 				player_on_turn->get_client()->write("[" + std::to_string(it.first) + "]: " + it.second + "\r\n");
 			}
-			fase = GamePhase::MurderPhase;
+			phase = GamePhase::MurderPhase;
 		break;
 		case CharacterType::Thief:
 			player_on_turn->get_client()->write("Steal from? \r\n");
@@ -389,7 +399,7 @@ void GameController::handle_char_property()
 			for (auto it : thief_choices)
 				player_on_turn->get_client()->write("[" + std::to_string(it.first) + "]: " + it.second + "\r\n");
 
-			fase = GamePhase::ThiefPhase;
+			phase = GamePhase::ThiefPhase;
 		break;
 		case CharacterType::Magicien:
 			do_magicien_property();
@@ -407,7 +417,7 @@ void GameController::handle_char_property()
 			}
 			player_on_turn->get_client()->write("You got " + std::to_string(yellow_cards_on_field) + " gold from the yellow buildings \r\n");
 			print_turn_info();
-			fase = GamePhase::PlayFase;
+			phase = GamePhase::PlayFase;
 		}
 		break;
 		case CharacterType::Preacher:
@@ -423,7 +433,7 @@ void GameController::handle_char_property()
 			}
 			player_on_turn->get_client()->write("You got " + std::to_string(blue_cards_on_field) + "gold from the blue buildings \r\n");
 			print_turn_info();
-			fase = GamePhase::PlayFase;
+			phase = GamePhase::PlayFase;
 		}
 		break;
 		case CharacterType::Merchant:
@@ -439,7 +449,7 @@ void GameController::handle_char_property()
 			}
 			player_on_turn->get_client()->write("You got " + std::to_string(green_cards_on_field) + "gold from the green buildings \r\n");
 			print_turn_info();
-			fase = GamePhase::PlayFase;
+			phase = GamePhase::PlayFase;
 		}
 		break;
 		case CharacterType::Architect:
@@ -449,7 +459,7 @@ void GameController::handle_char_property()
 				player_on_turn->get_client()->write("You picked up : " + new_card->get_name() + "(" + new_card->color_to_name() + ", " + std::to_string(new_card->get_points()) + ") \r\n");
 				player_on_turn->add_card_to_hand(new_card);
 			}
-			fase = GamePhase::PlayFase;
+			phase = GamePhase::PlayFase;
 			print_turn_info();
 		break;
 		case CharacterType::Condottiere:
@@ -484,12 +494,12 @@ void GameController::handle_char_property()
 				for (auto it : condottiere_choices)
 					player_on_turn->get_client()->write("[" + std::to_string(it.first) + "]: " + it.second->to_string() + "\r\n");
 
-				fase = GamePhase::CondottierePhase;
+				phase = GamePhase::CondottierePhase;
 			}
 			else
 			{
 				player_on_turn->get_client()->write("You can't destroy any buildings\r\n");
-				fase = GamePhase::PlayFase;
+				phase = GamePhase::PlayFase;
 				print_turn_info();
 			}
 		}
@@ -501,14 +511,14 @@ void GameController::handle_murder_character(std::string new_command)
 {
 	try{
 		int choice = std::stoi(new_command.c_str());
-		if (choice < 0 || choice > murderer_choices.size()){
+		if (choice < 0 || choice >= murderer_choices.size()){
 			throw std::exception();
 		}
 		for (int i = 0; i < players.size(); i++){
 			players[i]->remove_character_card(murderer_choices[choice]);
 		}
 		player_on_turn->get_client()->write("The murderer killed the " + murderer_choices[choice] + "\r\n");
-		fase = GamePhase::PlayFase;
+		phase = GamePhase::PlayFase;
 		init_thief_choices(murderer_choices[choice]);
 		print_turn_info();
 	}
@@ -520,12 +530,14 @@ void GameController::handle_murder_character(std::string new_command)
 
 void GameController::init_thief_choices(std::string name_of_murdered)
 {
+	int counter = 0;
 	for (int i = 0; i < char_order.size(); i++)
 	{
 		if (char_order[i].compare("Murderer") == 0 || char_order[i].compare("Thief") == 0 || char_order[i].compare(name_of_murdered) == 0){
 			continue;
 		}
-		thief_choices.insert(std::make_pair(i, char_order[i]));
+		thief_choices.insert(std::make_pair(counter, char_order[i]));
+		counter++;
 	}
 }
 
@@ -538,20 +550,20 @@ void GameController::handle_laboratory()
 		lab_choices.insert(std::make_pair(i, card));
 		player_on_turn->get_client()->write("[" + std::to_string(i) + "]: " + card->to_string() + "\r\n");
 	}
-	fase = GamePhase::LaboratoryPhase;
+	phase = GamePhase::LaboratoryPhase;
 }
 
 void GameController::handle_labroratory_choice(std::string new_command)
 {
 	try{
 		int choice = std::stoi(new_command.c_str());
-		if (choice < 0 || choice > lab_choices.size()){
+		if (choice < 0 || choice >= lab_choices.size()){
 			throw std::exception();
 		}
 		player_on_turn->get_client()->write("You destroyed " + lab_choices[choice]->get_name() + " for one gold \r\n");
 		player_on_turn->remove_card_from_hand(lab_choices[choice]->get_name());
 		player_on_turn->add_gold(1);
-		fase = GamePhase::PlayFase;
+		phase = GamePhase::PlayFase;
 		print_turn_info();
 	}
 	catch (std::exception& e){
@@ -564,28 +576,28 @@ void GameController::handle_build_card(std::string new_command)
 {
 	try{
 		int choice = std::stoi(new_command.c_str());
-		if (choice < 0 || choice > player_on_turn->get_hand_cards().size()){
+		if (choice < 0 || choice >= player_on_turn->get_hand_cards().size()){
 			throw std::exception();
 		}
 		std::shared_ptr<BuildingCard> chosen_building_card = player_on_turn->get_hand_cards().get_card_at(choice);
 		if (chosen_building_card->get_points() > player_on_turn->get_gold()){
 			player_on_turn->get_client()->write("Can't play this card because you need " + std::to_string(chosen_building_card->get_points()) + " points to play it \r\n");
-			fase = GamePhase::PlayFase;
+			phase = GamePhase::PlayFase;
 		}
 		else{
 			player_on_turn->remove_gold(chosen_building_card->get_points());
 			player_on_turn->put_card_on_field(chosen_building_card);
 			player_on_turn->remove_card_from_hand(choice);
 			player_on_turn->get_client()->write("You have built : " + chosen_building_card->to_string() + "\r\n");
-			if (player_on_turn->get_field_cards().size() >= 8){
+			if (player_on_turn->get_field_cards().size() > 7 && !game_is_finished){
 				for (int i = 0; i < players.size(); i++)
 				{
-					players[i]->get_client()->write(player_on_turn->get_name() + " has reached a city of " + std::to_string(player_on_turn->get_field_cards().size()) + " the game has ended! finish your turns");
-					game_is_finished = true;
-					player_on_turn->set_finished_first(true);
+					players[i]->get_client()->write("\r\n" + player_on_turn->get_name() + " has reached a city of " + std::to_string(player_on_turn->get_field_cards().size()) + " the game has ended! finish your turns");
 				}
+				game_is_finished = true;
+				player_on_turn->set_finished_first(true);
 			}
-			fase = GamePhase::PlayFase;
+			phase = GamePhase::PlayFase;
 			print_turn_info();
 		}
 	}
@@ -607,7 +619,6 @@ void GameController::call_next_char()
 				player_on_turn->set_type(card->get_type());
 				if (player_on_turn->get_char_type() == CharacterType::Merchant)
 					player_on_turn->add_gold(1);
-
 				if (player_on_turn->has_field_card("School voor magiërs"))
 				{
 					player_on_turn->get_client()->write("You are the master of the school of magics, which color should it become? \r\n");
@@ -616,9 +627,10 @@ void GameController::call_next_char()
 					player_on_turn->get_client()->write("[2]: Blue \r\n");
 					player_on_turn->get_client()->write("[3]: Red \r\n");
 					player_on_turn->get_client()->write("[4]: Lilac \r\n");
-					fase = GamePhase::SchoolOfMagicPhase;
+					phase = GamePhase::SchoolOfMagicPhase;
 					return;
 				}
+				set_turn_choices();
 				print_turn_info();
 				return;
 			}
@@ -644,7 +656,7 @@ void GameController::call_next_char()
 		call_count = 0;
 		count_builded_in_turn_for_architect = 0;
 		first_pick = true;
-		fase = GamePhase::ChooseChar;
+		phase = GamePhase::ChooseChar;
 		choose_character();
 	}
 }
@@ -659,20 +671,17 @@ void GameController::end_game()
 
 		if (player->get_finished_first())
 			player->add_points(4);
-		
+		if (player->get_field_cards().size() > 7)
+			player->add_points(2);
+		if (player->has_five_of_same_color()){
+			player->add_points(3);
+		}
 		for (int i = 0; i < player->get_field_cards().size(); i++)
 		{
 			player->add_points(player->get_field_cards().get_card_at(i)->get_points());
-			duplicate_colors.insert(std::pair<int, CardColor>(i,player->get_field_cards().get_card_at(i)->get_card_color()));
 		}
-		if (duplicate_colors.size() == 5)
-			player->add_points(3);
-		
-		duplicate_colors.clear();
-
-		if (!player->get_finished_first() && player->get_field_cards().size() >= 8)
-			player->add_points(2);
 	}
+	is_ended = true;
 	decide_winner();
 }
 
@@ -684,7 +693,7 @@ void GameController::decide_winner()
 	{
 		if (players[i]->get_points() > winner->get_points())
 			winner = players[i];
-		else
+		else if (players[i] != winner)
 			players[i]->get_client()->write("You lost with: " + std::to_string(players[i]->get_points()) + " points");
 	}
 	winner->get_client()->write("You won with:" + std::to_string(winner->get_points()) + " points");
@@ -704,7 +713,7 @@ void GameController::check_for_hof()
 				hof_choices.insert(std::make_pair(i, options.get_card_at(i)));
 				player->get_client()->write("[" + std::to_string(i) + "]:" + options.get_card_at(i)->to_string());
 				player_on_turn = player;
-				fase = GamePhase::HofOfMiraclesPhase;
+				phase = GamePhase::HofOfMiraclesPhase;
 				return;
 			}
 		}
@@ -715,7 +724,7 @@ void GameController::handle_hof_of_miracles_choice(std::string new_command)
 {
 	try{
 		int choice = std::stoi(new_command.c_str());
-		if (choice < 0 || choice > hof_choices.size()){
+		if (choice < 0 || choice >= hof_choices.size()){
 			throw std::exception();
 		}
 		player_on_turn->remove_field_card("Hof der Wonderen");
@@ -788,7 +797,6 @@ void GameController::set_turn_to_next_player()
 	for (int i = 0; i < players.size(); i++){
 		if (players[i] != player_on_turn){
 			player_on_turn = players[i];
-			set_turn_choices();
 			return;
 		}
 	}
@@ -816,8 +824,7 @@ void GameController::start_game()
 	else
 		player_on_turn = players[1];
 	player_on_turn->set_is_king(true);
-	set_turn_choices();
-	fase = GamePhase::ChooseChar;
+	phase = GamePhase::ChooseChar;
 	first_pick = true;
 	choose_character();
 }
@@ -857,13 +864,13 @@ void GameController::take_building_cards()
 			player_on_turn->get_client()->write("[" + std::to_string(j) + "] : " + picked_building_cards[j]->to_string() + "\r\n");
 		}
 		player_on_turn->get_client()->write(">");
-		fase = GamePhase::ChooseBuildingCard;
+		phase = GamePhase::ChooseBuildingCard;
 	}
 }
 
 void GameController::build_building_card()
 {
-	fase = GamePhase::BuildCard;
+	phase = GamePhase::BuildCard;
 	player_on_turn->get_client()->write("All the hand cards : \r\n");
 	for (int i = 0; i < player_on_turn->get_hand_cards().size(); i++){
 		player_on_turn->get_client()->write("[" + std::to_string(i) + "] : " + player_on_turn->get_hand_cards().get_card_at(i)->to_string() + "\r\n");
@@ -894,7 +901,7 @@ void GameController::dismiss_character()
 			player_on_turn->get_client()->write("[" + std::to_string(i) + "]: " + character_cards.get_card_at(i)->get_name() + "\r\n");
 	}
 	if (character_cards.size() == 0){
-		fase = GamePhase::PlayFase;
+		phase = GamePhase::PlayFase;
 		call_next_char();
 	}
 }
@@ -905,7 +912,7 @@ void GameController::do_magicien_property()
 	player_on_turn->get_client()->write("[0] : Trade hand cards with another player \r\n");
 	player_on_turn->get_client()->write("[1] : Chose cards to exchange with the bank \r\n");
 	player_on_turn->get_client()->write(">");
-	fase = GamePhase::MagicienProperty;
+	phase = GamePhase::MagicienProperty;
 }
 
 void GameController::handle_magicien_property(std::string new_command)
@@ -956,7 +963,7 @@ void GameController::magicien_trade_cards_with_player()
 	other_player->clear_hand();
 	other_player->set_new_hand(other_player_cards);
 	player_on_turn->get_client()->write("You have swapped your cards with the other player \r\n");	
-	fase = GamePhase::PlayFase;
+	phase = GamePhase::PlayFase;
 	print_turn_info();
 }
 
@@ -968,7 +975,7 @@ void GameController::magicien_trade_cards_with_bank()
 		player_on_turn->get_client()->write(card->to_string() + "\r\n");
 	}
 	player_on_turn->get_client()->write("which cards do you want to replace? Write the index including a comma \r\n >");
-	fase = GamePhase::MagicienTradeBank;
+	phase = GamePhase::MagicienTradeBank;
 }
 
 bool greaterThan(std::string i, std::string j)
@@ -1003,7 +1010,7 @@ void GameController::handle_magicien_trade_bank_prop(std::string new_command)
 		player_on_turn->get_client()->write("You picked up : " + new_card->to_string() + "\r\n");
 		player_on_turn->add_card_to_hand(new_card);
 	}
-	fase = GamePhase::PlayFase;
+	phase = GamePhase::PlayFase;
 	print_turn_info();
 }
 

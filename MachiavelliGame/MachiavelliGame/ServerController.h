@@ -27,6 +27,7 @@ class ServerController
 		bool is_handling;
 
 		std::shared_ptr<GameController> game_controller;
+		
 
 		// Socket info
 		const int port_number = 1080;

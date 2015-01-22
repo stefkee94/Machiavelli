@@ -21,8 +21,6 @@ class Player
 		CardStack<std::shared_ptr<BuildingCard>> get_field_cards();
 		CardStack<std::shared_ptr<BuildingCard>> get_hand_cards();
 
-		void use_character_property();
-
 		void add_gold(int amount);
 		void remove_gold(int amount);
 		void set_type(CharacterType type);
@@ -31,6 +29,7 @@ class Player
 		void reset_character_cards();
 		bool get_is_robbed();
 		void set_is_robbed(bool b);
+		bool has_five_of_same_color();
 		std::string get_name();
 		void add_points(int points);
 

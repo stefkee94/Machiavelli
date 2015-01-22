@@ -24,7 +24,7 @@ void ServerController::start_server()
 	//Create server socket
 	ServerSocket server_socket(port_number);
 
-	while (is_server_running)
+	while (true)
 	{
 		try
 		{
@@ -54,13 +54,15 @@ void ServerController::handle_client(std::shared_ptr<Socket> socket)
 {
 	std::shared_ptr<Socket> client = socket;
 	startup_player(client);
-	
 	is_handling = true;
-
 	while (is_handling)
 	{
 		try
 		{
+			if (game_controller->get_is_ended()){
+				client->write("Game has ended, disconnecting");
+				break;
+			}
 			std::string command = client->read_line();
 			ClientCommand client_command = ClientCommand(command, client);
 			client_queue.put(client_command);
@@ -75,6 +77,7 @@ void ServerController::handle_client(std::shared_ptr<Socket> socket)
 			client->write("ERROR: something went wrong");
 		}
 	}
+	client->close();
 }
 
 void ServerController::startup_player(std::shared_ptr<Socket> client)
@@ -86,7 +89,6 @@ void ServerController::startup_player(std::shared_ptr<Socket> client)
 	std::string name = client->read_line();
 	std::string age;
 	bool is_age_digit = false;	
-
 	while (!is_age_digit)
 	{
 		client->write("Please fill in your age \r\n");
@@ -96,18 +98,14 @@ void ServerController::startup_player(std::shared_ptr<Socket> client)
 		if (charact != 0)
 			is_age_digit = true;
 	}
-
 	client->write("You are ready to play! \r\n");
 	client->write(prompt);
-
-	// Get id from the client and save for the player
 	game_controller->connect_player(client, name, age);
 }
 
 void ServerController::consume_command()
 {
 	is_consuming = true;
-
 	while (is_consuming)
 	{
 		ClientCommand command;
