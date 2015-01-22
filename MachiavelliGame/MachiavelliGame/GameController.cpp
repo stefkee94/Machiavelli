@@ -110,31 +110,62 @@ void GameController::hanlde_choose_char_command(std::string new_command)
 
 void GameController::handle_condottiere_phase(std::string new_command)
 {
+	if (condottiere_choices.size() >= 7)
+	{
+		player_on_turn->get_client()->write("You can't destory a building which is a city of 8 buildings or more \r\n");
+		return;
+	}
+
 	bool is_command_digit = false;
 	int choice;
-	choice = atoi(new_command.c_str());
-	card_to_destroy = condottiere_choices[choice];
-	if (card_to_destroy->get_points() > 0){
-		player_on_turn->remove_gold(card_to_destroy->get_points() - 1);
-	}
-	for (int i = 0; i < players.size(); i++){
-		if (player_on_turn != players[i]){
-			players[i]->remove_field_card(card_to_destroy->get_name());
+
+	while (!is_command_digit)
+	{
+		choice = atoi(new_command.c_str());
+		if ((choice > 0 || new_command.compare("0") == 0) && (choice < condottiere_choices.size() - 1))
+			is_command_digit = true;
+		else
+		{
+			player_on_turn->get_client()->write("Invalid text, please fill in valid text to destroy the opponents building \r\n");
+			return;
 		}
 	}
+
+	std::shared_ptr<BuildingCard> card_to_destroy = condottiere_choices[choice];
+	if (player_on_turn->get_gold() - (card_to_destroy->get_points() - 1) < 0)
+		player_on_turn->get_client()->write("Can't destroy the " + card_to_destroy->get_name() + " with " + std::to_string(card_to_destroy->get_points()) + " gold, because you don't have enough gold \r\n");
+
+	if (card_to_destroy->get_points() > 0)
+		player_on_turn->remove_gold(card_to_destroy->get_points() - 1);
+
+	for (int i = 0; i < players.size(); i++)
+	{
+		if (player_on_turn != players[i])
+			players[i]->remove_field_card(card_to_destroy->get_name());
+	}
+
+	player_on_turn->get_client()->write("You destroyed " + card_to_destroy->get_name() + " with " + std::to_string(card_to_destroy->get_points()) + " gold from your enemy \r\n");
+
 	check_for_graveyard(card_to_destroy->get_name());
 }
 
 void GameController::check_for_graveyard(std::string card_name)
 {
-	for (int i = 0; i < players.size(); i++){
-		if (players[i]->has_field_card("Kerkhof") && players[i]->get_char_type() != CharacterType::Condottiere){
+	for (int i = 0; i < players.size(); i++)
+	{
+		if (players[i]->has_field_card("Kerkhof") && players[i]->get_char_type() != CharacterType::Condottiere)
+		{
 			fase = GamePhase::BuyDestroyedBuildingPhase;
 			player_on_turn = players[i];
 			player_on_turn->get_client()->write("You got the graveyard! \r\n");
 			player_on_turn->get_client()->write("Would you like to buy " + card_name + "for 1 gold? \r\n");
 			player_on_turn->get_client()->write("[0]: Yes \r\n");
 			player_on_turn->get_client()->write("[1]: No \r\n");
+		}
+		else
+		{
+			fase = GamePhase::PlayFase;
+			print_turn_info();
 		}
 	}
 }
@@ -148,24 +179,28 @@ void GameController::handle_buy_destroyed_building(std::string new_command)
 {
 	int choice;
 	choice = atoi(new_command.c_str());
-	switch (choice){
-	case 0:
-		player_on_turn->remove_gold(1);
-		player_on_turn->add_card_to_hand(card_to_destroy);
-		player_on_turn->get_client()->write("You bought " + card_to_destroy->to_string());
-		card_to_destroy.reset();
-		break;
-	case 1:
-		card_to_destroy.reset();
-		break;
+	switch (choice)
+	{
+		case 0:
+			player_on_turn->remove_gold(1);
+			player_on_turn->add_card_to_hand(card_to_destroy);
+			player_on_turn->get_client()->write("You bought " + card_to_destroy->to_string());
+			card_to_destroy.reset();
+			break;
+		case 1:
+			card_to_destroy.reset();
+			break;
 	}
-	for (int i = 0; i < players.size(); i++){
-		if (players[i]->get_char_type() == CharacterType::Condottiere){
+
+	for (int i = 0; i < players.size(); i++)
+	{
+		if (players[i]->get_char_type() == CharacterType::Condottiere)
 			player_on_turn = players[i];
-		}
 	}
+
 	fase = GamePhase::PlayFase;
 	print_turn_info();
+	
 }
 
 void GameController::handle_dismiss_char_command(std::string new_command)
@@ -225,6 +260,7 @@ void GameController::handle_play_turn_command(std::string new_command)
 			take_building_cards();
 		break;
 		case 2:
+		{
 			if (player_on_turn->get_char_type() == CharacterType::Architect)
 			{
 				count_builded_in_turn_for_architect++;
@@ -235,6 +271,7 @@ void GameController::handle_play_turn_command(std::string new_command)
 				remove_choice(choice);
 			}
 			build_building_card();
+		}
 		break;
 		case 3:
 			remove_choice(choice);
@@ -271,13 +308,34 @@ void GameController::handle_end_turn()
 
 void GameController::handle_steal_from_character(std::string new_command)
 {
+	bool is_command_digit = false;
 	int choice;
-	choice = atoi(new_command.c_str());
-	for (int i = 0; i < players.size(); i++){
-		if (players[i]->has_character(thief_choices[choice]) != nullptr){
-			players[i]->set_is_robbed(true);
+	while (!is_command_digit)
+	{
+		choice = atoi(new_command.c_str());
+		for (auto it : thief_choices)
+		{
+			if (it.first == choice)
+			{
+				is_command_digit = true;
+				break;
+			}
+		}
+		if (!is_command_digit)
+		{
+			player_on_turn->get_client()->write("Invalid text, please fill in valid text to steal from a character \r\n");
+			return;
 		}
 	}
+
+	for (int i = 0; i < players.size(); i++)
+	{
+		if (players[i]->has_character(thief_choices[choice]) != nullptr)
+			players[i]->set_is_robbed(true);
+	}
+
+	player_on_turn->get_client()->write("You robbed all the money of the : " + thief_choices[choice] + "\r\n");
+
 	fase = GamePhase::PlayFase;
 	print_turn_info();
 }
@@ -324,12 +382,12 @@ void GameController::handle_char_property()
 		break;
 		case CharacterType::Thief:
 			player_on_turn->get_client()->write("Steal from? \r\n");
-			if (thief_choices.empty()){
+			if (thief_choices.empty())
 				init_thief_choices("");
-			}
-			for (auto it : thief_choices){
+
+			for (auto it : thief_choices)
 				player_on_turn->get_client()->write("[" + std::to_string(it.first) + "]: " + it.second + "\r\n");
-			}
+
 			fase = GamePhase::ThiefPhase;
 		break;
 		case CharacterType::Magicien:
@@ -337,50 +395,50 @@ void GameController::handle_char_property()
 		break;
 		case CharacterType::King:
 		{
-									int yellow_cards_on_field = 0;
-									for (int i = 0; i < player_on_turn->get_field_cards().size(); i++)
-									{
-										if (!player_on_turn->get_field_cards().is_empty() && player_on_turn->get_field_cards().get_card_at(i)->get_card_color() == CardColor::Yellow)
-										{
-											player_on_turn->add_gold(1);
-											yellow_cards_on_field++;
-										}
-									}
-									player_on_turn->get_client()->write("You got " + std::to_string(yellow_cards_on_field) + "gold from the yellow buildings \r\n");
-									print_turn_info();
-									fase = GamePhase::PlayFase;
+			int yellow_cards_on_field = 0;
+			for (int i = 0; i < player_on_turn->get_field_cards().size(); i++)
+			{
+				if (!player_on_turn->get_field_cards().is_empty() && player_on_turn->get_field_cards().get_card_at(i)->get_card_color() == CardColor::Yellow)
+				{
+					player_on_turn->add_gold(1);
+					yellow_cards_on_field++;
+				}
+			}
+			player_on_turn->get_client()->write("You got " + std::to_string(yellow_cards_on_field) + " gold from the yellow buildings \r\n");
+			print_turn_info();
+			fase = GamePhase::PlayFase;
 		}
 		break;
 		case CharacterType::Preacher:
 		{
-										int blue_cards_on_field = 0;
-										for (int i = 0; i < player_on_turn->get_field_cards().size(); i++)
-										{
-											if (player_on_turn->get_field_cards().get_card_at(i)->get_card_color() == CardColor::Blue)
-											{
-												player_on_turn->add_gold(1);
-												blue_cards_on_field++;
-											}
-										}
-										player_on_turn->get_client()->write("You got " + std::to_string(blue_cards_on_field) + "gold from the blue buildings \r\n");
-										print_turn_info();
-										fase = GamePhase::PlayFase;
+			int blue_cards_on_field = 0;
+			for (int i = 0; i < player_on_turn->get_field_cards().size(); i++)
+			{
+				if (player_on_turn->get_field_cards().get_card_at(i)->get_card_color() == CardColor::Blue)
+				{
+					player_on_turn->add_gold(1);
+					blue_cards_on_field++;
+				}
+			}
+			player_on_turn->get_client()->write("You got " + std::to_string(blue_cards_on_field) + "gold from the blue buildings \r\n");
+			print_turn_info();
+			fase = GamePhase::PlayFase;
 		}
 		break;
 		case CharacterType::Merchant:
 		{
-										int green_cards_on_field = 0;
-										for (int i = 0; i < player_on_turn->get_field_cards().size(); i++)
-										{
-											if (player_on_turn->get_field_cards().get_card_at(i)->get_card_color() == CardColor::Green)
-											{
-												player_on_turn->add_gold(1);
-												green_cards_on_field++;
-											}
-										}
-										player_on_turn->get_client()->write("You got " + std::to_string(green_cards_on_field) + "gold from the green buildings \r\n");
-										print_turn_info();
-										fase = GamePhase::PlayFase;
+			int green_cards_on_field = 0;
+			for (int i = 0; i < player_on_turn->get_field_cards().size(); i++)
+			{
+				if (player_on_turn->get_field_cards().get_card_at(i)->get_card_color() == CardColor::Green)
+				{
+					player_on_turn->add_gold(1);
+					green_cards_on_field++;
+				}
+			}
+			player_on_turn->get_client()->write("You got " + std::to_string(green_cards_on_field) + "gold from the green buildings \r\n");
+			print_turn_info();
+			fase = GamePhase::PlayFase;
 		}
 		break;
 		case CharacterType::Architect:
@@ -394,22 +452,46 @@ void GameController::handle_char_property()
 			print_turn_info();
 		break;
 		case CharacterType::Condottiere:
-			for (int i = 0; i < players.size(); i++){
-				std::shared_ptr<Player> player = players[i];
-				if (player_on_turn != player && player->has_character("Preacher") == nullptr){
-						for (int a = 0; a < player->get_field_cards().size(); a++){
-							std::shared_ptr<BuildingCard> card = player->get_field_cards().get_card_at(a);
-							if (card->get_name().compare("Kerker") != 0){
-								condottiere_choices.insert(std::make_pair(a, player->get_field_cards().get_card_at(a)));
-							}
-						}
+		{
+			int red_cards_on_field = 0;
+			for (int i = 0; i < player_on_turn->get_field_cards().size(); i++)
+			{
+				if (player_on_turn->get_field_cards().get_card_at(i)->get_card_color() == CardColor::Red)
+				{
+					player_on_turn->add_gold(1);
+					red_cards_on_field++;
 				}
 			}
-			player_on_turn->get_client()->write("Which building would you like to destroy? \r\n");
-			for (auto it : condottiere_choices){
-				player_on_turn->get_client()->write("[" + std::to_string(it.first) + "]: " + it.second->to_string() + "\r\n");
+			player_on_turn->get_client()->write("You got " + std::to_string(red_cards_on_field) + "gold from the red buildings \r\n");
+
+			condottiere_choices.clear();
+			for (int i = 0; i < players.size(); i++)
+			{
+				std::shared_ptr<Player> player = players[i];
+				if (player_on_turn != player && player->has_character("Preacher") == nullptr){
+					for (int a = 0; a < player->get_field_cards().size(); a++){
+						std::shared_ptr<BuildingCard> card = player->get_field_cards().get_card_at(a);
+						if (card->get_name().compare("Kerker") != 0){
+							condottiere_choices.insert(std::make_pair(a, player->get_field_cards().get_card_at(a)));
+						}
+					}
+				}
 			}
-			fase = GamePhase::CondottierePhase;
+			if (condottiere_choices.size() > 0)
+			{
+				player_on_turn->get_client()->write("Which building would you like to destroy? \r\n");
+				for (auto it : condottiere_choices)
+					player_on_turn->get_client()->write("[" + std::to_string(it.first) + "]: " + it.second->to_string() + "\r\n");
+
+				fase = GamePhase::CondottierePhase;
+			}
+			else
+			{
+				player_on_turn->get_client()->write("You can't destroy any buildings because your opponent has got the preacher \r\n");
+				fase = GamePhase::PlayFase;
+				print_turn_info();
+			}
+		}
 		break;
 	}
 }
@@ -431,6 +513,7 @@ void GameController::handle_murder_character(std::string new_command)
 	}
 	for (int i = 0; i < players.size(); i++)
 		players[i]->remove_character_card(murderer_choices[choice]);
+
 	player_on_turn->get_client()->write("The murderer killed the " + murderer_choices[choice] + "\r\n");
 	fase = GamePhase::PlayFase;
 	init_thief_choices(murderer_choices[choice]);
@@ -439,10 +522,10 @@ void GameController::handle_murder_character(std::string new_command)
 
 void GameController::init_thief_choices(std::string name_of_murdered)
 {
-	for (int i = 0; i < char_order.size(); i++){
-		if (char_order[i].compare("Murderer") == 0 || char_order[i].compare("Thief") == 0 ||char_order[i].compare(name_of_murdered) == 0){
+	for (int i = 0; i < char_order.size(); i++)
+	{
+		if (char_order[i].compare("Murderer") == 0 || char_order[i].compare("Thief") == 0 ||char_order[i].compare(name_of_murdered) == 0)
 			continue;
-		}
 		thief_choices.insert(std::make_pair(i, char_order[i]));
 	}
 }
@@ -516,15 +599,19 @@ void GameController::call_next_char()
 				return;
 			}
 		}
+		for (int i = 0; i < players.size(); i++)
+			players[i]->get_client()->write("\r\n>The card : " + char_order[call_count] + " is on the discard pile \r\n");
+
 		call_count++;
 		call_next_char();
 	}
-	else{
+	else
+	{
 		set_new_king();
 		reset_characters();
-		for (int i = 0; i < players.size(); i++){
+		for (int i = 0; i < players.size(); i++)
 			players[i]->get_client()->write("<----------------------- NEXT ROUND ------------------------> \r\n");
-		}
+
 		MachiavelliReader reader;
 		character_cards = reader.read_character_cards("karakters.csv");
 		call_count = 0;
