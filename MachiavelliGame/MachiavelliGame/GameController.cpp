@@ -578,7 +578,7 @@ void GameController::handle_laboratory()
 	{
 		std::shared_ptr<BuildingCard> card = player_on_turn->get_hand_cards().get_card_at(i);
 		lab_choices.insert(std::make_pair(i, card));
-		player_on_turn->get_client()->write("[" + std::to_string(i) + "]: " + card->to_string());
+		player_on_turn->get_client()->write("[" + std::to_string(i) + "]: " + card->to_string() + "\r\n");
 	}
 
 	fase = GamePhase::LaboratoryPhase;
@@ -627,7 +627,10 @@ void GameController::handle_build_card(std::string new_command)
 	}
 	std::shared_ptr<BuildingCard> chosen_building_card = player_on_turn->get_hand_cards().get_card_at(choice);
 	if (chosen_building_card->get_points() > player_on_turn->get_gold())
-		player_on_turn->get_client()->write("Can't play this card because you need " + std::to_string(chosen_building_card->get_points()) + " points to play it \r\nPlease choose another card \r\n");
+	{
+		player_on_turn->get_client()->write("Can't play this card because you need " + std::to_string(chosen_building_card->get_points()) + " points to play it \r\n");
+		fase = GamePhase::PlayFase;
+	}
 	else
 	{
 		player_on_turn->remove_gold(chosen_building_card->get_points());
@@ -635,9 +638,11 @@ void GameController::handle_build_card(std::string new_command)
 		player_on_turn->remove_card_from_hand(choice);
 		player_on_turn->get_client()->write("You have built : " + chosen_building_card->to_string() + "\r\n");
 
-		if (player_on_turn->get_field_cards().size() >= 8){
-			for (int i = 0; i < players.size(); i++){
-				players[i]->get_client()->write(player_on_turn->get_name() + " has reached a city of " + std::to_string(player_on_turn->get_field_cards().size()) + " the game has ended! finish you're turns");
+		if (player_on_turn->get_field_cards().size() >= 8)
+		{
+			for (int i = 0; i < players.size(); i++)
+			{
+				players[i]->get_client()->write(player_on_turn->get_name() + " has reached a city of " + std::to_string(player_on_turn->get_field_cards().size()) + " the game has ended! finish your turns");
 				game_is_finished = true;
 			}
 		}
