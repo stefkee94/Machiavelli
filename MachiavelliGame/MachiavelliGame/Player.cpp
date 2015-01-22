@@ -107,6 +107,16 @@ int Player::get_gold()
 	return gold;
 }
 
+void Player::add_points(int points)
+{
+	this->points += points;
+}
+
+int Player::get_points()
+{
+	return points;
+}
+
 CardStack<std::shared_ptr<BuildingCard>> Player::get_field_cards()
 {
 	return field_cards;
@@ -126,6 +136,11 @@ std::shared_ptr<BuildingCard> Player::get_field_card(std::string card_name)
 			return card;
 	}
 	return nullptr;
+}
+
+std::string Player::get_name()
+{
+	return name;
 }
 
 bool Player::get_is_king()

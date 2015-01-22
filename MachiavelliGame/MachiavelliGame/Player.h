@@ -31,6 +31,8 @@ class Player
 		void reset_character_cards();
 		bool get_is_robbed();
 		void set_is_robbed(bool b);
+		std::string get_name();
+		void add_points(int points);
 
 		std::shared_ptr<CharacterCard> has_character(std::string character_name);
 		bool has_field_card(std::string card_name);
@@ -42,6 +44,8 @@ class Player
 		CharacterType get_char_type();
 		int get_gold();
 		int get_age();
+		int get_points();
+
 		std::shared_ptr<Socket> get_client();
 
 		std::vector<std::string> get_turn_choices();
@@ -53,6 +57,7 @@ class Player
 		std::string name;
 		int age;
 		int gold;
+		int points;
 
 		bool is_king;
 		bool char_property_used;

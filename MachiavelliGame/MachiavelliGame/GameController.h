@@ -43,10 +43,14 @@ class GameController
 		void handle_condottiere_phase(std::string new_command);
 		void handle_buy_destroyed_building(std::string new_command);
 		void handle_school_of_magic_choice(std::string new_command);
+		void handle_hof_of_miracles_choice(std::string new_command);
 		void handle_laboratory();
 		void handle_workplace();
+		void check_for_hof();
+		void decide_winner();
 		void check_for_graveyard(std::string card_name);
 		void handle_labroratory_choice(std::string new_command);
+		void end_game();
 	private:
 		CardStack<std::shared_ptr<BuildingCard>> building_cards;
 		CardStack<std::shared_ptr<CharacterCard>> character_cards;
@@ -75,6 +79,7 @@ class GameController
 		std::map<int, std::string> thief_choices;
 		std::map<int, std::shared_ptr<BuildingCard>> condottiere_choices;
 		std::map < int, std::shared_ptr<BuildingCard>> lab_choices;
+		std::map<int, std::shared_ptr<BuildingCard>> hof_choices;
 
 		std::vector<std::shared_ptr<BuildingCard>> picked_building_cards;
 
@@ -85,6 +90,7 @@ class GameController
 
 		GamePhase fase;
 		bool first_pick;
+		bool game_is_finished;
 		int count_builded_in_turn_for_architect = 0;
 		int call_count = 0;
 };

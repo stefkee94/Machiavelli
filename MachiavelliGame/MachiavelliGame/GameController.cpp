@@ -49,6 +49,8 @@ void GameController::handle_client_command(std::shared_ptr<Socket> client, std::
 			handle_labroratory_choice(new_command);
 		else if (fase == GamePhase::SchoolOfMagicPhase)
 			handle_school_of_magic_choice(new_command);
+		else if (fase == GamePhase::HofOfMiraclesPhase)
+			handle_hof_of_miracles_choice(new_command);
 	}
 }
 
@@ -632,7 +634,6 @@ void GameController::handle_build_card(std::string new_command)
 			return;
 		}
 	}
-
 	std::shared_ptr<BuildingCard> chosen_building_card = player_on_turn->get_hand_cards().get_card_at(choice);
 	if (chosen_building_card->get_points() > player_on_turn->get_gold())
 		player_on_turn->get_client()->write("Can't play this card because you need " + std::to_string(chosen_building_card->get_points()) + " points to play it \r\nPlease choose another card \r\n");
@@ -642,6 +643,14 @@ void GameController::handle_build_card(std::string new_command)
 		player_on_turn->put_card_on_field(chosen_building_card);
 		player_on_turn->remove_card_from_hand(choice);
 		player_on_turn->get_client()->write("You have built : " + chosen_building_card->to_string() + "\r\n");
+
+		if (player_on_turn->get_field_cards().size() >= 8){
+			for (int i = 0; i < players.size(); i++){
+				players[i]->get_client()->write(player_on_turn->get_name() + " has reached a city of " + std::to_string(player_on_turn->get_field_cards().size()) + " the game has ended! finish you're turns");
+				game_is_finished = true;
+			}
+		}
+
 		fase = GamePhase::PlayFase;
 		print_turn_info();
 	}
@@ -681,6 +690,9 @@ void GameController::call_next_char()
 		call_count++;
 		call_next_char();
 	}
+	else if (game_is_finished){
+		end_game();
+	}
 	else
 	{
 		set_new_king();
@@ -698,6 +710,64 @@ void GameController::call_next_char()
 	}
 }
 
+void GameController::end_game()
+{
+	check_for_hof();
+	for (int i = 0; i < players.size(); i++){
+		std::shared_ptr<Player> player = players[i];
+		for (int i = 0; i < player->get_field_cards().size(); i++){
+			player->add_points(player->get_field_cards().get_card_at(i)->get_points());
+		}
+	}
+	decide_winner();
+}
+
+void GameController::decide_winner()
+{
+	std::shared_ptr<Player> winner;
+	winner = players[0];
+	for (int i = 0; i < players.size(); i++){
+		if (players[i]->get_points() > winner->get_points()){
+			winner = players[i];
+		}
+		else{
+			players[i]->get_client()->write("You lost with: " + std::to_string(players[i]->get_points()) + " points");
+		}
+	}
+	winner->get_client()->write("You won with:" + std::to_string(winner->get_points()) + " points");
+}
+
+void GameController::check_for_hof()
+{
+	for (int i = 0; i < players.size(); i++){
+		std::shared_ptr<Player> player = players[i];
+		if (player->has_field_card("Hof der Wonderen")){
+			MachiavelliReader reader;
+			CardStack<std::shared_ptr<BuildingCard>> options = reader.read_building_cards("Bouwkaarten.csv");
+			player->get_client()->write("Choose a building \r\n");
+			for (int i = 0; i < options.size(); i++){
+				hof_choices.insert(std::make_pair(i, options.get_card_at(i)));
+				player->get_client()->write("[" + std::to_string(i) + "]:" + options.get_card_at(i)->to_string());
+				player_on_turn = player;
+				fase = GamePhase::HofOfMiraclesPhase;
+				return;
+			}
+		}
+	}
+}
+
+void GameController::handle_hof_of_miracles_choice(std::string new_command)
+{
+	int choice;
+	choice = atoi(new_command.c_str());
+	player_on_turn->remove_field_card("Hof der Wonderen");
+	std::shared_ptr<BuildingCard> card = hof_choices[choice];
+	player_on_turn->add_card_to_hand(card);
+	for (int i = 0; i < players.size(); i++){
+		players[i]->get_client()->write(player_on_turn->get_name() + "exchanged hof of miracles with " + card->to_string());
+	}
+	end_game();
+}
 void GameController::reset_characters()
 {
 	for (int i = 0; i < players.size(); i++){
