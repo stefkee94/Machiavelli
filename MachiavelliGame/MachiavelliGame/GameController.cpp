@@ -709,6 +709,7 @@ void GameController::start_game()
 		player_on_turn = players[1];
 
 	player_on_turn->set_is_king(true);
+	set_turn_choices();
 	fase = GamePhase::ChooseChar;
 	first_pick = true;
 
@@ -980,8 +981,6 @@ void GameController::init()
 		{ 5, "Architect"},
 		{ 6, "Condottiere"}
 	};
-
-	set_turn_choices();
 	count_builded_in_turn_for_architect = 0;
 	first_pick = true;
 }
