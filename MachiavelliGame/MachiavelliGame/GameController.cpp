@@ -45,6 +45,8 @@ void GameController::handle_client_command(std::shared_ptr<Socket> client, std::
 			handle_condottiere_phase(new_command);
 		else if (fase == GamePhase::BuyDestroyedBuildingPhase)
 			handle_buy_destroyed_building(new_command);
+		else if (fase == GamePhase::LaboratoryPhase)
+			handle_labroratory_choice(new_command);
 	}
 }
 
@@ -168,6 +170,11 @@ void GameController::check_for_graveyard(std::string card_name)
 	}
 }
 
+void GameController::handle_workplace()
+{
+	player_on_turn->remove_gold(3);
+}
+
 void GameController::handle_buy_destroyed_building(std::string new_command)
 {
 	int choice;
@@ -195,6 +202,7 @@ void GameController::handle_buy_destroyed_building(std::string new_command)
 	print_turn_info();
 	
 }
+
 void GameController::handle_dismiss_char_command(std::string new_command)
 {
 	bool is_command_digit = false;
@@ -272,6 +280,11 @@ void GameController::handle_play_turn_command(std::string new_command)
 		case 4:
 			handle_end_turn();
 		break;
+		case 5:
+			handle_laboratory();
+			break;
+		case 6:
+			break;
 	}
 }
 
@@ -292,6 +305,7 @@ void GameController::handle_end_turn()
 	call_count++;
 	call_next_char();
 }
+
 void GameController::handle_steal_from_character(std::string new_command)
 {
 	bool is_command_digit = false;
@@ -454,22 +468,15 @@ void GameController::handle_char_property()
 			for (int i = 0; i < players.size(); i++)
 			{
 				std::shared_ptr<Player> player = players[i];
-				if (player_on_turn != player && player->has_character("Preacher") == nullptr)
-				{
-					for (int a = 0; a < player->get_field_cards().size(); a++)
-						condottiere_choices.insert(std::make_pair(a, player->get_field_cards().get_card_at(a)));
-				}
-				if (player_on_turn != player)
-				{
-					for (int a = 0; a < player->get_field_cards().size(); a++)
-					{
+				if (player_on_turn != player && player->has_character("Preacher") == nullptr){
+					for (int a = 0; a < player->get_field_cards().size(); a++){
 						std::shared_ptr<BuildingCard> card = player->get_field_cards().get_card_at(a);
-						if (card->get_name().compare("Kerker") != 0)
+						if (card->get_name().compare("Kerker") != 0){
 							condottiere_choices.insert(std::make_pair(a, player->get_field_cards().get_card_at(a)));
+						}
 					}
 				}
 			}
-
 			if (condottiere_choices.size() > 0)
 			{
 				player_on_turn->get_client()->write("Which building would you like to destroy? \r\n");
@@ -521,6 +528,27 @@ void GameController::init_thief_choices(std::string name_of_murdered)
 			continue;
 		thief_choices.insert(std::make_pair(i, char_order[i]));
 	}
+}
+
+void GameController::handle_laboratory()
+{
+	player_on_turn->get_client()->write("Which buildingcard you want to turn in for gold? \r\n");
+	for (int i = 0; i < player_on_turn->get_hand_cards().size(); i++){
+		std::shared_ptr<BuildingCard> card = player_on_turn->get_hand_cards().get_card_at(i);
+		lab_choices.insert(std::make_pair(i, card));
+		player_on_turn->get_client()->write("[" + std::to_string(i) + "]: " + card->to_string());
+	}
+}
+
+void GameController::handle_labroratory_choice(std::string new_command)
+{
+	int choice;
+	choice = atoi(new_command.c_str());
+	player_on_turn->get_client()->write("You destroyed " + lab_choices[choice]->get_name() + " for one gold \r\n");
+	player_on_turn->remove_card_from_hand(lab_choices[choice]->get_name());
+	player_on_turn->add_gold(1);
+	fase = GamePhase::PlayFase;
+	print_turn_info();
 }
 
 void GameController::handle_build_card(std::string new_command)
@@ -888,9 +916,14 @@ std::vector<std::pair<int, std::string>> GameController::get_turn_choices()
 void GameController::set_turn_choices()
 {
 	turn_choices.clear();
-
 	for (int x = 0; x < init_choices.size(); x++)
 		turn_choices.push_back(std::pair<int, std::string>(x,init_choices[x]));
+	if (player_on_turn->has_field_card("Laboratorium")){
+		turn_choices.push_back(std::pair<int, std::string>(turn_choices.size(), "Drop buildingcard and get one gold \r\n"));
+	}
+	else if (player_on_turn->has_field_card("Werkplaats")){
+		turn_choices.push_back(std::pair<int, std::string>(turn_choices.size(), "Pay 3 gold and draw two building cards \r\n"));
+	}
 }
 
 void GameController::remove_choice(int index)

@@ -42,9 +42,10 @@ class GameController
 		void handle_magicien_trade_bank_prop(std::string new_command);
 		void handle_condottiere_phase(std::string new_command);
 		void handle_buy_destroyed_building(std::string new_command);
-
+		void handle_laboratory();
+		void handle_workplace();
 		void check_for_graveyard(std::string card_name);
-
+		void handle_labroratory_choice(std::string new_command);
 	private:
 		CardStack<std::shared_ptr<BuildingCard>> building_cards;
 		CardStack<std::shared_ptr<CharacterCard>> character_cards;
@@ -72,6 +73,7 @@ class GameController
 		std::map<int, std::string> murderer_choices;
 		std::map<int, std::string> thief_choices;
 		std::map<int, std::shared_ptr<BuildingCard>> condottiere_choices;
+		std::map < int, std::shared_ptr<BuildingCard>> lab_choices;
 
 		std::vector<std::shared_ptr<BuildingCard>> picked_building_cards;
 
