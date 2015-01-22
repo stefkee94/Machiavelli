@@ -2,8 +2,6 @@
 #include "ServerController.h"
 #include <vector>
 #include <string>
-#include <sstream>
-#include <iostream>
 
 GameController::GameController()
 {
@@ -78,71 +76,64 @@ void GameController::consume_command(ClientCommand command, std::shared_ptr<Sock
 	{
 		client->write("Sorry, something went wrong with handling request");
 	}
-
 	client->write(">");
 }
 
 void GameController::hanlde_choose_char_command(std::string new_command)
 {
-	bool is_command_digit = false;
-	int choice;
-	while (!is_command_digit)
-	{
-		choice = atoi(new_command.c_str());
-		if ((choice > 0 || new_command.compare("0") == 0) && (choice < character_cards.size()))
-			is_command_digit = true;
-		else
-		{
-			player_on_turn->get_client()->write("Invalid text, please fill in valid text to choose a character \r\n");
-			return;
+	try{
+		int choice = std::stoi(new_command.c_str());
+		if (choice < 0 || choice > character_cards.size()){
+			throw std::exception();
+		}
+		player_on_turn->get_client()->write("You chose the : " + character_cards.get_card_at(choice)->get_name() + "\r\n");
+		player_on_turn->add_character(character_cards.get_card_and_remove_at_index(choice));
+		if (first_pick){
+			first_pick = false;
+			character_cards.get_card_at_top();
+			set_turn_to_next_player();
+			choose_character();
+		}
+		else{
+			fase = GamePhase::DismissChar;
+			dismiss_character();
 		}
 	}
-	player_on_turn->get_client()->write("You chose the : " + character_cards.get_card_at(choice)->get_name() + "\r\n");
-	player_on_turn->add_character(character_cards.get_card_and_remove_at_index(choice));
-	if (first_pick)
-	{
-		first_pick = false;
-		set_turn_to_next_player();
-		choose_character();
-	}
-	else
-	{
-		fase = GamePhase::DismissChar;
-		dismiss_character();
+	catch (std::exception &e){
+		player_on_turn->get_client()->write("Invalid text, please fill in valid text to choose a character \r\n");
+		return;
 	}
 }
 
 void GameController::handle_condottiere_phase(std::string new_command)
 {
-	if (condottiere_choices.size() > 7)
-	{
+	if (condottiere_choices.size() > 7){
 		player_on_turn->get_client()->write("Opponent has a city of 8 buildings or more \r\n");
 		fase = GamePhase::PlayFase;
 		print_turn_info();
 		return;
 	}
-	int choice;
-	choice = atoi(new_command.c_str());
-	if (!(choice > 0 || new_command.compare("0") == 0) && !(choice < condottiere_choices.size()))
-	{
+	try{
+		int choice = std::stoi(new_command.c_str());
+		card_to_destroy = condottiere_choices[choice];
+		if (player_on_turn->get_gold() - (card_to_destroy->get_points() - 1) < 0){
+			player_on_turn->get_client()->write("Can't destroy the " + card_to_destroy->get_name() + " with " + std::to_string(card_to_destroy->get_points()) + " gold, because you don't have enough gold \r\n");
+			fase = GamePhase::PlayFase;
+			print_turn_info();
+		}
+		else{
+			player_on_turn->remove_gold(card_to_destroy->get_points() - 1);
+			for (int i = 0; i < players.size(); i++){
+				if (player_on_turn != players[i])
+					players[i]->remove_field_card(card_to_destroy->get_name());
+			}
+			player_on_turn->get_client()->write("You destroyed " + card_to_destroy->get_name() + " with " + std::to_string(card_to_destroy->get_points()) + " gold from your enemy \r\n");
+			check_for_graveyard(card_to_destroy->get_name());
+		}
+	}
+	catch (std::exception& e){
 		player_on_turn->get_client()->write("Invalid text, please fill in valid text to destroy the opponents building \r\n");
 		return;
-	}
-	card_to_destroy = condottiere_choices[choice];
-	if (player_on_turn->get_gold() - (card_to_destroy->get_points() - 1) < 0){
-		player_on_turn->get_client()->write("Can't destroy the " + card_to_destroy->get_name() + " with " + std::to_string(card_to_destroy->get_points()) + " gold, because you don't have enough gold \r\n");
-		fase = GamePhase::PlayFase;
-		print_turn_info();
-	}
-	else{
-		player_on_turn->remove_gold(card_to_destroy->get_points() - 1);
-		for (int i = 0; i < players.size(); i++)
-		{
-			if (player_on_turn != players[i])
-				players[i]->remove_field_card(card_to_destroy->get_name());
-		}
-		player_on_turn->get_client()->write("You destroyed " + card_to_destroy->get_name() + " with " + std::to_string(card_to_destroy->get_points()) + " gold from your enemy \r\n");
-		check_for_graveyard(card_to_destroy->get_name());
 	}
 }
 
@@ -150,8 +141,7 @@ void GameController::check_for_graveyard(std::string card_name)
 {
 	for (int i = 0; i < players.size(); i++)
 	{
-		if (players[i]->has_field_card("Kerkhof") && players[i]->get_char_type() != CharacterType::Condottiere)
-		{
+		if (players[i]->has_field_card("Kerkhof") && players[i]->get_char_type() != CharacterType::Condottiere){
 			fase = GamePhase::BuyDestroyedBuildingPhase;
 			player_on_turn = players[i];
 			player_on_turn->get_client()->write("You got the graveyard! \r\n");
@@ -167,13 +157,13 @@ void GameController::check_for_graveyard(std::string card_name)
 
 void GameController::handle_school_of_magic_choice(std::string new_command)
 {
-	int choice; 
-	choice = atoi(new_command.c_str());
-	std::shared_ptr<BuildingCard> card = player_on_turn->get_field_card("School voor magiërs");
-	if (card != nullptr)
-	{
-		switch (choice)
+	try{
+		int choice = std::stoi(new_command.c_str());
+		std::shared_ptr<BuildingCard> card = player_on_turn->get_field_card("School voor magiërs");
+		if (card != nullptr)
 		{
+			switch (choice)
+			{
 			case 0:
 				card->set_color(CardColor::Yellow);
 				player_on_turn->get_client()->write("You changed the school to yellow \r\n");
@@ -194,10 +184,15 @@ void GameController::handle_school_of_magic_choice(std::string new_command)
 				card->set_color(CardColor::Lilac);
 				player_on_turn->get_client()->write("You changed the school to lilac \r\n");
 				break;
+			}
 		}
+		fase = GamePhase::PlayFase;
+		print_turn_info();
 	}
-	fase = GamePhase::PlayFase;
-	print_turn_info();
+	catch (std::exception& e){
+		player_on_turn->get_client()->write("Invalid text, please fill in valid text to change color \r\n");
+		return;
+	}
 }
 
 void GameController::handle_workplace()
@@ -209,17 +204,15 @@ void GameController::handle_workplace()
 		player_on_turn->add_card_to_hand(card);
 		player_on_turn->get_client()->write("You picked: " + card->to_string() + "\r\n");
 	}
-
 	print_turn_info();
-
 }
 
 void GameController::handle_buy_destroyed_building(std::string new_command)
 {
-	int choice;
-	choice = atoi(new_command.c_str());
-	switch (choice)
-	{
+	try{
+		int choice = std::stoi(new_command.c_str());
+		switch (choice)
+		{
 		case 0:
 			player_on_turn->remove_gold(1);
 			player_on_turn->add_card_to_hand(card_to_destroy);
@@ -229,113 +222,100 @@ void GameController::handle_buy_destroyed_building(std::string new_command)
 		case 1:
 			card_to_destroy.reset();
 			break;
+		}
+		for (int i = 0; i < players.size(); i++)
+		{
+			if (players[i]->get_char_type() == CharacterType::Condottiere)
+				player_on_turn = players[i];
+		}
+		fase = GamePhase::PlayFase;
+		print_turn_info();
 	}
-
-	for (int i = 0; i < players.size(); i++)
-	{
-		if (players[i]->get_char_type() == CharacterType::Condottiere)
-			player_on_turn = players[i];
+	catch (std::exception& e){
+		player_on_turn->get_client()->write("Invalid text, please fill in valid text to destroy building \r\n");
+		return;
 	}
-
-	fase = GamePhase::PlayFase;
-	print_turn_info();
-	
 }
 
 void GameController::handle_dismiss_char_command(std::string new_command)
 {
-	bool is_command_digit = false;
-	int choice;
-
-	if (character_cards.size() > 0)
-	{
-		while (!is_command_digit)
-		{
-			choice = atoi(new_command.c_str());
-			if ((choice > 0 || new_command.compare("0") == 0) && (choice < character_cards.size()))
-				is_command_digit = true;
-			else
-			{
-				player_on_turn->get_client()->write("Invalid text, please fill in valid text to dismiss a character \r\n");
-				return;
-			}
+	try{
+		int choice = std::stoi(new_command.c_str());
+		if (choice < 0 || choice > character_cards.size()){
+			throw std::exception();
 		}
-
 		player_on_turn->get_client()->write("You dismissed the : " + character_cards.get_card_at(choice)->get_name() + "\r\n");
-
 		character_cards.get_card_and_remove_at_index(choice);
 		set_turn_to_next_player();
+		if (character_cards.size() > 0){
+			fase = GamePhase::ChooseChar;
+			choose_character();
+		}
 	}
-
-	if (character_cards.size() > 0)
-	{
-		fase = GamePhase::ChooseChar;
-		choose_character();
+	catch (std::exception& e){
+		player_on_turn->get_client()->write("Invalid text, please fill in valid text to dismiss a character \r\n");
+		return;
 	}
 }
 
 void GameController::handle_play_turn_command(std::string new_command)
 {
-	bool is_command_digit = false;
-	int choice;
-	while (!is_command_digit)
-	{
-		choice = atoi(new_command.c_str());
-		if ((choice > 0 || new_command.compare("0") == 0) && choice <= turn_choices.size()-1)
-			is_command_digit = true;
-		else
+	try{
+		int choice = std::stoi(new_command.c_str());
+		if (choice < 0 || choice > turn_choices.size()){
+			throw std::exception();
+		}
+		switch (turn_choices[choice].first)
 		{
-			player_on_turn->get_client()->write("Invalid text, please fill in valid text to play a turn \r\n");
-			return;
+			case 0:
+				take_gold(2);
+				break;
+			case 1:
+				take_building_cards();
+				break;
+			case 2:
+			{
+					  if (player_on_turn->get_char_type() == CharacterType::Architect)
+					  {
+						  count_builded_in_turn_for_architect++;
+						  if (count_builded_in_turn_for_architect >= 3)
+							  remove_choice(choice);
+					  }
+					  else{
+						  remove_choice(choice);
+					  }
+					  build_building_card();
+			}
+				break;
+			case 3:
+				remove_choice(choice);
+				handle_char_property();
+				break;
+			case 4:
+				handle_end_turn();
+				break;
+			case 5:
+				remove_choice(choice);
+				handle_laboratory();
+				break;
+			case 6:
+				remove_choice(choice);
+				handle_workplace();
+				break;
 		}
 	}
-	int turn_number = turn_choices[choice].first;
-	switch (turn_number)
-	{
-		case 0:
-			take_gold(2);
-		break;
-		case 1:
-			take_building_cards();
-		break;
-		case 2:
-		{
-			if (player_on_turn->get_char_type() == CharacterType::Architect)
-			{
-				count_builded_in_turn_for_architect++;
-				if (count_builded_in_turn_for_architect >= 3)
-					remove_choice(choice);
-			}
-			else{
-				remove_choice(choice);
-			}
-			build_building_card();
-		}
-		break;
-		case 3:
-			remove_choice(choice);
-			handle_char_property();
-		break;
-		case 4:
-			handle_end_turn();
-		break;
-		case 5:
-			handle_laboratory();
-			break;
-		case 6:
-			handle_workplace();
-			break;
+	catch (std::exception& e){
+		player_on_turn->get_client()->write("Invalid text, please fill in valid text to play a turn \r\n");
+		return;
 	}
 }
 
 void GameController::handle_end_turn()
 {
-	if (player_on_turn->get_char_type() == CharacterType::Thief)
-	{
+	if (player_on_turn->get_char_type() == CharacterType::Thief){
 		for (int i = 0; i < players.size(); i++)
 		{
-			if (players[i]->get_is_robbed())
-			{
+			if (players[i]->get_is_robbed()){
 				player_on_turn->add_gold(players[i]->get_gold());
 				players[i]->remove_gold(players[i]->get_gold());
 			}
@@ -349,64 +329,45 @@ void GameController::handle_end_turn()
 void GameController::handle_steal_from_character(std::string new_command)
 {
 	bool is_command_digit = false;
-	int choice;
-	while (!is_command_digit)
-	{
-		choice = atoi(new_command.c_str());
-		for (auto it : thief_choices)
-		{
-			if (it.first == choice)
-			{
-				is_command_digit = true;
-				break;
-			}
+	try{
+		int choice = std::stoi(new_command.c_str());
+		if (choice < 0 || choice > thief_choices.size()){
+			throw std::exception();
 		}
-		if (!is_command_digit)
+		for (int i = 0; i < players.size(); i++)
 		{
-			player_on_turn->get_client()->write("Invalid text, please fill in valid text to steal from a character \r\n");
-			return;
+			if (players[i]->has_character(thief_choices[choice]) != nullptr)
+				players[i]->set_is_robbed(true);
 		}
+		player_on_turn->get_client()->write("You robbed all the money of the : " + thief_choices[choice] + "\r\n");
+		fase = GamePhase::PlayFase;
+		print_turn_info();
 	}
-
-	for (int i = 0; i < players.size(); i++)
-	{
-		if (players[i]->has_character(thief_choices[choice]) != nullptr)
-			players[i]->set_is_robbed(true);
+	catch (std::exception& e){
+		player_on_turn->get_client()->write("Invalid text, please fill in valid text to steal from a character \r\n");
+		return;
 	}
-
-	player_on_turn->get_client()->write("You robbed all the money of the : " + thief_choices[choice] + "\r\n");
-
-	fase = GamePhase::PlayFase;
-	print_turn_info();
 }
 
 void GameController::handle_choose_building_card(std::string new_command)
 {
-	bool is_command_digit = false;
-	int choice;
-
-	while (!is_command_digit)
-	{
-		choice = atoi(new_command.c_str());
-		if (choice == 1 || new_command.compare("0") == 0)
-			is_command_digit = true;
-		else
-		{
-			player_on_turn->get_client()->write("Invalid text, please fill in valid text to choose a building card \r\n");
-			return;
+	try{
+		int choice = std::stoi(new_command.c_str());
+		if (choice < 0 || choice > picked_building_cards.size()){
+			throw std::exception();
 		}
+		player_on_turn->add_card_to_hand(picked_building_cards[choice]);
+		player_on_turn->get_client()->write("You picked up : " + picked_building_cards[choice]->get_name() + "\r\n");// card
+		picked_building_cards.clear();
+		remove_choice(0);
+		remove_choice(0);
+		fase = GamePhase::PlayFase;
+		print_turn_info();
 	}
-	player_on_turn->add_card_to_hand(picked_building_cards[choice]);
-
-	player_on_turn->get_client()->write("You picked up : " + picked_building_cards[choice]->get_name() + "\r\n");// card
-	
-	picked_building_cards.clear();
-
-	remove_choice(0);
-	remove_choice(0);
-
-	fase = GamePhase::PlayFase;
-	print_turn_info();
+	catch (std::exception& e){
+		player_on_turn->get_client()->write("Invalid text, please fill in valid text to choose a building card \r\n");
+		return;
+	}
 }
 
 void GameController::handle_char_property()
@@ -503,7 +464,6 @@ void GameController::handle_char_property()
 				}
 			}
 			player_on_turn->get_client()->write("You got " + std::to_string(red_cards_on_field) + " gold from the red buildings \r\n");
-
 			condottiere_choices.clear();
 			for (int i = 0; i < players.size(); i++)
 			{
@@ -539,34 +499,32 @@ void GameController::handle_char_property()
 
 void GameController::handle_murder_character(std::string new_command)
 {
-	bool is_command_digit = false;
-	int choice;
-	while (!is_command_digit)
-	{
-		choice = atoi(new_command.c_str());
-		if ((choice > 0 && choice <= murderer_choices.size()) || new_command.compare("0") == 0)
-			is_command_digit = true;
-		else
-		{
-			player_on_turn->get_client()->write("Invalid text, please fill in valid text to murder a character \r\n");
-			return;
+	try{
+		int choice = std::stoi(new_command.c_str());
+		if (choice < 0 || choice > murderer_choices.size()){
+			throw std::exception();
 		}
+		for (int i = 0; i < players.size(); i++){
+			players[i]->remove_character_card(murderer_choices[choice]);
+		}
+		player_on_turn->get_client()->write("The murderer killed the " + murderer_choices[choice] + "\r\n");
+		fase = GamePhase::PlayFase;
+		init_thief_choices(murderer_choices[choice]);
+		print_turn_info();
 	}
-	for (int i = 0; i < players.size(); i++)
-		players[i]->remove_character_card(murderer_choices[choice]);
-
-	player_on_turn->get_client()->write("The murderer killed the " + murderer_choices[choice] + "\r\n");
-	fase = GamePhase::PlayFase;
-	init_thief_choices(murderer_choices[choice]);
-	print_turn_info();
+	catch (std::exception& e){
+		player_on_turn->get_client()->write("Invalid text, please fill in valid text to murder a character \r\n");
+		return;
+	}
 }
 
 void GameController::init_thief_choices(std::string name_of_murdered)
 {
 	for (int i = 0; i < char_order.size(); i++)
 	{
-		if (char_order[i].compare("Murderer") == 0 || char_order[i].compare("Thief") == 0 ||char_order[i].compare(name_of_murdered) == 0)
+		if (char_order[i].compare("Murderer") == 0 || char_order[i].compare("Thief") == 0 || char_order[i].compare(name_of_murdered) == 0){
 			continue;
+		}
 		thief_choices.insert(std::make_pair(i, char_order[i]));
 	}
 }
@@ -580,76 +538,60 @@ void GameController::handle_laboratory()
 		lab_choices.insert(std::make_pair(i, card));
 		player_on_turn->get_client()->write("[" + std::to_string(i) + "]: " + card->to_string() + "\r\n");
 	}
-
 	fase = GamePhase::LaboratoryPhase;
 }
 
 void GameController::handle_labroratory_choice(std::string new_command)
 {
-	bool is_command_digit = false;
-	int choice;
-
-	while (!is_command_digit)
-	{
-		choice = atoi(new_command.c_str());
-		if ((choice > 0 && choice <= player_on_turn->get_hand_cards().size()) || new_command.compare("0") == 0)
-			is_command_digit = true;
-		else
-		{
-			player_on_turn->get_client()->write("Invalid text, please fill in valid text to handle the labratory choice \r\n");
-			return;
+	try{
+		int choice = std::stoi(new_command.c_str());
+		if (choice < 0 || choice > lab_choices.size()){
+			throw std::exception();
 		}
+		player_on_turn->get_client()->write("You destroyed " + lab_choices[choice]->get_name() + " for one gold \r\n");
+		player_on_turn->remove_card_from_hand(lab_choices[choice]->get_name());
+		player_on_turn->add_gold(1);
+		fase = GamePhase::PlayFase;
+		print_turn_info();
 	}
-
-	player_on_turn->get_client()->write("You destroyed " + lab_choices[choice]->get_name() + " for one gold \r\n");
-	player_on_turn->remove_card_from_hand(lab_choices[choice]->get_name());
-	player_on_turn->add_gold(1);
-
-	fase = GamePhase::PlayFase;
-	print_turn_info();
+	catch (std::exception& e){
+		player_on_turn->get_client()->write("Invalid text, please fill in valid text to handle the labratory choice \r\n");
+		return;
+	}
 }
 
 void GameController::handle_build_card(std::string new_command)
 {
-	bool is_command_digit = false;
-	int choice;
-
-	while (!is_command_digit)
-	{
-		choice = atoi(new_command.c_str());
-		if ((choice > 0 && choice <= player_on_turn->get_hand_cards().size()) || new_command.compare("0") == 0)
-			is_command_digit = true;
-		else
-		{
-			player_on_turn->get_client()->write("Invalid text, please fill in valid text to play a building card \r\n");
-			return;
+	try{
+		int choice = std::stoi(new_command.c_str());
+		if (choice < 0 || choice > player_on_turn->get_hand_cards().size()){
+			throw std::exception();
 		}
-	}
-	std::shared_ptr<BuildingCard> chosen_building_card = player_on_turn->get_hand_cards().get_card_at(choice);
-	if (chosen_building_card->get_points() > player_on_turn->get_gold())
-	{
-		player_on_turn->get_client()->write("Can't play this card because you need " + std::to_string(chosen_building_card->get_points()) + " points to play it \r\n");
-		fase = GamePhase::PlayFase;
-	}
-	else
-	{
-		player_on_turn->remove_gold(chosen_building_card->get_points());
-		player_on_turn->put_card_on_field(chosen_building_card);
-		player_on_turn->remove_card_from_hand(choice);
-		player_on_turn->get_client()->write("You have built : " + chosen_building_card->to_string() + "\r\n");
-
-		if (player_on_turn->get_field_cards().size() >= 8)
-		{
-			for (int i = 0; i < players.size(); i++)
-			{
-				players[i]->get_client()->write(player_on_turn->get_name() + " has reached a city of " + std::to_string(player_on_turn->get_field_cards().size()) + " the game has ended! finish your turns");
-				game_is_finished = true;
-				player_on_turn->set_finished_first(true);
+		std::shared_ptr<BuildingCard> chosen_building_card = player_on_turn->get_hand_cards().get_card_at(choice);
+		if (chosen_building_card->get_points() > player_on_turn->get_gold()){
+			player_on_turn->get_client()->write("Can't play this card because you need " + std::to_string(chosen_building_card->get_points()) + " points to play it \r\n");
+			fase = GamePhase::PlayFase;
+		}
+		else{
+			player_on_turn->remove_gold(chosen_building_card->get_points());
+			player_on_turn->put_card_on_field(chosen_building_card);
+			player_on_turn->remove_card_from_hand(choice);
+			player_on_turn->get_client()->write("You have built : " + chosen_building_card->to_string() + "\r\n");
+			if (player_on_turn->get_field_cards().size() >= 8){
+				for (int i = 0; i < players.size(); i++)
+				{
+					players[i]->get_client()->write(player_on_turn->get_name() + " has reached a city of " + std::to_string(player_on_turn->get_field_cards().size()) + " the game has ended! finish your turns");
+					game_is_finished = true;
+					player_on_turn->set_finished_first(true);
+				}
 			}
+			fase = GamePhase::PlayFase;
+			print_turn_info();
 		}
-
-		fase = GamePhase::PlayFase;
-		print_turn_info();
+	}
+	catch (std::exception& e){
+		player_on_turn->get_client()->write("Invalid text, please fill in valid text to play a building card \r\n");
+		return;
 	}
 }
 
@@ -669,11 +611,11 @@ void GameController::call_next_char()
 				if (player_on_turn->has_field_card("School voor magiërs"))
 				{
 					player_on_turn->get_client()->write("You are the master of the school of magics, which color should it become? \r\n");
-					player_on_turn->get_client()->write("[0]: Yellow");
-					player_on_turn->get_client()->write("[1]: Green");
-					player_on_turn->get_client()->write("[2]: Blue");
-					player_on_turn->get_client()->write("[3]: Red");
-					player_on_turn->get_client()->write("[4]: Lilac");
+					player_on_turn->get_client()->write("[0]: Yellow \r\n");
+					player_on_turn->get_client()->write("[1]: Green \r\n");
+					player_on_turn->get_client()->write("[2]: Blue \r\n");
+					player_on_turn->get_client()->write("[3]: Red \r\n");
+					player_on_turn->get_client()->write("[4]: Lilac \r\n");
 					fase = GamePhase::SchoolOfMagicPhase;
 					return;
 				}
@@ -723,8 +665,6 @@ void GameController::end_game()
 			player->add_points(player->get_field_cards().get_card_at(i)->get_points());
 			duplicate_colors.insert(std::pair<int, CardColor>(i,player->get_field_cards().get_card_at(i)->get_card_color()));
 		}
-
-		// all different colors
 		if (duplicate_colors.size() == 5)
 			player->add_points(3);
 		
@@ -747,7 +687,6 @@ void GameController::decide_winner()
 		else
 			players[i]->get_client()->write("You lost with: " + std::to_string(players[i]->get_points()) + " points");
 	}
-
 	winner->get_client()->write("You won with:" + std::to_string(winner->get_points()) + " points");
 }
 
@@ -774,21 +713,29 @@ void GameController::check_for_hof()
 
 void GameController::handle_hof_of_miracles_choice(std::string new_command)
 {
-	int choice;
-	choice = atoi(new_command.c_str());
-	player_on_turn->remove_field_card("Hof der Wonderen");
-	std::shared_ptr<BuildingCard> card = hof_choices[choice];
-
-	player_on_turn->add_card_to_hand(card);
-	for (int i = 0; i < players.size(); i++)
-		players[i]->get_client()->write(player_on_turn->get_name() + "exchanged hof of miracles with " + card->to_string());
-
-	end_game();
+	try{
+		int choice = std::stoi(new_command.c_str());
+		if (choice < 0 || choice > hof_choices.size()){
+			throw std::exception();
+		}
+		player_on_turn->remove_field_card("Hof der Wonderen");
+		std::shared_ptr<BuildingCard> card = hof_choices[choice];
+		player_on_turn->add_card_to_hand(card);
+		for (int i = 0; i < players.size(); i++){
+			players[i]->get_client()->write(player_on_turn->get_name() + "exchanged hof of miracles with " + card->to_string());
+		}
+		end_game();
+	}
+	catch (std::exception& e){
+		player_on_turn->get_client()->write("Invalid text, please fill in valid text to handle hof of miracles \r\n");
+		return;
+	}
 }
 void GameController::reset_characters()
 {
-	for (int i = 0; i < players.size(); i++)
+	for (int i = 0; i < players.size(); i++){
 		players[i]->reset_character_cards();
+	}
 }
 
 void GameController::set_new_king()
@@ -796,61 +743,50 @@ void GameController::set_new_king()
 	std::shared_ptr<Player> temp;
 	for (int i = 0; i < players.size(); i++)
 	{
-		if (players[i]->get_is_king())
+		if (players[i]->get_is_king()){
 			temp = players[i];
-
+		}
 		players[i]->set_is_king(false);
 	}
 	for (int i = 0; i < players.size(); i++)
 	{
-		if (players[i]->has_character("King") != nullptr)
-		{
+		if (players[i]->has_character("King") != nullptr){
 			players[i]->set_is_king(true);
 			player_on_turn = players[i];
+			return;
 		}
-		return;
 	}
-
 	player_on_turn = temp;
 	player_on_turn->set_is_king(true);
 }
 
 void GameController::print_turn_info()
 {
-	player_on_turn->get_client()->write("As of now you're the " + char_order[call_count] + "\r\n");
+	player_on_turn->get_client()->write("\r\n As of now you're the " + char_order[call_count] + "\r\n");
 	player_on_turn->get_client()->write("Gold: " + std::to_string(player_on_turn->get_gold()) + "\r\n\r\n");
 	player_on_turn->get_client()->write("Field: \r\n");
-
-	for (int i = 0; i < player_on_turn->get_field_cards().size(); i++)
-	{
+	for (int i = 0; i < player_on_turn->get_field_cards().size(); i++){
 		std::shared_ptr<BuildingCard> card = player_on_turn->get_field_cards().get_card_at(i);
 		player_on_turn->get_client()->write(card->to_string() + "\r\n");
 	}
-
 	player_on_turn->get_client()->write("\r\n");
 	player_on_turn->get_client()->write("Hand: \r\n");
-
-	for (int i = 0; i < player_on_turn->get_hand_cards().size(); i++)
-	{
+	for (int i = 0; i < player_on_turn->get_hand_cards().size(); i++){
 		std::shared_ptr<BuildingCard> card = player_on_turn->get_hand_cards().get_card_at(i);
 		player_on_turn->get_client()->write(card->to_string() + "\r\n");
 	}
-
 	player_on_turn->get_client()->write("\r\n");
 	player_on_turn->get_client()->write("What to do? \r\n");
-
-	for (int i = 0; i < turn_choices.size(); i++)
+	for (int i = 0; i < turn_choices.size(); i++){
 		player_on_turn->get_client()->write("[" + std::to_string(i) + "] : " + turn_choices[i].second);
-
+	}
 	player_on_turn->get_client()->write(">");
 }
 
 void GameController::set_turn_to_next_player()
 {
-	for (int i = 0; i < players.size(); i++)
-	{
-		if (players[i] != player_on_turn)
-		{
+	for (int i = 0; i < players.size(); i++){
+		if (players[i] != player_on_turn){
 			player_on_turn = players[i];
 			set_turn_choices();
 			return;
@@ -860,53 +796,46 @@ void GameController::set_turn_to_next_player()
 
 void GameController::connect_player(std::shared_ptr<Socket> client, std::string name, std::string age)
 {
-	players.push_back(std::make_shared<Player>(client, name, std::atoi(age.c_str())));
-	if (players.size() >= 2) // needed to start the game
+	players.push_back(std::make_shared<Player>(client, name, std::stoi(age.c_str())));
+	if (players.size() >= 2){
 		start_game();
+	}
 }
 
 void GameController::start_game()
 {
 	for (std::shared_ptr<Player> player : players)
 	{
-		// Add 4 gold to each player
 		player->add_gold(4);
-		// Give each player 4 building cards
-		for (int i = 0; i < 4; i++)
+		for (int i = 0; i < 4; i++){
 			player->add_card_to_hand(building_cards.get_card_at_top());
+		}
 	}
-	// geef beurt aan de speler
 	if (players[0]->get_age() >= players[1]->get_age())
 		player_on_turn = players[0];
 	else
 		player_on_turn = players[1];
-
 	player_on_turn->set_is_king(true);
 	set_turn_choices();
 	fase = GamePhase::ChooseChar;
 	first_pick = true;
-
 	choose_character();
 }
 
 void GameController::take_gold(int amount)
 {
 	player_on_turn->add_gold(amount);
-
 	remove_choice(0);
 	remove_choice(0);
-
 	player_on_turn->get_client()->write("You picked up " + std::to_string(amount) + " gold \r\n");
 	player_on_turn->get_client()->write(">");
-
 	print_turn_info();
 }
 
 void GameController::take_building_cards()
 {
 	int draw_counter = 2;
-	if (player_on_turn->has_field_card("Bibliotheek"))
-	{
+	if (player_on_turn->has_field_card("Bibliotheek")){
 		player_on_turn->get_client()->write("Thanks to the library, you may keep both cards \r\n");
 		for (int i = 0; i < draw_counter; i++)
 		{
@@ -914,23 +843,20 @@ void GameController::take_building_cards()
 			player_on_turn->add_card_to_hand(card);
 			player_on_turn->get_client()->write("You picked: " + card->to_string() + "\r\n");
 		}
-
 		print_turn_info();
 	}
 	else
 	{
 		if (player_on_turn->has_field_card("Observatorium"))
 			draw_counter = 3;
-
-		for (int i = 0; i < draw_counter; i++)
+		for (int i = 0; i < draw_counter; i++){
 			picked_building_cards.push_back(building_cards.get_card_at_top());
-
+		}
 		player_on_turn->get_client()->write("You picked these cards, you have to chose one of these and throw the other away \r\n");
-
-		for (int j = 0; j < picked_building_cards.size(); j++)
+		for (int j = 0; j < picked_building_cards.size(); j++){
 			player_on_turn->get_client()->write("[" + std::to_string(j) + "] : " + picked_building_cards[j]->to_string() + "\r\n");
+		}
 		player_on_turn->get_client()->write(">");
-
 		fase = GamePhase::ChooseBuildingCard;
 	}
 }
@@ -939,19 +865,14 @@ void GameController::build_building_card()
 {
 	fase = GamePhase::BuildCard;
 	player_on_turn->get_client()->write("All the hand cards : \r\n");
-
-	for (int i = 0; i < player_on_turn->get_hand_cards().size(); i++)
+	for (int i = 0; i < player_on_turn->get_hand_cards().size(); i++){
 		player_on_turn->get_client()->write("[" + std::to_string(i) + "] : " + player_on_turn->get_hand_cards().get_card_at(i)->to_string() + "\r\n");
-
+	}
 	player_on_turn->get_client()->write("Choose one of these cards to build \r\n");
 }
 
 void GameController::choose_character()
 {
-	if (player_on_turn->get_is_king() && first_pick)
-	{
-		character_cards.get_card_at_top();
-	}
 	player_on_turn->get_client()->write("Choose a character \r\n");
 	for (int i = 0; i < character_cards.size(); i++)
 	{
@@ -963,20 +884,16 @@ void GameController::choose_character()
 void GameController::dismiss_character()
 {
 	player_on_turn->get_client()->write("Dismiss a character \r\n");
-
 	for (int i = 0; i < character_cards.size(); i++)
 	{
-		if (character_cards.size() == 1)
-		{
+		if (character_cards.size() == 1){
 			player_on_turn->get_client()->write("Dismissed : " + character_cards.get_card_at(i)->get_name() + "\r\n");
 			character_cards.get_card_and_remove_at_index(0);
 		}
 		else
 			player_on_turn->get_client()->write("[" + std::to_string(i) + "]: " + character_cards.get_card_at(i)->get_name() + "\r\n");
 	}
-
-	if (character_cards.size() == 0)
-	{
+	if (character_cards.size() == 0){
 		fase = GamePhase::PlayFase;
 		call_next_char();
 	}
@@ -988,35 +905,29 @@ void GameController::do_magicien_property()
 	player_on_turn->get_client()->write("[0] : Trade hand cards with another player \r\n");
 	player_on_turn->get_client()->write("[1] : Chose cards to exchange with the bank \r\n");
 	player_on_turn->get_client()->write(">");
-
 	fase = GamePhase::MagicienProperty;
 }
 
 void GameController::handle_magicien_property(std::string new_command)
 {
-	bool is_command_digit = false;
-	int choice;
-
-	while (!is_command_digit)
-	{
-		choice = atoi(new_command.c_str());
-		if ((choice > 0 && choice < 3) || new_command.compare("0") == 0)
-			is_command_digit = true;
-		else
+	try{
+		int choice = std::stoi(new_command.c_str());
+		if (choice < 0 || choice > 1){
+			throw std::exception();
+		}
+		switch (choice)
 		{
-			player_on_turn->get_client()->write("Invalid text, please fill in valid text to play the magicien property \r\n");
-			return;
+			case 0:
+				magicien_trade_cards_with_player();
+			break;
+			case 1:
+				magicien_trade_cards_with_bank();
+			break;
 		}
 	}
-
-	switch (choice)
-	{
-		case 0:
-			magicien_trade_cards_with_player();
-		break;
-		case 1:
-			magicien_trade_cards_with_bank();
-		break;
+	catch (std::exception& e){
+		player_on_turn->get_client()->write("Invalid text, please fill in valid text to play the magicien property \r\n");
+		return;
 	}
 }
 
@@ -1025,7 +936,6 @@ void GameController::magicien_trade_cards_with_player()
 	CardStack<std::shared_ptr<BuildingCard>> current_player_cards = player_on_turn->get_hand_cards();
 	CardStack<std::shared_ptr<BuildingCard>> other_player_cards;
 	CardStack<std::shared_ptr<BuildingCard>> tmp_player_cards;
-
 	std::shared_ptr<Player> other_player;
 	for (int i = 0; i < players.size(); i++)
 	{
@@ -1036,21 +946,16 @@ void GameController::magicien_trade_cards_with_player()
 			break;
 		}
 	}
-	// Change cards to other players
 	tmp_player_cards = current_player_cards;
 	current_player_cards.clear();
 	current_player_cards = other_player_cards;
 	other_player_cards.clear();
 	other_player_cards = tmp_player_cards;
-
 	player_on_turn->clear_hand();
 	player_on_turn->set_new_hand(current_player_cards);
-
 	other_player->clear_hand();
 	other_player->set_new_hand(other_player_cards);
-
-	player_on_turn->get_client()->write("You have swapped your cards with the other player \r\n");
-	
+	player_on_turn->get_client()->write("You have swapped your cards with the other player \r\n");	
 	fase = GamePhase::PlayFase;
 	print_turn_info();
 }
@@ -1062,59 +967,44 @@ void GameController::magicien_trade_cards_with_bank()
 		std::shared_ptr<BuildingCard> card = player_on_turn->get_hand_cards().get_card_at(i);
 		player_on_turn->get_client()->write(card->to_string() + "\r\n");
 	}
-
 	player_on_turn->get_client()->write("which cards do you want to replace? Write the index including a comma \r\n >");
-
 	fase = GamePhase::MagicienTradeBank;
 }
 
-bool greaterThan(std::string i, std::string j) { return i > j; }
+bool greaterThan(std::string i, std::string j)
+{ 
+	return i > j; 
+}
 
 void GameController::handle_magicien_trade_bank_prop(std::string new_command)
 {
 	std::vector<std::string> card_indices;
 	std::stringstream ss(new_command);
 	std::string buffer;
-
 	while (std::getline(ss, buffer, ',')) {
 		card_indices.push_back(buffer);
 	}
-
 	std::sort(card_indices.begin(), card_indices.end(), greaterThan);
-
 	for (int x = 0; x < card_indices.size(); x++)
 	{
 		int choice = atoi(card_indices[x].c_str());
-		if ((choice == 0 && card_indices[x].compare("0") != 0) || choice > player_on_turn->get_hand_cards().size() - 1)
-		{
+		if ((choice == 0 && card_indices[x].compare("0") != 0) || choice > player_on_turn->get_hand_cards().size() - 1){
 			player_on_turn->get_client()->write("Invalid text, please fill in valid text for the numbers to exchange with the bank \r\n");
 			return;
 		}
 	}
-
 	int count_of_new_cards = card_indices.size();
-	for (int i = 0; i < card_indices.size(); i++)
-	{
+	for (int i = 0; i < card_indices.size(); i++){
 		player_on_turn->get_client()->write("Removed : " + player_on_turn->get_hand_cards().get_card_at(atoi(card_indices.at(i).c_str()))->get_name() + "\r\n");
 		player_on_turn->remove_card_from_hand(atoi(card_indices.at(i).c_str()));
 	}
-
-	for (int j = 0; j < count_of_new_cards; j++)
-	{
+	for (int j = 0; j < count_of_new_cards; j++){
 		std::shared_ptr<BuildingCard> new_card = building_cards.get_card_at_top();
 		player_on_turn->get_client()->write("You picked up : " + new_card->to_string() + "\r\n");
-
 		player_on_turn->add_card_to_hand(new_card);
 	}
-
 	fase = GamePhase::PlayFase;
-
 	print_turn_info();
-}
-
-std::vector<std::pair<int, std::string>> GameController::get_turn_choices()
-{
-	return turn_choices;
 }
 
 void GameController::set_turn_choices()
@@ -1123,10 +1013,10 @@ void GameController::set_turn_choices()
 	for (int x = 0; x < init_choices.size(); x++)
 		turn_choices.push_back(std::pair<int, std::string>(x,init_choices[x]));
 	if (player_on_turn->has_field_card("Laboratorium")){
-		turn_choices.push_back(std::pair<int, std::string>(turn_choices.size(), "Drop buildingcard and get one gold \r\n"));
+		turn_choices.push_back(std::pair<int, std::string>(5, "Drop buildingcard and get one gold \r\n"));
 	}
 	else if (player_on_turn->has_field_card("Werkplaats")){
-		turn_choices.push_back(std::pair<int, std::string>(turn_choices.size(), "Pay 3 gold and draw two building cards \r\n"));
+		turn_choices.push_back(std::pair<int, std::string>(6, "Pay 3 gold and draw two building cards \r\n"));
 	}
 }
 
@@ -1156,7 +1046,6 @@ void GameController::init()
 	MachiavelliReader reader;
 	building_cards = reader.read_building_cards("Bouwkaarten.csv");
 	character_cards = reader.read_character_cards("karakters.csv");
-
 	building_cards.shuffle_cards();
 	character_cards.shuffle_cards();
 
