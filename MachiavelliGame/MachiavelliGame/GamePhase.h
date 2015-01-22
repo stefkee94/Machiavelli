@@ -13,4 +13,5 @@ enum class GamePhase
 	CondottierePhase,
 	BuyDestroyedBuildingPhase,
 	LaboratoryPhase,
+	SchoolOfMagicPhase
 };

@@ -25,6 +25,10 @@ std::string BuildingCard::color_to_name()
 		return "Yellow";
 	}
 }
+void BuildingCard::set_color(CardColor color)
+{
+	this->color = color;
+}
 
 CardColor BuildingCard::get_card_color()
 {

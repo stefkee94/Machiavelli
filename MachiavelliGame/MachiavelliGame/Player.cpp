@@ -117,6 +117,17 @@ CardStack<std::shared_ptr<BuildingCard>> Player::get_hand_cards()
 	return hand_cards;
 }
 
+std::shared_ptr<BuildingCard> Player::get_field_card(std::string card_name)
+{
+	for (int i = 0; i < field_cards.size(); i++)
+	{
+		std::shared_ptr<BuildingCard> card = field_cards.get_card_at(i);
+		if (card->get_name().compare(card_name) == 0)
+			return card;
+	}
+	return nullptr;
+}
+
 bool Player::get_is_king()
 {
 	return is_king;

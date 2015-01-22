@@ -42,6 +42,7 @@ class GameController
 		void handle_magicien_trade_bank_prop(std::string new_command);
 		void handle_condottiere_phase(std::string new_command);
 		void handle_buy_destroyed_building(std::string new_command);
+		void handle_school_of_magic_choice(std::string new_command);
 		void handle_laboratory();
 		void handle_workplace();
 		void check_for_graveyard(std::string card_name);
