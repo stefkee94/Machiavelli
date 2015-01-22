@@ -37,7 +37,7 @@ class Player
 
 		void remove_character_card(std::string character_name);
 		void remove_field_card(std::string name);
-
+		void remove_card_from_hand(std::string name);
 		CharacterType get_char_type();
 		int get_gold();
 		int get_age();

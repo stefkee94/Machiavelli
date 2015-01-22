@@ -77,6 +77,16 @@ void Player::remove_field_card(std::string name)
 	}
 }
 
+void Player::remove_card_from_hand(std::string name)
+{
+	for (int i = 0; i < hand_cards.size(); i++){
+		if (hand_cards.get_card_at(i)->get_name().compare(name) == 0){
+			std::shared_ptr<BuildingCard> card = hand_cards.get_card_and_remove_at_index(i);
+			card.reset();
+		}
+	}
+}
+
 bool Player::get_is_robbed()
 {
 	return is_robbed;
