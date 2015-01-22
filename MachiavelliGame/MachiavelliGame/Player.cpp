@@ -4,11 +4,22 @@ Player::Player(std::shared_ptr<Socket> client, std::string name, int age) : clie
 {
 	this->is_king = false;
 	this->is_robbed = false;
+	this->finished_first = false;
 }
 
 
 Player::~Player()
 {
+}
+
+void Player::set_finished_first(bool first)
+{
+	finished_first = first;
+}
+
+bool Player::get_finished_first()
+{
+	return finished_first;
 }
 
 std::shared_ptr<Socket> Player::get_client()

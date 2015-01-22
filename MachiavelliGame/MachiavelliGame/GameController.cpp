@@ -644,7 +644,7 @@ void GameController::handle_build_card(std::string new_command)
 			{
 				players[i]->get_client()->write(player_on_turn->get_name() + " has reached a city of " + std::to_string(player_on_turn->get_field_cards().size()) + " the game has ended! finish your turns");
 				game_is_finished = true;
-				player_on_turn->add_points(4);
+				player_on_turn->set_finished_first(true);
 			}
 		}
 
@@ -713,9 +713,25 @@ void GameController::end_game()
 	for (int i = 0; i < players.size(); i++)
 	{
 		std::shared_ptr<Player> player = players[i];
+		std::map<int, CardColor> duplicate_colors;
 
+		if (player->get_finished_first())
+			player->add_points(4);
+		
 		for (int i = 0; i < player->get_field_cards().size(); i++)
+		{
 			player->add_points(player->get_field_cards().get_card_at(i)->get_points());
+			duplicate_colors.insert(std::pair<int, CardColor>(i,player->get_field_cards().get_card_at(i)->get_card_color()));
+		}
+
+		// all different colors
+		if (duplicate_colors.size() == 5)
+			player->add_points(3);
+		
+		duplicate_colors.clear();
+
+		if (!player->get_finished_first() && player->get_field_cards().size() >= 8)
+			player->add_points(2);
 	}
 	decide_winner();
 }
