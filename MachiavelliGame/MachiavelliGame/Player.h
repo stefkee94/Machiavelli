@@ -33,9 +33,10 @@ class Player
 		void set_is_robbed(bool b);
 
 		std::shared_ptr<CharacterCard> has_character(std::string character_name);
+		bool has_field_card(std::string card_name);
+
 		void remove_character_card(std::string character_name);
 		void remove_field_card(std::string name);
-		bool has_field_card();
 
 		CharacterType get_char_type();
 		int get_gold();
