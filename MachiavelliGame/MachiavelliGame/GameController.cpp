@@ -216,7 +216,9 @@ void GameController::handle_workplace()
 		player_on_turn->add_card_to_hand(card);
 		player_on_turn->get_client()->write("You picked: " + card->to_string() + "\r\n");
 	}
+
 	print_turn_info();
+
 }
 
 void GameController::handle_buy_destroyed_building(std::string new_command)
@@ -655,9 +657,9 @@ void GameController::call_next_char()
 			{
 				player_on_turn = players[i];
 				player_on_turn->set_type(card->get_type());
-				if (player_on_turn->get_char_type() == CharacterType::Merchant){
+				if (player_on_turn->get_char_type() == CharacterType::Merchant)
 					player_on_turn->add_gold(1);
-				}
+
 				if (player_on_turn->has_field_card("School voor magiërs"))
 				{
 					player_on_turn->get_client()->write("You are the master of the school of magics, which color should it become? \r\n");
@@ -806,24 +808,32 @@ void GameController::take_gold(int amount)
 void GameController::take_building_cards()
 {
 	int draw_counter = 2;
-	if (player_on_turn->has_field_card("Bibliotheek")){
+	if (player_on_turn->has_field_card("Bibliotheek"))
+	{
 		player_on_turn->get_client()->write("Thanks to the library, you may keep both cards \r\n");
-		for (int i = 0; i < draw_counter; i++){
+		for (int i = 0; i < draw_counter; i++)
+		{
 			std::shared_ptr<BuildingCard> card = building_cards.get_card_at_top();
 			player_on_turn->add_card_to_hand(card);
 			player_on_turn->get_client()->write("You picked: " + card->to_string() + "\r\n");
 		}
+
+		print_turn_info();
 	}
-	else{
-		if (player_on_turn->has_field_card("Observatorium")){
+	else
+	{
+		if (player_on_turn->has_field_card("Observatorium"))
 			draw_counter = 3;
-		}
+
 		for (int i = 0; i < draw_counter; i++)
 			picked_building_cards.push_back(building_cards.get_card_at_top());
+
 		player_on_turn->get_client()->write("You picked these cards, you have to chose one of these and throw the other away \r\n");
+
 		for (int j = 0; j < picked_building_cards.size(); j++)
 			player_on_turn->get_client()->write("[" + std::to_string(j) + "] : " + picked_building_cards[j]->to_string() + "\r\n");
 		player_on_turn->get_client()->write(">");
+
 		fase = GamePhase::ChooseBuildingCard;
 	}
 }
