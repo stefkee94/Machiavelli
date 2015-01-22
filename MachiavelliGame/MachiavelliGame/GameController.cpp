@@ -43,6 +43,8 @@ void GameController::handle_client_command(std::shared_ptr<Socket> client, std::
 			handle_steal_from_character(new_command);
 		else if (fase == GamePhase::CondottierePhase)
 			handle_condottiere_phase(new_command);
+		else if (fase == GamePhase::BuyDestroyedBuildingPhase)
+			handle_buy_destroyed_building(new_command);
 	}
 }
 
@@ -109,19 +111,55 @@ void GameController::handle_condottiere_phase(std::string new_command)
 	bool is_command_digit = false;
 	int choice;
 	choice = atoi(new_command.c_str());
-	std::shared_ptr<BuildingCard> card_to_destor = condottiere_choices[choice];
-	if (card_to_destor->get_points() > 0){
-		player_on_turn->remove_gold(card_to_destor->get_points() - 1);
+	card_to_destroy = condottiere_choices[choice];
+	if (card_to_destroy->get_points() > 0){
+		player_on_turn->remove_gold(card_to_destroy->get_points() - 1);
 	}
 	for (int i = 0; i < players.size(); i++){
 		if (player_on_turn != players[i]){
-			players[i]->remove_field_card(card_to_destor->get_name());
+			players[i]->remove_field_card(card_to_destroy->get_name());
+		}
+	}
+	check_for_graveyard(card_to_destroy->get_name());
+}
+
+void GameController::check_for_graveyard(std::string card_name)
+{
+	for (int i = 0; i < players.size(); i++){
+		if (players[i]->has_field_card("Kerkhof") && players[i]->get_char_type() != CharacterType::Condottiere){
+			fase = GamePhase::BuyDestroyedBuildingPhase;
+			player_on_turn = players[i];
+			player_on_turn->get_client()->write("You got the graveyard! \r\n");
+			player_on_turn->get_client()->write("Would you like to buy " + card_name + "for 1 gold? \r\n");
+			player_on_turn->get_client()->write("[0]: Yes \r\n");
+			player_on_turn->get_client()->write("[1]: No \r\n");
+		}
+	}
+}
+
+void GameController::handle_buy_destroyed_building(std::string new_command)
+{
+	int choice;
+	choice = atoi(new_command.c_str());
+	switch (choice){
+	case 0:
+		player_on_turn->remove_gold(1);
+		player_on_turn->add_card_to_hand(card_to_destroy);
+		player_on_turn->get_client()->write("You bought " + card_to_destroy->to_string());
+		card_to_destroy.reset();
+		break;
+	case 1:
+		card_to_destroy.reset();
+		break;
+	}
+	for (int i = 0; i < players.size(); i++){
+		if (players[i]->get_char_type() == CharacterType::Condottiere){
+			player_on_turn = players[i];
 		}
 	}
 	fase = GamePhase::PlayFase;
 	print_turn_info();
 }
-
 void GameController::handle_dismiss_char_command(std::string new_command)
 {
 	bool is_command_digit = false;
@@ -346,7 +384,10 @@ void GameController::handle_char_property()
 				std::shared_ptr<Player> player = players[i];
 				if (player_on_turn != player){
 						for (int a = 0; a < player->get_field_cards().size(); a++){
-							condottiere_choices.insert(std::make_pair(a, player->get_field_cards().get_card_at(a)));
+							std::shared_ptr<BuildingCard> card = player->get_field_cards().get_card_at(a);
+							if (card->get_name().compare("Kerker") != 0){
+								condottiere_choices.insert(std::make_pair(a, player->get_field_cards().get_card_at(a)));
+							}
 						}
 				}
 			}

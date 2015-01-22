@@ -16,5 +16,6 @@ class BuildingCard
 		std::string name;
 		int points;
 		CardColor color;
+		std::string effect;
 };
 

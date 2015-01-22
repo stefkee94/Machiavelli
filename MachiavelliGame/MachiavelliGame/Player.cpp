@@ -32,6 +32,15 @@ std::shared_ptr<CharacterCard> Player::has_character(std::string character_name)
 	return nullptr;
 }
 
+bool Player::has_field_card(std::string card_name)
+{
+	for (int i = 0; i < field_cards.size(); i++){
+		if (field_cards.get_card_at(i)->get_name().compare(card_name) == 0){
+			return true;
+		}
+	}
+	return false;
+}
 void Player::set_type(CharacterType type){
 	character_type = type;
 }

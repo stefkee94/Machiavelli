@@ -10,5 +10,6 @@ enum class GamePhase
 	BuildCard,
 	MagicienProperty,
 	MagicienTradeBank,
-	CondottierePhase
+	CondottierePhase,
+	BuyDestroyedBuildingPhase
 };
