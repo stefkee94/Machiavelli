@@ -768,15 +768,22 @@ void GameController::reset_characters()
 
 void GameController::set_new_king()
 {
+	std::shared_ptr<Player> temp;
 	for (int i = 0; i < players.size(); i++){
-		if (players[i]->has_character("King") != nullptr || players[i]->get_is_king()){
+		if (players[i]->get_is_king()){
+			temp = players[i];
+		}
+		players[i]->set_is_king(false);
+	}
+	for (int i = 0; i < players.size(); i++){
+		if (players[i]->has_character("King") != nullptr){
 			players[i]->set_is_king(true);
 			player_on_turn = players[i];
 		}
-		else{
-			players[i]->set_is_king(false);
-		}
+		return;
 	}
+	player_on_turn = temp;
+	player_on_turn->set_is_king(true);
 }
 
 void GameController::print_turn_info()

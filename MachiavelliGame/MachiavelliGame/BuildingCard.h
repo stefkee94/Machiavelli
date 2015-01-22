@@ -14,8 +14,8 @@ class BuildingCard
 		CardColor get_card_color();
 		std::string to_string();
 		void set_color(CardColor color);
-
 		std::string get_effect();
+
 	private:
 		std::string name;
 		int points;
