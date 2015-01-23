@@ -99,6 +99,43 @@
               </associationHasOwnedEnds>
             </relationshipOwnedElementsInternal>
           </association>
+          <association
+            Id="8b29f507-016d-4bbf-848b-4a7b007959b5"
+            isDerived="false"
+            sourceEndRoleName=""
+            targetEndRoleName=""
+            isLeaf="false"
+            isAbstract="false">
+            <enumerationMoniker
+              Id="1a08279d-7a30-454b-a4f8-44455b5b5e09"
+              LastKnownName="GamePhase"
+              LastKnownLocation="Package_0937.uml" />
+            <relationshipOwnedElementsInternal>
+              <associationHasOwnedEnds>
+                <memberEnd
+                  Id="484a6f47-70d9-4390-aca7-dbd04bd6f846"
+                  isLeaf="false"
+                  isStatic="false"
+                  isReadOnly="false"
+                  isDerived="false"
+                  isDerivedUnion="false"
+                  aggregation="None"
+                  isComposite="false"
+                  isNavigableOwned="false" />
+              </associationHasOwnedEnds>
+              <associationHasOwnedEnds>
+                <memberEnd
+                  Id="4a588ec3-a2a4-4352-bb86-d60443269067"
+                  isLeaf="false"
+                  isStatic="false"
+                  isReadOnly="false"
+                  isDerived="false"
+                  isDerivedUnion="false"
+                  aggregation="None"
+                  isComposite="false" />
+              </associationHasOwnedEnds>
+            </relationshipOwnedElementsInternal>
+          </association>
         </targetEnds>
       </class>
     </packageHasNamedElement>
@@ -655,6 +692,111 @@
               <associationHasOwnedEnds>
                 <memberEnd
                   Id="22fbeb04-5f20-4848-8b46-66a9942fb18c"
+                  isLeaf="false"
+                  isStatic="false"
+                  isReadOnly="false"
+                  isDerived="false"
+                  isDerivedUnion="false"
+                  aggregation="None"
+                  isComposite="false" />
+              </associationHasOwnedEnds>
+            </relationshipOwnedElementsInternal>
+          </association>
+        </targetEnds>
+      </class>
+    </packageHasNamedElement>
+    <packageHasNamedElement>
+      <enumeration
+        Id="1a08279d-7a30-454b-a4f8-44455b5b5e09"
+        name="GamePhase"
+        isAbstract="false"
+        isLeaf="false" />
+    </packageHasNamedElement>
+    <packageHasNamedElement>
+      <class
+        Id="22f85f9c-a461-44e3-8882-ae276ac5005d"
+        name="ClientCommand"
+        isAbstract="false"
+        isLeaf="false"
+        isActiveClass="false">
+        <targetEnds>
+          <association
+            Id="23e4e460-67c0-4b20-8277-001a05fa738a"
+            isDerived="false"
+            sourceEndRoleName=""
+            targetEndRoleName=""
+            isLeaf="false"
+            isAbstract="false">
+            <classMoniker
+              Id="78e6d4b8-522c-4cf5-981f-96d6eb14c5d0"
+              LastKnownName="ServerController"
+              LastKnownLocation="Package_0937.uml" />
+            <relationshipOwnedElementsInternal>
+              <associationHasOwnedEnds>
+                <memberEnd
+                  Id="ed1bb508-c340-4aa2-8a56-aca9b5bbdd34"
+                  isLeaf="false"
+                  isStatic="false"
+                  isReadOnly="false"
+                  isDerived="false"
+                  isDerivedUnion="false"
+                  aggregation="None"
+                  isComposite="false"
+                  isNavigableOwned="false" />
+              </associationHasOwnedEnds>
+              <associationHasOwnedEnds>
+                <memberEnd
+                  Id="1135de43-0f7c-4d66-84ac-017822997432"
+                  isLeaf="false"
+                  isStatic="false"
+                  isReadOnly="false"
+                  isDerived="false"
+                  isDerivedUnion="false"
+                  aggregation="None"
+                  isComposite="false" />
+              </associationHasOwnedEnds>
+            </relationshipOwnedElementsInternal>
+          </association>
+        </targetEnds>
+      </class>
+    </packageHasNamedElement>
+    <packageHasNamedElement>
+      <class
+        Id="ae3e4342-3fd9-4786-8059-26775891005e"
+        name="Socket"
+        isAbstract="false"
+        isLeaf="false"
+        isActiveClass="false">
+        <targetEnds>
+          <association
+            Id="66ca77e5-e771-49d8-a3d9-c5132aaa56ea"
+            isDerived="false"
+            sourceEndRoleName="Socket"
+            targetEndRoleName="ServerController"
+            isLeaf="false"
+            isAbstract="false">
+            <classMoniker
+              Id="78e6d4b8-522c-4cf5-981f-96d6eb14c5d0"
+              LastKnownName="ServerController"
+              LastKnownLocation="Package_0937.uml" />
+            <relationshipOwnedElementsInternal>
+              <associationHasOwnedEnds>
+                <memberEnd
+                  Id="33e76836-c92f-46dc-8252-f00df939b1c5"
+                  name="Socket"
+                  isLeaf="false"
+                  isStatic="false"
+                  isReadOnly="false"
+                  isDerived="false"
+                  isDerivedUnion="false"
+                  aggregation="None"
+                  isComposite="false"
+                  isNavigableOwned="false" />
+              </associationHasOwnedEnds>
+              <associationHasOwnedEnds>
+                <memberEnd
+                  Id="471f10bb-1b6b-4430-a0d2-e7fac63046be"
+                  name="ServerController"
                   isLeaf="false"
                   isStatic="false"
                   isReadOnly="false"
