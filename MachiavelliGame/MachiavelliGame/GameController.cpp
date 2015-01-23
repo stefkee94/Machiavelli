@@ -204,7 +204,7 @@ void GameController::handle_school_of_magic_choice(std::string new_command)
 void GameController::handle_workplace()
 {
 	if (player_on_turn->get_gold() < 3){
-		player_on_turn->get_client()->write("You dont have enough moneys \r\n");
+		player_on_turn->get_client()->write("You dont have enough gold \r\n");
 		return;
 	}
 	player_on_turn->remove_gold(3);
@@ -285,16 +285,16 @@ void GameController::handle_play_turn_command(std::string new_command)
 				break;
 			case 2:
 			{
-					  if (player_on_turn->get_char_type() == CharacterType::Architect)
-					  {
-						  count_builded_in_turn_for_architect++;
-						  if (count_builded_in_turn_for_architect >= 3)
-							  remove_choice(choice);
-					  }
-					  else{
-						  remove_choice(choice);
-					  }
-					  build_building_card();
+				if (player_on_turn->get_char_type() == CharacterType::Architect)
+				{
+					count_builded_in_turn_for_architect++;
+					if (count_builded_in_turn_for_architect >= 3)
+						remove_choice(choice);
+				}
+				else{
+					remove_choice(choice);
+				}
+				build_building_card();
 			}
 				break;
 			case 3:
@@ -583,6 +583,7 @@ void GameController::handle_build_card(std::string new_command)
 		if (chosen_building_card->get_points() > player_on_turn->get_gold()){
 			player_on_turn->get_client()->write("Can't play this card because you need " + std::to_string(chosen_building_card->get_points()) + " points to play it \r\n");
 			phase = GamePhase::PlayFase;
+			print_turn_info();
 		}
 		else{
 			player_on_turn->remove_gold(chosen_building_card->get_points());
@@ -673,7 +674,7 @@ void GameController::end_game()
 			player->add_points(4);
 		if (player->get_field_cards().size() > 7)
 			player->add_points(2);
-		if (player->has_five_of_same_color()){
+		if (player->has_five_of_different_colors()){
 			player->add_points(3);
 		}
 		for (int i = 0; i < player->get_field_cards().size(); i++)
@@ -1035,8 +1036,8 @@ void GameController::remove_choice(int index)
 void GameController::show_help_text(std::shared_ptr<Socket> client)
 {
 	client->write("\r\nFront : \r\n");
-	client->write("Inkomsten -> Take 2 gold or take 2 building cards and choose one \r\n");
-	client->write("Bouwen -> Build 1 building card and pay the value \r\n");
+	client->write("Income -> Take 2 gold or take 2 building cards and choose one \r\n");
+	client->write("Build -> Build 1 building card and pay the value \r\n");
 	client->write("Character property can be used at every moment when it's your turn \r\n");
 	client->write("1. Murderer -> Kill another character \r\n");
 	client->write("2. Thief -> Steal from another character \r\n");

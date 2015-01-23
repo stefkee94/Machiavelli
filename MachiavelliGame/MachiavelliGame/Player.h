@@ -29,7 +29,7 @@ class Player
 		void reset_character_cards();
 		bool get_is_robbed();
 		void set_is_robbed(bool b);
-		bool has_five_of_same_color();
+		bool has_five_of_different_colors();
 		std::string get_name();
 		void add_points(int points);
 

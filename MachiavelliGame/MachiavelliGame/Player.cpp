@@ -23,7 +23,7 @@ bool Player::get_finished_first()
 	return finished_first;
 }
 
-bool Player::has_five_of_same_color()
+bool Player::has_five_of_different_colors()
 {
 	int yellow = 0;
 	int blue = 0;
@@ -49,7 +49,7 @@ bool Player::has_five_of_same_color()
 			break;
 		}
 	}
-	if (yellow > 4 || blue > 4 || green > 4 || lilac > 4 || red > 4){
+	if (yellow >= 1 && blue >= 1 && green >= 1 && lilac >= 1 && red >= 1){
 		return true;
 	}
 	else{
